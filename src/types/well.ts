@@ -7,6 +7,8 @@ export interface Casing {
   base: number;           // pies
   isLiner: boolean;
   linerType?: 'slot' | 'shoot';
+  weight?: number;            // lb/ft
+  grade?: string;             // e.g. 'J-55', 'N-80', 'P-110'
 }
 
 export interface TubingSegment {

@@ -10,3 +10,4 @@ export { default as GasAnchorIcon } from './GasAnchorIcon';
 export { default as PackingIcon } from './PackingIcon';
 export { default as WireIcon } from './WireIcon';
 export { default as ShoeIcon } from './ShoeIcon';
+export { default as HangerIcon } from './HangerIcon';

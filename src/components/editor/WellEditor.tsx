@@ -52,7 +52,7 @@ export default function WellEditor() {
         </div>
         <table className="editor-table">
           <thead>
-            <tr><th>Diám.</th><th>Tope</th><th>Base</th><th>Liner</th><th></th></tr>
+            <tr><th>Diám.</th><th>Tope</th><th>Base</th><th>Liner</th><th>Peso (lb/ft)</th><th>Grado</th><th></th></tr>
           </thead>
           <tbody>
             {well.casings.map((c: Casing) => (
@@ -61,6 +61,8 @@ export default function WellEditor() {
                 <td><input type="number" value={c.top} onChange={e => updateElement('casings', c.id, { top: +e.target.value })} /></td>
                 <td><input type="number" value={c.base} onChange={e => updateElement('casings', c.id, { base: +e.target.value })} /></td>
                 <td><input type="checkbox" checked={c.isLiner} onChange={e => updateElement('casings', c.id, { isLiner: e.target.checked })} /></td>
+                <td><input type="number" step="0.1" value={c.weight ?? ''} placeholder="—" onChange={e => updateElement('casings', c.id, { weight: e.target.value ? +e.target.value : undefined })} /></td>
+                <td><input type="text" value={c.grade ?? ''} placeholder="J-55" onChange={e => updateElement('casings', c.id, { grade: e.target.value || undefined })} /></td>
                 <td><button className="btn-delete" onClick={() => removeElement('casings', c.id)}>×</button></td>
               </tr>
             ))}
