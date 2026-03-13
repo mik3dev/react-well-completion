@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { DiagramConfig, Well } from '../types';
 
 const DIAMETER_SCALE = 40; // divide el ancho entre 40 para obtener px/pulgada
+const DEPTH_GAMMA = 1.5;   // γ>1 → más píxeles para secciones profundas
 
 export function useDiagramConfig(
   width: number,
@@ -25,8 +26,10 @@ export function useDiagramConfig(
     const pulgada = width / DIAMETER_SCALE;
     const pxPerFt = height / maxDepth;
     const centerX = width / 2;
+    const depthToY = (depth: number) =>
+      Math.pow(depth / maxDepth, DEPTH_GAMMA) * height;
 
-    return { width, height, pulgada, pxPerFt, centerX, maxDepth };
+    return { width, height, pulgada, pxPerFt, centerX, maxDepth, depthToY };
   }, [width, height, well]);
 }
 

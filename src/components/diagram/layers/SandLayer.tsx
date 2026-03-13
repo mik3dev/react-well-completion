@@ -15,8 +15,8 @@ export default function SandLayer({ sands, minCasingDiameter, config }: Props) {
   return (
     <g className="layer-sands">
       {sands.map((sand) => {
-        const y = sand.top * config.pxPerFt;
-        const h = (sand.base - sand.top) * config.pxPerFt;
+        const y = config.depthToY(sand.top);
+        const h = config.depthToY(sand.base) - y;
         const pattern = sand.segment % 2 === 0 ? 'url(#sandB)' : 'url(#sandA)';
         const info = [`${sand.name}`, `Tope: ${sand.top} ft`, `Base: ${sand.base} ft`];
 

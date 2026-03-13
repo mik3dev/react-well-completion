@@ -18,8 +18,8 @@ export default function CasingLayer({ casings, config }: Props) {
     <g className="layer-casings">
       {sorted.map((casing, idx) => {
         const { x1, x2 } = diameterToX(config, casing.diameter);
-        const y = casing.top * config.pxPerFt;
-        const h = (casing.base - casing.top) * config.pxPerFt;
+        const y = config.depthToY(casing.top);
+        const h = config.depthToY(casing.base) - y;
         const label = casing.isLiner ? 'Liner' : 'Casing';
         const color = casing.isLiner ? 'gray' : 'darkgray';
 

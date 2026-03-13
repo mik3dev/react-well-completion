@@ -13,10 +13,13 @@ export default function PumpLayer({ pump, config }: Props) {
 
   const pumpWidth = pump.diameter * config.pulgada;
   const x = config.centerX - pumpWidth / 2;
-  const y = pump.depth * config.pxPerFt;
+  const y = config.depthToY(pump.depth);
   // Height proportional to width (aspect ratio ~2.5:1 for BM/BCP, ~3:1 for BES)
   const minH = pump.type === 'BES' ? pumpWidth * 3 : pumpWidth * 2.5;
-  const pumpHeight = Math.max(pump.length * config.pxPerFt, minH);
+  const scaledH = pump.length > 0
+    ? config.depthToY(pump.depth + pump.length) - y
+    : 0;
+  const pumpHeight = Math.max(scaledH, minH);
 
   const labels: Record<string, string> = {
     BM: 'Bomba Mecánica',

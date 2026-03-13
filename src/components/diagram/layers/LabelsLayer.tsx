@@ -43,8 +43,8 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
       {/* Casing labels — right side */}
       {visible.casings && well.casings.map(c => {
         const { x2 } = diameterToX(config, c.diameter);
-        const yTop = c.top * config.pxPerFt;
-        const yBase = c.base * config.pxPerFt;
+        const yTop = config.depthToY(c.top);
+        const yBase = config.depthToY(c.base);
         const yMid = (yTop + yBase) / 2;
         const label = `${c.diameter}" ${c.isLiner ? 'Liner' : 'Csg'}`;
 
@@ -68,7 +68,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
             acc += t.length;
             const base = acc;
             const { x1 } = diameterToX(config, t.diameter);
-            const yMid = ((top + base) / 2) * config.pxPerFt;
+            const yMid = (config.depthToY(top) + config.depthToY(base)) / 2;
 
             return (
               <g key={`label-tbg-${t.id}`}>
@@ -89,7 +89,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
             const top = acc;
             acc += r.length;
             const base = acc;
-            const yMid = ((top + base) / 2) * config.pxPerFt;
+            const yMid = (config.depthToY(top) + config.depthToY(base)) / 2;
 
             return (
               <g key={`label-rod-${r.id}`}>
@@ -101,7 +101,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
 
       {/* Pump label */}
       {visible.pump && well.pump && (() => {
-        const y = well.pump.depth * config.pxPerFt;
+        const y = config.depthToY(well.pump.depth);
         const labels: Record<string, string> = {
           BM: 'B. Mecánica',
           BCP: 'BCP',
@@ -118,7 +118,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
       {/* Sand labels — left side */}
       {visible.sands && well.sands.map(s => {
         const { x1 } = diameterToX(config, minCasingDiameter);
-        const yMid = ((s.top + s.base) / 2) * config.pxPerFt;
+        const yMid = (config.depthToY(s.top) + config.depthToY(s.base)) / 2;
         return (
           <g key={`label-sand-${s.id}`}>
             <LeaderLine x1={0} y1={yMid} x2={x1 - 5} y2={yMid} />
@@ -131,7 +131,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
       {/* Perforation labels — right side */}
       {visible.perforations && well.perforations.map(p => {
         const { x2 } = diameterToX(config, minCasingDiameter);
-        const yMid = ((p.top + p.base) / 2) * config.pxPerFt;
+        const yMid = (config.depthToY(p.top) + config.depthToY(p.base)) / 2;
         const tipo = p.type === 'shoot' ? 'Cañ.' : 'Ran.';
         return (
           <g key={`label-perf-${p.id}`}>
@@ -143,7 +143,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
 
       {/* Packer labels */}
       {visible.packers && well.packers.map(p => {
-        const y = p.depth * config.pxPerFt;
+        const y = config.depthToY(p.depth);
         return (
           <g key={`label-pkr-${p.id}`}>
             <Label x={rightMargin} y={y} text={`Packer @ ${p.depth}'`} />
@@ -153,7 +153,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
 
       {/* Nipple labels */}
       {visible.nipples && well.seatNipples.map(n => {
-        const y = n.depth * config.pxPerFt;
+        const y = config.depthToY(n.depth);
         const tipo = n.type === 'polished' ? 'N.Pulido' : 'N.Asiento';
         return (
           <g key={`label-nip-${n.id}`}>
@@ -165,7 +165,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
       {/* Mandrel labels */}
       {visible.mandrels && well.mandrels.map(m => {
         const { x2 } = diameterToX(config, m.diameter);
-        const y = m.depth * config.pxPerFt;
+        const y = config.depthToY(m.depth);
         const valvula = m.hasValve ? ' +VGL' : '';
         return (
           <g key={`label-mdr-${m.id}`}>
@@ -194,8 +194,8 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         });
 
         return Object.entries(byYac).map(([yacName, yacPerfs]) => {
-          const yacTop  = Math.min(...yacPerfs.map(p => p.top))  * config.pxPerFt;
-          const yacBase = Math.max(...yacPerfs.map(p => p.base)) * config.pxPerFt;
+          const yacTop  = config.depthToY(Math.min(...yacPerfs.map(p => p.top)));
+          const yacBase = config.depthToY(Math.max(...yacPerfs.map(p => p.base)));
           const yacMid  = (yacTop + yacBase) / 2;
 
           // Group by arena within yacimiento
@@ -217,8 +217,8 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
               <Label x={xYac - 3} y={yacMid} text={yacName} anchor="end" />
 
               {Object.entries(byArena).map(([arenaName, aPerfs]) => {
-                const aTop  = Math.min(...aPerfs.map(p => p.top))  * config.pxPerFt;
-                const aBase = Math.max(...aPerfs.map(p => p.base)) * config.pxPerFt;
+                const aTop  = config.depthToY(Math.min(...aPerfs.map(p => p.top)));
+                const aBase = config.depthToY(Math.max(...aPerfs.map(p => p.base)));
                 const aMid  = (aTop + aBase) / 2;
 
                 return (
@@ -234,7 +234,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
                     )}
                     {/* Interval list */}
                     {aPerfs.map(p => {
-                      const yMid    = ((p.top + p.base) / 2) * config.pxPerFt;
+                      const yMid    = (config.depthToY(p.top) + config.depthToY(p.base)) / 2;
                       const espesor = p.base - p.top;
                       const xText   = hasArenas ? xInterval : xInterval;
                       return (
@@ -267,7 +267,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
 
         const sortedDepths = [...depths].sort((a, b) => a - b);
         return sortedDepths.map(d => {
-          const y = d * config.pxPerFt;
+          const y = config.depthToY(d);
           return (
             <g key={`depth-${d}`}>
               <line x1={0} y1={y} x2={width} y2={y} stroke="#f44336" strokeWidth={0.3} strokeDasharray="4,3" />

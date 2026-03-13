@@ -16,7 +16,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
     <g className="layer-accessories">
       {/* Packers */}
       {well.packers.map((packer) => {
-        const y = packer.depth * config.pxPerFt;
+        const y = config.depthToY(packer.depth);
         const { x1, x2 } = diameterToX(config, packer.diameter);
         const packerW = config.pulgada * 1.5;
         const packerH = packerW * 1.2; // aspect ratio ~1.2:1
@@ -37,7 +37,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
 
       {/* Seat Nipples */}
       {well.seatNipples.map((nipple) => {
-        const y = nipple.depth * config.pxPerFt;
+        const y = config.depthToY(nipple.depth);
         const { x1, x2 } = diameterToX(config, nipple.diameter);
         const nW = config.pulgada * 0.5;
         const nH = nW * 1.5; // taller than wide
@@ -57,7 +57,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
 
       {/* Plugs */}
       {well.plugs.map((plug) => {
-        const y = plug.depth * config.pxPerFt;
+        const y = config.depthToY(plug.depth);
         const { x1, x2 } = diameterToX(config, minCasingDiameter);
         const plugH = config.pulgada * 0.6;
 
@@ -75,9 +75,10 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
       {/* Gas Anchors */}
       {well.gasAnchors.map((ga) => {
         const { x1, x2 } = diameterToX(config, ga.diameter);
-        const y = ga.depth * config.pxPerFt;
+        const y = config.depthToY(ga.depth);
         const gaWidth = x2 - x1;
-        const h = Math.max(ga.length * config.pxPerFt, gaWidth * 2.5);
+        const scaledH = ga.length > 0 ? config.depthToY(ga.depth + ga.length) - y : 0;
+        const h = Math.max(scaledH, gaWidth * 2.5);
 
         return (
           <g key={ga.id}
@@ -93,7 +94,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
       {/* Sleeves */}
       {well.sleeves.map((sleeve) => {
         const { x1, x2 } = diameterToX(config, sleeve.diameter);
-        const y = sleeve.depth * config.pxPerFt;
+        const y = config.depthToY(sleeve.depth);
         const sleeveWidth = x2 - x1;
         const h = sleeveWidth * 0.8; // slightly wider than tall
 
@@ -111,7 +112,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
       {/* Packings */}
       {well.packings.map((pk) => {
         const { x1, x2 } = diameterToX(config, pk.diameter);
-        const y = pk.depth * config.pxPerFt;
+        const y = config.depthToY(pk.depth);
         const pkW = config.pulgada * 1.2;
         const pkH = pkW * 1; // square-ish
 
@@ -130,7 +131,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
       {/* Mandrels (Gas Lift) */}
       {well.mandrels.map((mandrel) => {
         const { x2 } = diameterToX(config, mandrel.diameter);
-        const y = mandrel.depth * config.pxPerFt;
+        const y = config.depthToY(mandrel.depth);
         const mW = config.pulgada * 1.2;
         const mH = mW * 1.5; // taller pocket
         const label = mandrel.hasValve ? 'Mandril + Válvula GL' : 'Mandril (sin válvula)';
