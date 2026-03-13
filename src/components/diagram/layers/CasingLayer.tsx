@@ -1,5 +1,4 @@
 import type { DiagramConfig, Casing } from '../../../types';
-import { diameterToX } from '../../../hooks/use-diagram-config';
 import { useTooltip } from '../Tooltip';
 import { ShoeIcon, HangerIcon } from '../icons';
 
@@ -24,20 +23,53 @@ function buildLabel(c: Casing): string {
   return `Rev. ${d}"${weightPart}${gradePart} a ${c.base}'`;
 }
 
+/**
+ * Calcula posiciones esquemáticas para los casings de ADENTRO HACIA AFUERA.
+ * El casing más interno (liner de producción) usa su posición proporcional real,
+ * preservando el espacio con el tubing. Los casings exteriores se expanden hacia
+ * afuera cuando la diferencia de diámetro real es insuficiente para el gap mínimo.
+ */
+function computeSchematicPositions(
+  sorted: Casing[],    // sorted[0] = mayor diámetro (exterior)
+  config: DiagramConfig,
+  WALL: number,
+  MIN_GAP: number,
+): { x1: number; x2: number }[] {
+  const n = sorted.length;
+  const x1s = new Array<number>(n);
+
+  // Partir del más interno (último en sorted) con posición natural
+  x1s[n - 1] = config.centerX - (sorted[n - 1].diameter / 2) * config.pulgada;
+
+  // Trabajar hacia afuera: cada casing exterior debe estar al menos WALL+MIN_GAP
+  // a la IZQUIERDA del siguiente casing interior
+  for (let i = n - 2; i >= 0; i--) {
+    const naturalX1 = config.centerX - (sorted[i].diameter / 2) * config.pulgada;
+    const maxX1 = x1s[i + 1] - WALL - MIN_GAP; // no puede solaparse con el interior
+    x1s[i] = Math.min(naturalX1, maxX1);         // tomar el más a la izquierda
+  }
+
+  return x1s.map(x1 => ({ x1, x2: config.centerX * 2 - x1 }));
+}
+
 export default function CasingLayer({ casings, config }: Props) {
   const { show, move, hide } = useTooltip();
   const WALL = 5;
-  const shoeH = WALL * 2;        // 10px — altura vertical de la zapata
-  const shoeW = WALL * 3;        // 15px — extensión horizontal hacia afuera
-  const hangerH = WALL * 4;      // 20px — espacio reservado (offset de pared del liner)
-  const hangerBlockH = WALL;     // 5px  — altura del bloque del colgador (delgado)
+  const MIN_CASING_GAP = 12;    // px mínimos entre paredes de casings adyacentes
+  const shoeH = WALL * 2;       // 10px
+  const shoeW = WALL * 3;       // 15px
+  const hangerH = WALL * 4;     // 20px — espacio total reservado para el colgador
+  const hangerBlockH = WALL;    //  5px — altura del bloque del colgador
 
   const sorted = [...casings].sort((a, b) => b.diameter - a.diameter);
+
+  // Posiciones esquemáticas: gap mínimo garantizado entre casings adyacentes
+  const positions = computeSchematicPositions(sorted, config, WALL, MIN_CASING_GAP);
 
   return (
     <g className="layer-casings">
       {sorted.map((casing, idx) => {
-        const { x1, x2 } = diameterToX(config, casing.diameter);
+        const { x1, x2 } = positions[idx];
         const y = config.depthToY(casing.top);
         const h = config.depthToY(casing.base) - y;
         const label = casing.isLiner ? 'Liner' : 'Casing';
@@ -50,11 +82,11 @@ export default function CasingLayer({ casings, config }: Props) {
           `Diámetro: ${casing.diameter}"`,
         ];
 
-        // Conector horizontal de escalonamiento: solo para casings sin colgador
+        // Conector horizontal para casings sin colgador (reducción de diámetro sin liner)
         const prev = idx > 0 ? sorted[idx - 1] : null;
         let connector = null;
         if (prev && prev.diameter > casing.diameter && !hasHanger) {
-          const { x1: px1, x2: px2 } = diameterToX(config, prev.diameter);
+          const { x1: px1, x2: px2 } = positions[idx - 1];
           connector = (
             <g>
               <line x1={px1} y1={y} x2={x1} y2={y} stroke="black" strokeWidth={2} />
@@ -63,26 +95,27 @@ export default function CasingLayer({ casings, config }: Props) {
           );
         }
 
-        // Pared del liner: empieza hangerH px más abajo para dejar espacio al colgador
+        // Pared del liner empieza hangerH px abajo para dejar espacio visible al colgador
         const wallY = y + (hasHanger ? hangerH : 0);
         const wallH = h - (hasHanger ? hangerH : 0);
 
-        // earW del colgador: se calcula dinámicamente para llegar exactamente desde
-        // la cara interior del casing padre hasta la cara exterior del liner.
-        // Esto asegura que el bloque visible "cruce" el espacio anular entre casings.
-        let earW = WALL; // fallback
-        if (hasHanger) {
-          const parent = sorted.find(
-            c => c !== casing &&
-                 c.diameter > casing.diameter &&
-                 c.top <= casing.top &&
-                 c.base >= casing.top
-          );
-          if (parent) {
-            const { x1: px1 } = diameterToX(config, parent.diameter);
-            // gap = distancia entre cara interior del padre y cara exterior del liner
-            // earW hace que el bloque empiece en la cara interior del padre
-            earW = Math.max(x1 - px1 - WALL, WALL / 2);
+        // earW del colgador: cruza todo el gap entre el casing padre y este liner.
+        // Con posiciones esquemáticas el gap siempre es >= MIN_CASING_GAP.
+        let earW = MIN_CASING_GAP; // default: gap mínimo garantizado
+        if (hasHanger && idx > 0) {
+          // Buscar el índice del casing padre (el más cercano que lo contenga)
+          let parentIdx = -1;
+          for (let i = idx - 1; i >= 0; i--) {
+            const c = sorted[i];
+            if (c.diameter > casing.diameter && c.top <= casing.top && c.base >= casing.top) {
+              parentIdx = i;
+              break;
+            }
+          }
+          if (parentIdx >= 0) {
+            const parentX1 = positions[parentIdx].x1;
+            // Gap real entre cara interior del padre y cara exterior de este liner
+            earW = Math.max(x1 - parentX1 - WALL, WALL / 2);
           }
         }
 
@@ -93,10 +126,11 @@ export default function CasingLayer({ casings, config }: Props) {
           <g key={casing.id}>
             {connector}
 
-            {/* Colgador: bloque delgado que cruza todo el espacio anular entre casings */}
+            {/* Colgador: bloque centrado en el espacio hangerH */}
             {hasHanger && (
               <HangerIcon
-                x1={x1} x2={x2} y={y + (hangerH - hangerBlockH) / 2}
+                x1={x1} x2={x2}
+                y={y + hangerH - hangerBlockH}
                 earW={earW} wall={WALL} h={hangerBlockH}
               />
             )}
