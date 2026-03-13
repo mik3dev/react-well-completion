@@ -174,6 +174,87 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         );
       })}
 
+      {/* Yacimiento / Arena labels — left side, hierarchical brackets */}
+      {visible.yacimientos && (() => {
+        const withYac = well.perforations.filter(p => p.yacimiento);
+        if (withYac.length === 0) return null;
+
+        const { x1 } = diameterToX(config, minCasingDiameter);
+        const xInterval  = x1 - 6;   // interval text (anchor=end)
+        const xArena     = x1 - 42;  // arena bracket spine
+        const xYac       = x1 - 80;  // yacimiento bracket spine
+        const bracketColor = '#555';
+
+        // Group by yacimiento
+        const byYac: Record<string, typeof withYac> = {};
+        withYac.forEach(p => {
+          const k = p.yacimiento!;
+          if (!byYac[k]) byYac[k] = [];
+          byYac[k].push(p);
+        });
+
+        return Object.entries(byYac).map(([yacName, yacPerfs]) => {
+          const yacTop  = Math.min(...yacPerfs.map(p => p.top))  * config.pxPerFt;
+          const yacBase = Math.max(...yacPerfs.map(p => p.base)) * config.pxPerFt;
+          const yacMid  = (yacTop + yacBase) / 2;
+
+          // Group by arena within yacimiento
+          const byArena: Record<string, typeof yacPerfs> = {};
+          yacPerfs.forEach(p => {
+            const k = p.arena ?? '__none__';
+            if (!byArena[k]) byArena[k] = [];
+            byArena[k].push(p);
+          });
+
+          const hasArenas = Object.keys(byArena).some(k => k !== '__none__');
+
+          return (
+            <g key={`yac-lbl-${yacName}`}>
+              {/* Yacimiento bracket */}
+              <line x1={xYac} y1={yacTop}  x2={xYac + 6} y2={yacTop}  stroke={bracketColor} strokeWidth={0.8} />
+              <line x1={xYac} y1={yacBase} x2={xYac + 6} y2={yacBase} stroke={bracketColor} strokeWidth={0.8} />
+              <line x1={xYac} y1={yacTop}  x2={xYac}     y2={yacBase} stroke={bracketColor} strokeWidth={0.8} />
+              <Label x={xYac - 3} y={yacMid} text={yacName} anchor="end" />
+
+              {Object.entries(byArena).map(([arenaName, aPerfs]) => {
+                const aTop  = Math.min(...aPerfs.map(p => p.top))  * config.pxPerFt;
+                const aBase = Math.max(...aPerfs.map(p => p.base)) * config.pxPerFt;
+                const aMid  = (aTop + aBase) / 2;
+
+                return (
+                  <g key={`arena-lbl-${arenaName}`}>
+                    {/* Arena bracket (only when arena field is set) */}
+                    {arenaName !== '__none__' && (
+                      <>
+                        <line x1={xArena} y1={aTop}  x2={xArena + 5} y2={aTop}  stroke={bracketColor} strokeWidth={0.7} />
+                        <line x1={xArena} y1={aBase} x2={xArena + 5} y2={aBase} stroke={bracketColor} strokeWidth={0.7} />
+                        <line x1={xArena} y1={aTop}  x2={xArena}     y2={aBase} stroke={bracketColor} strokeWidth={0.7} />
+                        <Label x={xArena - 3} y={aMid} text={arenaName} anchor="end" />
+                      </>
+                    )}
+                    {/* Interval list */}
+                    {aPerfs.map(p => {
+                      const yMid    = ((p.top + p.base) / 2) * config.pxPerFt;
+                      const espesor = p.base - p.top;
+                      const xText   = hasArenas ? xInterval : xInterval;
+                      return (
+                        <Label
+                          key={`interval-${p.id}`}
+                          x={xText}
+                          y={yMid}
+                          text={`${p.top}' - ${p.base}' (${espesor}')`}
+                          anchor="end"
+                        />
+                      );
+                    })}
+                  </g>
+                );
+              })}
+            </g>
+          );
+        });
+      })()}
+
       {/* Depth markers */}
       {visible.depths && (() => {
         const depths = new Set<number>();

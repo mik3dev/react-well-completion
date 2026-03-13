@@ -178,7 +178,7 @@ export default function WellEditor() {
         </div>
         <table className="editor-table">
           <thead>
-            <tr><th>Tope</th><th>Base</th><th>Tipo</th><th></th></tr>
+            <tr><th>Tope</th><th>Base</th><th>Tipo</th><th>Yacimiento</th><th>Arena</th><th></th></tr>
           </thead>
           <tbody>
             {well.perforations.map(p => (
@@ -191,6 +191,8 @@ export default function WellEditor() {
                     <option value="slot">Ranurado</option>
                   </select>
                 </td>
+                <td><input value={p.yacimiento ?? ''} placeholder="Yacimiento" onChange={e => updateElement('perforations', p.id, { yacimiento: e.target.value || undefined })} /></td>
+                <td><input value={p.arena ?? ''} placeholder="Arena" onChange={e => updateElement('perforations', p.id, { arena: e.target.value || undefined })} /></td>
                 <td><button className="btn-delete" onClick={() => removeElement('perforations', p.id)}>×</button></td>
               </tr>
             ))}

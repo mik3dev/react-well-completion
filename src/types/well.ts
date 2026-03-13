@@ -83,6 +83,8 @@ export interface Perforation {
   top: number;            // pies
   base: number;           // pies
   type: 'slot' | 'shoot';
+  yacimiento?: string;    // nombre del yacimiento/reservorio
+  arena?: string;         // nombre de la arena o sub-zona productora
 }
 
 export interface Sand {
