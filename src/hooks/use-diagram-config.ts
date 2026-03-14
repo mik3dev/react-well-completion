@@ -43,3 +43,35 @@ export function diameterToX(config: DiagramConfig, diameter: number) {
     x2: config.centerX + halfWidth,
   };
 }
+
+const CASING_WALL = 5;
+const MIN_CASING_GAP = 12;
+
+/**
+ * Calcula posiciones esquemáticas de casings de adentro hacia afuera.
+ * Retorna un Map de casing.id → {x1, x2} para lookup rápido.
+ */
+export function computeCasingPositions(
+  casings: { id: string; diameter: number; top: number; base: number }[],
+  config: DiagramConfig,
+): Map<string, { x1: number; x2: number }> {
+  const sorted = [...casings].sort((a, b) => b.diameter - a.diameter);
+  const n = sorted.length;
+  if (n === 0) return new Map();
+
+  const x1s = new Array<number>(n);
+  x1s[n - 1] = config.centerX - (sorted[n - 1].diameter / 2) * config.pulgada;
+
+  for (let i = n - 2; i >= 0; i--) {
+    const naturalX1 = config.centerX - (sorted[i].diameter / 2) * config.pulgada;
+    const maxX1 = x1s[i + 1] - CASING_WALL - MIN_CASING_GAP;
+    x1s[i] = Math.min(naturalX1, maxX1);
+  }
+
+  const result = new Map<string, { x1: number; x2: number }>();
+  sorted.forEach((c, idx) => {
+    const x1 = x1s[idx];
+    result.set(c.id, { x1, x2: config.centerX * 2 - x1 });
+  });
+  return result;
+}

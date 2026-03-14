@@ -12,18 +12,26 @@ const FONT_SIZE = 9;
 const LABEL_COLOR = '#444';
 const LINE_COLOR = '#bbb';
 
-function Label({ x, y, text, anchor = 'start' }: { x: number; y: number; text: string; anchor?: 'start' | 'middle' | 'end' }) {
+function Label({ x, y, text, anchor = 'start', bg = false }: { x: number; y: number; text: string; anchor?: 'start' | 'middle' | 'end'; bg?: boolean }) {
+  const charW = FONT_SIZE * 0.42;
+  const pad = 2;
+  const w = text.length * charW + pad * 2;
+  const h = FONT_SIZE + pad * 2;
+  const rx = anchor === 'end' ? x - w : anchor === 'middle' ? x - w / 2 : x;
   return (
-    <text
-      x={x} y={y}
-      fontSize={FONT_SIZE}
-      fill={LABEL_COLOR}
-      textAnchor={anchor}
-      dominantBaseline="middle"
-      fontFamily="sans-serif"
-    >
-      {text}
-    </text>
+    <g>
+      {bg && <rect x={rx - 1} y={y - h / 2} width={w + 2} height={h} fill="white" fillOpacity={0.85} rx={1} />}
+      <text
+        x={x} y={y}
+        fontSize={FONT_SIZE}
+        fill={LABEL_COLOR}
+        textAnchor={anchor}
+        dominantBaseline="middle"
+        fontFamily="sans-serif"
+      >
+        {text}
+      </text>
+    </g>
   );
 }
 
@@ -128,18 +136,25 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         );
       })}
 
-      {/* Perforation labels — right side */}
-      {visible.perforations && well.perforations.map(p => {
-        const { x2 } = diameterToX(config, minCasingDiameter);
-        const yMid = (config.depthToY(p.top) + config.depthToY(p.base)) / 2;
-        const tipo = p.type === 'shoot' ? 'Cañ.' : 'Ran.';
-        return (
-          <g key={`label-perf-${p.id}`}>
-            <LeaderLine x1={x2 + 5} y1={yMid} x2={rightMargin - 2} y2={yMid} />
-            <Label x={rightMargin} y={yMid} text={`${tipo} ${p.top}'-${p.base}'`} />
-          </g>
-        );
-      })}
+      {/* Perforation labels — right side, with anti-overlap */}
+      {visible.perforations && (() => {
+        const MIN_SPACING = FONT_SIZE + 4;
+        const sorted = [...well.perforations].sort((a, b) => a.top - b.top);
+        let lastY = -Infinity;
+        return sorted.map(p => {
+          const { x2 } = diameterToX(config, minCasingDiameter);
+          let yMid = (config.depthToY(p.top) + config.depthToY(p.base)) / 2;
+          if (yMid - lastY < MIN_SPACING) yMid = lastY + MIN_SPACING;
+          lastY = yMid;
+          const tipo = p.type === 'shoot' ? 'Cañ.' : 'Ran.';
+          return (
+            <g key={`label-perf-${p.id}`}>
+              <LeaderLine x1={x2 + 5} y1={yMid} x2={rightMargin - 2} y2={yMid} />
+              <Label x={rightMargin} y={yMid} text={`${tipo} ${p.top}'-${p.base}'`} bg />
+            </g>
+          );
+        });
+      })()}
 
       {/* Packer labels */}
       {visible.packers && well.packers.map(p => {
@@ -180,9 +195,14 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         if (withYac.length === 0) return null;
 
         const { x1 } = diameterToX(config, minCasingDiameter);
-        const xInterval  = x1 - 6;   // interval text (anchor=end)
-        const xArena     = x1 - 42;  // arena bracket spine
-        const xYac       = x1 - 80;  // yacimiento bracket spine
+        // Layout: casing wall ... interval text ... arena bracket ... yac bracket
+        // Interval text right-aligned close to casing; brackets to the left
+        const layoutCharW = FONT_SIZE * 0.55;
+        const maxIntervalLen = Math.max(...withYac.map(p => `${p.top}' - ${p.base}' (${p.base - p.top}')`.length));
+        const intervalTextW = maxIntervalLen * layoutCharW + 8;
+        const xInterval  = x1 - 20;                      // interval text (anchor=end, near casing)
+        const xArena     = x1 - intervalTextW - 10;      // arena bracket left of interval text
+        const xYac       = xArena - 50;                   // yacimiento bracket left of arena
         const bracketColor = '#555';
 
         // Group by yacimiento
@@ -214,7 +234,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
               <line x1={xYac} y1={yacTop}  x2={xYac + 6} y2={yacTop}  stroke={bracketColor} strokeWidth={0.8} />
               <line x1={xYac} y1={yacBase} x2={xYac + 6} y2={yacBase} stroke={bracketColor} strokeWidth={0.8} />
               <line x1={xYac} y1={yacTop}  x2={xYac}     y2={yacBase} stroke={bracketColor} strokeWidth={0.8} />
-              <Label x={xYac - 3} y={yacMid} text={yacName} anchor="end" />
+              <Label x={xYac - 3} y={yacMid} text={yacName} anchor="end" bg />
 
               {Object.entries(byArena).map(([arenaName, aPerfs]) => {
                 const aTop  = config.depthToY(Math.min(...aPerfs.map(p => p.top)));
@@ -229,7 +249,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
                         <line x1={xArena} y1={aTop}  x2={xArena + 5} y2={aTop}  stroke={bracketColor} strokeWidth={0.7} />
                         <line x1={xArena} y1={aBase} x2={xArena + 5} y2={aBase} stroke={bracketColor} strokeWidth={0.7} />
                         <line x1={xArena} y1={aTop}  x2={xArena}     y2={aBase} stroke={bracketColor} strokeWidth={0.7} />
-                        <Label x={xArena - 3} y={aMid} text={arenaName} anchor="end" />
+                        <Label x={xArena - 3} y={aMid} text={arenaName} anchor="end" bg />
                       </>
                     )}
                     {/* Interval list */}
@@ -244,6 +264,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
                           y={yMid}
                           text={`${p.top}' - ${p.base}' (${espesor}')`}
                           anchor="end"
+                          bg
                         />
                       );
                     })}

@@ -1,4 +1,5 @@
 import type { DiagramConfig, Casing } from '../../../types';
+import { computeCasingPositions } from '../../../hooks/use-diagram-config';
 import { useTooltip } from '../Tooltip';
 import { ShoeIcon, HangerIcon } from '../icons';
 
@@ -23,48 +24,20 @@ function buildLabel(c: Casing): string {
   return `Rev. ${d}"${weightPart}${gradePart} a ${c.base}'`;
 }
 
-/**
- * Calcula posiciones esquemáticas para los casings de ADENTRO HACIA AFUERA.
- * El casing más interno (liner de producción) usa su posición proporcional real,
- * preservando el espacio con el tubing. Los casings exteriores se expanden hacia
- * afuera cuando la diferencia de diámetro real es insuficiente para el gap mínimo.
- */
-function computeSchematicPositions(
-  sorted: Casing[],    // sorted[0] = mayor diámetro (exterior)
-  config: DiagramConfig,
-  WALL: number,
-  MIN_GAP: number,
-): { x1: number; x2: number }[] {
-  const n = sorted.length;
-  const x1s = new Array<number>(n);
-
-  // Partir del más interno (último en sorted) con posición natural
-  x1s[n - 1] = config.centerX - (sorted[n - 1].diameter / 2) * config.pulgada;
-
-  // Trabajar hacia afuera: cada casing exterior debe estar al menos WALL+MIN_GAP
-  // a la IZQUIERDA del siguiente casing interior
-  for (let i = n - 2; i >= 0; i--) {
-    const naturalX1 = config.centerX - (sorted[i].diameter / 2) * config.pulgada;
-    const maxX1 = x1s[i + 1] - WALL - MIN_GAP; // no puede solaparse con el interior
-    x1s[i] = Math.min(naturalX1, maxX1);         // tomar el más a la izquierda
-  }
-
-  return x1s.map(x1 => ({ x1, x2: config.centerX * 2 - x1 }));
-}
-
 export default function CasingLayer({ casings, config }: Props) {
   const { show, move, hide } = useTooltip();
   const WALL = 5;
-  const MIN_CASING_GAP = 12;    // px mínimos entre paredes de casings adyacentes
-  const shoeH = WALL * 2;       // 10px
-  const shoeW = WALL * 3;       // 15px
-  const hangerH = WALL * 4;     // 20px — espacio total reservado para el colgador
-  const hangerBlockH = WALL;    //  5px — altura del bloque del colgador
+  const MIN_CASING_GAP = 12;
+  const shoeH = WALL * 2;
+  const shoeW = WALL * 3;
+  const hangerH = WALL * 4;
+  const hangerBlockH = WALL;
 
   const sorted = [...casings].sort((a, b) => b.diameter - a.diameter);
 
-  // Posiciones esquemáticas: gap mínimo garantizado entre casings adyacentes
-  const positions = computeSchematicPositions(sorted, config, WALL, MIN_CASING_GAP);
+  // Posiciones esquemáticas compartidas (misma lógica que AccessoriesLayer)
+  const posMap = computeCasingPositions(casings, config);
+  const positions = sorted.map(c => posMap.get(c.id)!);
 
   return (
     <g className="layer-casings">

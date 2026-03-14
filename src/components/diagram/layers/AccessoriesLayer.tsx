@@ -1,5 +1,5 @@
 import type { DiagramConfig, Well } from '../../../types';
-import { diameterToX } from '../../../hooks/use-diagram-config';
+import { diameterToX, computeCasingPositions } from '../../../hooks/use-diagram-config';
 import { useTooltip } from '../Tooltip';
 import { PackerIcon, NippleIcon, PlugIcon, GasAnchorIcon, SleeveIcon, PackingIcon, MandrelIcon } from '../icons';
 
@@ -109,24 +109,47 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
         );
       })}
 
-      {/* Packings */}
-      {well.packings.map((pk) => {
-        const { x1, x2 } = diameterToX(config, pk.diameter);
-        const y = config.depthToY(pk.depth);
-        const pkW = config.pulgada * 1.2;
-        const pkH = pkW * 1; // square-ish
+      {/* Packings — span from tubing outer wall to containing casing inner wall */}
+      {(() => {
+        const PK_H = config.pulgada * 0.8;
+        const WALL = 5;
+        const casingPos = computeCasingPositions(well.casings, config);
+        return well.packings.map((pk) => {
+          const { x1: tbgX1, x2: tbgX2 } = diameterToX(config, pk.diameter);
+          const y = config.depthToY(pk.depth);
 
-        return (
-          <g key={pk.id}
-            onMouseEnter={e => show(e, ['Tipo: Empacadura', `Profundidad: ${pk.depth} ft`, `Diámetro: ${pk.diameter}"`])}
-            onMouseMove={move}
-            onMouseLeave={hide}
-          >
-            <PackingIcon x={x1 - pkW} y={y - pkH / 2} width={pkW} height={pkH} side="left" />
-            <PackingIcon x={x2} y={y - pkH / 2} width={pkW} height={pkH} side="right" />
-          </g>
-        );
-      })}
+          // Find the smallest casing that contains this packing at pk.depth
+          const containingCasing = well.casings
+            .filter(c => c.top <= pk.depth && c.base >= pk.depth)
+            .sort((a, b) => a.diameter - b.diameter)[0];
+
+          // Use schematic casing position (matches CasingLayer rendering)
+          let csgX1: number, csgX2: number;
+          if (containingCasing) {
+            const pos = casingPos.get(containingCasing.id)!;
+            csgX1 = pos.x1;
+            csgX2 = pos.x2;
+          } else {
+            const fallback = diameterToX(config, pk.od || pk.diameter + 2);
+            csgX1 = fallback.x1;
+            csgX2 = fallback.x2;
+          }
+
+          const pkWL = tbgX1 - (csgX1 + WALL / 2);
+          const pkWR = (csgX2 - WALL / 2) - tbgX2;
+
+          return (
+            <g key={pk.id}
+              onMouseEnter={e => show(e, ['Tipo: Empacadura', `Profundidad: ${pk.depth} ft`, `Diámetro: ${pk.diameter}"`])}
+              onMouseMove={move}
+              onMouseLeave={hide}
+            >
+              <PackingIcon x={csgX1 + WALL / 2} y={y - PK_H / 2} width={Math.max(pkWL, 4)} height={PK_H} side="left" />
+              <PackingIcon x={tbgX2} y={y - PK_H / 2} width={Math.max(pkWR, 4)} height={PK_H} side="right" />
+            </g>
+          );
+        });
+      })()}
 
       {/* Mandrels (Gas Lift) */}
       {well.mandrels.map((mandrel) => {
