@@ -14,12 +14,12 @@ export default function PumpLayer({ pump, config }: Props) {
   const pumpWidth = pump.diameter * config.pulgada;
   const x = config.centerX - pumpWidth / 2;
   const y = config.depthToY(pump.depth);
-  // Height proportional to width (aspect ratio ~2.5:1 for BM/BCP, ~3:1 for BES)
-  const minH = pump.type === 'BES' ? pumpWidth * 3 : pumpWidth * 2.5;
+  // Altura: escala real si hay longitud, mínimo visual de 20px para que no sea invisible
+  const MIN_PUMP_H = 20;
   const scaledH = pump.length > 0
     ? config.depthToY(pump.depth + pump.length) - y
     : 0;
-  const pumpHeight = Math.max(scaledH, minH);
+  const pumpHeight = Math.max(scaledH, MIN_PUMP_H);
 
   const labels: Record<string, string> = {
     BM: 'Bomba Mecánica',
@@ -42,16 +42,16 @@ export default function PumpLayer({ pump, config }: Props) {
       onMouseLeave={hide}
     >
       {pump.type === 'BM' && (
-        <BmPumpIcon x={x} y={y - pumpHeight} width={pumpWidth} height={pumpHeight} />
+        <BmPumpIcon x={x} y={y} width={pumpWidth} height={pumpHeight} />
       )}
       {pump.type === 'BCP' && (
-        <BcpPumpIcon x={x} y={y - pumpHeight} width={pumpWidth} height={pumpHeight} />
+        <BcpPumpIcon x={x} y={y} width={pumpWidth} height={pumpHeight} />
       )}
       {pump.type === 'BES' && (
-        <BesPumpIcon x={x} y={y - pumpHeight} width={pumpWidth} height={pumpHeight} />
+        <BesPumpIcon x={x} y={y} width={pumpWidth} height={pumpHeight} />
       )}
       {/* Transparent hover target */}
-      <rect x={x} y={y - pumpHeight} width={pumpWidth} height={pumpHeight} fill="transparent" />
+      <rect x={x} y={y} width={pumpWidth} height={pumpHeight} fill="transparent" />
     </g>
   );
 }
