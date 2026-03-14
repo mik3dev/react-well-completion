@@ -73,7 +73,7 @@ export default function CasingLayer({ casings, config }: Props) {
         const y = config.depthToY(casing.top);
         const h = config.depthToY(casing.base) - y;
         const label = casing.isLiner ? 'Liner' : 'Casing';
-        const hasHanger = casing.top > 0;
+        const hasHanger = casing.isLiner && casing.top > 0;
 
         const info = [
           `Tipo: ${label}`,
@@ -81,6 +81,18 @@ export default function CasingLayer({ casings, config }: Props) {
           `Base: ${casing.base} ft`,
           `Diámetro: ${casing.diameter}"`,
         ];
+
+        // Buscar casing padre (el más cercano que contenga el tope de este casing)
+        let parentIdx = -1;
+        if (idx > 0) {
+          for (let i = idx - 1; i >= 0; i--) {
+            const c = sorted[i];
+            if (c.diameter > casing.diameter && c.top <= casing.top && c.base >= casing.top) {
+              parentIdx = i;
+              break;
+            }
+          }
+        }
 
         // Conector horizontal para casings sin colgador (reducción de diámetro sin liner)
         const prev = idx > 0 ? sorted[idx - 1] : null;
@@ -95,28 +107,21 @@ export default function CasingLayer({ casings, config }: Props) {
           );
         }
 
-        // Pared del liner empieza hangerH px abajo para dejar espacio visible al colgador
-        const wallY = y + (hasHanger ? hangerH : 0);
-        const wallH = h - (hasHanger ? hangerH : 0);
+        // hangerGap dinámico: limitado al solapamiento real con el padre en px
+        let hangerGap = 0;
+        if (hasHanger && parentIdx >= 0) {
+          const overlapPx = config.depthToY(sorted[parentIdx].base) - y;
+          hangerGap = Math.min(hangerH, Math.max(overlapPx, hangerBlockH));
+        }
 
-        // earW del colgador: cruza todo el gap entre el casing padre y este liner.
-        // Con posiciones esquemáticas el gap siempre es >= MIN_CASING_GAP.
-        let earW = MIN_CASING_GAP; // default: gap mínimo garantizado
-        if (hasHanger && idx > 0) {
-          // Buscar el índice del casing padre (el más cercano que lo contenga)
-          let parentIdx = -1;
-          for (let i = idx - 1; i >= 0; i--) {
-            const c = sorted[i];
-            if (c.diameter > casing.diameter && c.top <= casing.top && c.base >= casing.top) {
-              parentIdx = i;
-              break;
-            }
-          }
-          if (parentIdx >= 0) {
-            const parentX1 = positions[parentIdx].x1;
-            // Gap real entre cara interior del padre y cara exterior de este liner
-            earW = Math.max(x1 - parentX1 - WALL, WALL / 2);
-          }
+        const wallY = y + hangerGap;
+        const wallH = h - hangerGap;
+
+        // earW del colgador: cruza todo el gap entre el casing padre y este liner
+        let earW = MIN_CASING_GAP;
+        if (hasHanger && parentIdx >= 0) {
+          const parentX1 = positions[parentIdx].x1;
+          earW = Math.max(x1 - parentX1 - WALL, WALL / 2);
         }
 
         const labelY = wallY + wallH * 0.12;
@@ -126,11 +131,11 @@ export default function CasingLayer({ casings, config }: Props) {
           <g key={casing.id}>
             {connector}
 
-            {/* Colgador: bloque centrado en el espacio hangerH */}
-            {hasHanger && (
+            {/* Colgador: bloque al fondo del gap, tocando la pared del liner */}
+            {hasHanger && hangerGap > 0 && (
               <HangerIcon
                 x1={x1} x2={x2}
-                y={y + hangerH - hangerBlockH}
+                y={y + hangerGap - hangerBlockH}
                 earW={earW} wall={WALL} h={hangerBlockH}
               />
             )}
