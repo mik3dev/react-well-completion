@@ -32,6 +32,10 @@ export default function TubingLayer({ tubingString, config }: Props) {
           `Prof: ${top} - ${base} ft`,
         ];
 
+        const half = config.halfSection;
+        const showLeft = !half || config.halfSide === 'left';
+        const showRight = !half || config.halfSide === 'right';
+
         // Connection to previous segment if diameter changes
         const prev = idx > 0 ? sorted[idx - 1] : null;
         let connector = null;
@@ -39,8 +43,8 @@ export default function TubingLayer({ tubingString, config }: Props) {
           const { x1: px1, x2: px2 } = diameterToX(config, prev.diameter);
           connector = (
             <g>
-              <line x1={px1} y1={y1} x2={x1} y2={y1} stroke="gray" strokeWidth={1} />
-              <line x1={px2} y1={y1} x2={x2} y2={y1} stroke="gray" strokeWidth={1} />
+              {showLeft && <line x1={px1} y1={y1} x2={x1} y2={y1} stroke="gray" strokeWidth={1} />}
+              {showRight && <line x1={px2} y1={y1} x2={x2} y2={y1} stroke="gray" strokeWidth={1} />}
             </g>
           );
         }
@@ -48,20 +52,24 @@ export default function TubingLayer({ tubingString, config }: Props) {
         return (
           <g key={seg.id}>
             {connector}
-            <line
-              x1={x1} y1={y1} x2={x1} y2={y2}
-              stroke="gray" strokeWidth={2.5}
-              onMouseEnter={e => show(e, info)}
-              onMouseMove={move}
-              onMouseLeave={hide}
-            />
-            <line
-              x1={x2} y1={y1} x2={x2} y2={y2}
-              stroke="gray" strokeWidth={2.5}
-              onMouseEnter={e => show(e, info)}
-              onMouseMove={move}
-              onMouseLeave={hide}
-            />
+            {showLeft && (
+              <line
+                x1={x1} y1={y1} x2={x1} y2={y2}
+                stroke="gray" strokeWidth={2.5}
+                onMouseEnter={e => show(e, info)}
+                onMouseMove={move}
+                onMouseLeave={hide}
+              />
+            )}
+            {showRight && (
+              <line
+                x1={x2} y1={y1} x2={x2} y2={y2}
+                stroke="gray" strokeWidth={2.5}
+                onMouseEnter={e => show(e, info)}
+                onMouseMove={move}
+                onMouseLeave={hide}
+              />
+            )}
           </g>
         );
       })}

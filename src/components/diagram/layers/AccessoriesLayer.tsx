@@ -11,6 +11,9 @@ interface Props {
 
 export default function AccessoriesLayer({ well, config, minCasingDiameter }: Props) {
   const { show, move, hide } = useTooltip();
+  const half = config.halfSection;
+  const showLeft = !half || config.halfSide === 'left';
+  const showRight = !half || config.halfSide === 'right';
 
   return (
     <g className="layer-accessories">
@@ -29,8 +32,8 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
             onMouseMove={move}
             onMouseLeave={hide}
           >
-            <PackerIcon x={x1 - packerW} y={y - packerH / 2} width={packerW} height={packerH} side="left" />
-            <PackerIcon x={x2} y={y - packerH / 2} width={packerW} height={packerH} side="right" />
+            {showLeft && <PackerIcon x={x1 - packerW} y={y - packerH / 2} width={packerW} height={packerH} side="left" />}
+            {showRight && <PackerIcon x={x2} y={y - packerH / 2} width={packerW} height={packerH} side="right" />}
           </g>
         );
       })}
@@ -49,8 +52,8 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
             onMouseMove={move}
             onMouseLeave={hide}
           >
-            <NippleIcon x={x1 - nW} y={y - nH / 2} width={nW} height={nH} type={nipple.type} side="left" />
-            <NippleIcon x={x2} y={y - nH / 2} width={nW} height={nH} type={nipple.type} side="right" />
+            {showLeft && <NippleIcon x={x1 - nW} y={y - nH / 2} width={nW} height={nH} type={nipple.type} side="left" />}
+            {showRight && <NippleIcon x={x2} y={y - nH / 2} width={nW} height={nH} type={nipple.type} side="right" />}
           </g>
         );
       })}
@@ -142,8 +145,8 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
               onMouseMove={move}
               onMouseLeave={hide}
             >
-              <PackingIcon x={csgX1 + WALL / 2} y={y - PK_H / 2} width={Math.max(pkWL, 4)} height={PK_H} side="left" />
-              <PackingIcon x={tbgX2} y={y - PK_H / 2} width={Math.max(pkWR, 4)} height={PK_H} side="right" />
+              {showLeft && <PackingIcon x={csgX1 + WALL / 2} y={y - PK_H / 2} width={Math.max(pkWL, 4)} height={PK_H} side="left" />}
+              {showRight && <PackingIcon x={tbgX2} y={y - PK_H / 2} width={Math.max(pkWR, 4)} height={PK_H} side="right" />}
             </g>
           );
         });
@@ -161,7 +164,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
             onMouseMove={move}
             onMouseLeave={hide}
           >
-            <MandrelIcon x={x1} y={y} tubingW={x2 - x1} hasValve={mandrel.hasValve} side="right" />
+            <MandrelIcon x={x1} y={y} tubingW={x2 - x1} hasValve={mandrel.hasValve} side={half ? config.halfSide : 'right'} />
           </g>
         );
       })}

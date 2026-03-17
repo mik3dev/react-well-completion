@@ -20,24 +20,32 @@ export default function SandLayer({ sands, minCasingDiameter, config }: Props) {
         const pattern = sand.segment % 2 === 0 ? 'url(#sandB)' : 'url(#sandA)';
         const info = [`${sand.name}`, `Tope: ${sand.top} ft`, `Base: ${sand.base} ft`];
 
+        const half = config.halfSection;
+        const showLeft = !half || config.halfSide === 'left';
+        const showRight = !half || config.halfSide === 'right';
+
         return (
           <g key={sand.id}>
             {/* Left side sand */}
-            <rect
-              x={0} y={y} width={x1} height={h}
-              fill={pattern}
-              onMouseEnter={e => show(e, info)}
-              onMouseMove={move}
-              onMouseLeave={hide}
-            />
+            {showLeft && (
+              <rect
+                x={0} y={y} width={x1} height={h}
+                fill={pattern}
+                onMouseEnter={e => show(e, info)}
+                onMouseMove={move}
+                onMouseLeave={hide}
+              />
+            )}
             {/* Right side sand */}
-            <rect
-              x={x2} y={y} width={config.width - x2} height={h}
-              fill={pattern}
-              onMouseEnter={e => show(e, info)}
-              onMouseMove={move}
-              onMouseLeave={hide}
-            />
+            {showRight && (
+              <rect
+                x={x2} y={y} width={config.width - x2} height={h}
+                fill={pattern}
+                onMouseEnter={e => show(e, info)}
+                onMouseMove={move}
+                onMouseLeave={hide}
+              />
+            )}
           </g>
         );
       })}

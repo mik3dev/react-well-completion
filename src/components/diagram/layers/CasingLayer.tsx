@@ -67,6 +67,10 @@ export default function CasingLayer({ casings, config }: Props) {
           }
         }
 
+        const half = config.halfSection;
+        const showLeft = !half || config.halfSide === 'left';
+        const showRight = !half || config.halfSide === 'right';
+
         // Conector horizontal para casings sin colgador (reducción de diámetro sin liner)
         const prev = idx > 0 ? sorted[idx - 1] : null;
         let connector = null;
@@ -74,8 +78,8 @@ export default function CasingLayer({ casings, config }: Props) {
           const { x1: px1, x2: px2 } = positions[idx - 1];
           connector = (
             <g>
-              <line x1={px1} y1={y} x2={x1} y2={y} stroke="black" strokeWidth={2} />
-              <line x1={x2} y1={y} x2={px2} y2={y} stroke="black" strokeWidth={2} />
+              {showLeft && <line x1={px1} y1={y} x2={x1} y2={y} stroke="black" strokeWidth={2} />}
+              {showRight && <line x1={x2} y1={y} x2={px2} y2={y} stroke="black" strokeWidth={2} />}
             </g>
           );
         }
@@ -110,41 +114,60 @@ export default function CasingLayer({ casings, config }: Props) {
                 x1={x1} x2={x2}
                 y={y + hangerGap - hangerBlockH}
                 earW={earW} wall={WALL} h={hangerBlockH}
+                showLeft={showLeft} showRight={showRight}
               />
             )}
 
             {/* Pared izquierda */}
-            <rect
-              x={x1 - WALL / 2} y={wallY} width={WALL} height={wallH}
-              fill="url(#casingHatch)" stroke="black" strokeWidth={1}
-              onMouseEnter={e => show(e, info)}
-              onMouseMove={move}
-              onMouseLeave={hide}
-            />
+            {showLeft && (
+              <rect
+                x={x1 - WALL / 2} y={wallY} width={WALL} height={wallH}
+                fill="url(#casingHatch)" stroke="black" strokeWidth={1}
+                onMouseEnter={e => show(e, info)}
+                onMouseMove={move}
+                onMouseLeave={hide}
+              />
+            )}
             {/* Pared derecha */}
-            <rect
-              x={x2 - WALL / 2} y={wallY} width={WALL} height={wallH}
-              fill="url(#casingHatch)" stroke="black" strokeWidth={1}
-              onMouseEnter={e => show(e, info)}
-              onMouseMove={move}
-              onMouseLeave={hide}
-            />
+            {showRight && (
+              <rect
+                x={x2 - WALL / 2} y={wallY} width={WALL} height={wallH}
+                fill="url(#casingHatch)" stroke="black" strokeWidth={1}
+                onMouseEnter={e => show(e, info)}
+                onMouseMove={move}
+                onMouseLeave={hide}
+              />
+            )}
 
             {/* Zapatas */}
-            <ShoeIcon x={x1 - WALL / 2} y={y + h - shoeH} width={shoeW} height={shoeH} side="left" />
-            <ShoeIcon x={x2 + WALL / 2} y={y + h - shoeH} width={shoeW} height={shoeH} side="right" />
+            {showLeft && <ShoeIcon x={x1 - WALL / 2} y={y + h - shoeH} width={shoeW} height={shoeH} side="left" />}
+            {showRight && <ShoeIcon x={x2 + WALL / 2} y={y + h - shoeH} width={shoeW} height={shoeH} side="right" />}
 
             {/* Label inline */}
-            <text
-              x={x1 - WALL / 2 - 3}
-              y={labelY}
-              fontSize={7}
-              textAnchor="end"
-              fill="#333"
-              fontFamily="monospace"
-            >
-              {inlineLabel}
-            </text>
+            {showLeft && (
+              <text
+                x={x1 - WALL / 2 - 3}
+                y={labelY}
+                fontSize={7}
+                textAnchor="end"
+                fill="#333"
+                fontFamily="monospace"
+              >
+                {inlineLabel}
+              </text>
+            )}
+            {!showLeft && showRight && (
+              <text
+                x={x2 + WALL / 2 + 3}
+                y={labelY}
+                fontSize={7}
+                textAnchor="start"
+                fill="#333"
+                fontFamily="monospace"
+              >
+                {inlineLabel}
+              </text>
+            )}
           </g>
         );
       })}

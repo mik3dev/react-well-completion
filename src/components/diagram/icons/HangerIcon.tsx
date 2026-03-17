@@ -16,9 +16,11 @@ interface Props {
   earW: number;
   wall: number;
   h: number;
+  showLeft?: boolean;
+  showRight?: boolean;
 }
 
-export default function HangerIcon({ x1, x2, y, earW, wall, h }: Props) {
+export default function HangerIcon({ x1, x2, y, earW, wall, h, showLeft = true, showRight = true }: Props) {
   const fill = '#222';
   // Bloque izquierdo: desde cara exterior extendida hasta cara interior de la pared
   const lx = x1 - wall / 2 - earW;
@@ -29,8 +31,8 @@ export default function HangerIcon({ x1, x2, y, earW, wall, h }: Props) {
 
   return (
     <g>
-      <rect x={lx} y={y} width={lw} height={h} fill={fill} />
-      <rect x={rx} y={y} width={rw} height={h} fill={fill} />
+      {showLeft && <rect x={lx} y={y} width={lw} height={h} fill={fill} />}
+      {showRight && <rect x={rx} y={y} width={rw} height={h} fill={fill} />}
     </g>
   );
 }

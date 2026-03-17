@@ -13,6 +13,9 @@ export default function WireLayer({ wire, tubingString, config }: Props) {
   const { show, move, hide } = useTooltip();
   if (!wire || tubingString.length === 0) return null;
 
+  // Wire is on the left side of tubing — hide if half-section right only
+  if (config.halfSection && config.halfSide === 'right') return null;
+
   const firstTubDiam = tubingString[0]?.diameter || 4;
   const { x1 } = diameterToX(config, firstTubDiam);
   const wireWidth = config.pulgada * 0.35;

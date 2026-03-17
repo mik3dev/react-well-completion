@@ -42,35 +42,47 @@ export default function PerforationLayer({ perforations, minCasingDiameter, conf
         for (let i = 1; i <= numShots; i++) {
           const y = yTop + spacing * i;
 
+          const half = config.halfSection;
+          const showLeft = !half || config.halfSide === 'left';
+          const showRight = !half || config.halfSide === 'right';
+
           if (isShoot) {
             lines.push(
               <g key={`${perf.id}-line-${i}`}>
-                <line
-                  x1={x1 - outerLen} y1={y}
-                  x2={x1 + innerOverlap} y2={y}
-                  stroke={lineColor} strokeWidth={strokeW} strokeLinecap="round"
-                />
-                <line
-                  x1={x2 - innerOverlap} y1={y}
-                  x2={x2 + outerLen} y2={y}
-                  stroke={lineColor} strokeWidth={strokeW} strokeLinecap="round"
-                />
+                {showLeft && (
+                  <line
+                    x1={x1 - outerLen} y1={y}
+                    x2={x1 + innerOverlap} y2={y}
+                    stroke={lineColor} strokeWidth={strokeW} strokeLinecap="round"
+                  />
+                )}
+                {showRight && (
+                  <line
+                    x1={x2 - innerOverlap} y1={y}
+                    x2={x2 + outerLen} y2={y}
+                    stroke={lineColor} strokeWidth={strokeW} strokeLinecap="round"
+                  />
+                )}
               </g>
             );
           } else {
             const slotLen = config.pulgada * 0.45;
             lines.push(
               <g key={`${perf.id}-slot-${i}`}>
-                <line
-                  x1={x1 - slotLen} y1={y}
-                  x2={x1 + slotLen * 0.25} y2={y}
-                  stroke={lineColor} strokeWidth={strokeW} strokeLinecap="round"
-                />
-                <line
-                  x1={x2 - slotLen * 0.25} y1={y}
-                  x2={x2 + slotLen} y2={y}
-                  stroke={lineColor} strokeWidth={strokeW} strokeLinecap="round"
-                />
+                {showLeft && (
+                  <line
+                    x1={x1 - slotLen} y1={y}
+                    x2={x1 + slotLen * 0.25} y2={y}
+                    stroke={lineColor} strokeWidth={strokeW} strokeLinecap="round"
+                  />
+                )}
+                {showRight && (
+                  <line
+                    x1={x2 - slotLen * 0.25} y1={y}
+                    x2={x2 + slotLen} y2={y}
+                    stroke={lineColor} strokeWidth={strokeW} strokeLinecap="round"
+                  />
+                )}
               </g>
             );
           }

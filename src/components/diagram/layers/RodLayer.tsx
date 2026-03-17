@@ -19,8 +19,11 @@ export default function RodLayer({ rodString, config }: Props) {
         accDepth += seg.length;
         const base = accDepth;
 
-        const rodWidth = seg.diameter * config.pulgada;
-        const x = config.centerLine - rodWidth / 2;
+        const fullRodW = seg.diameter * config.pulgada;
+        const rodWidth = config.halfSection ? fullRodW / 2 : fullRodW;
+        const x = config.halfSection
+          ? (config.halfSide === 'right' ? config.centerLine : config.centerLine - rodWidth)
+          : config.centerLine - fullRodW / 2;
         const y = config.depthToPos(top);
         const h = config.depthToPos(base) - y;
 

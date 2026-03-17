@@ -85,6 +85,15 @@ export default function WellDiagram({ well }: Props) {
               <AccessoriesLayer well={well} config={config} minCasingDiameter={minCasingDiameter} />
               <LabelsLayer well={well} config={config} minCasingDiameter={minCasingDiameter} />
               <WellDetailLayer well={well} config={config} />
+              {/* Línea de eje central en half-section */}
+              {config.halfSection && (
+                <line
+                  x1={config.centerLine} y1={0}
+                  x2={config.centerLine} y2={config.height}
+                  stroke="#999" strokeWidth={0.8}
+                  strokeDasharray="6,3"
+                />
+              )}
             </g>
           </svg>
         )}

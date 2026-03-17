@@ -11,8 +11,11 @@ export default function PumpLayer({ pump, config }: Props) {
   const { show, move, hide } = useTooltip();
   if (!pump) return null;
 
-  const pumpWidth = pump.diameter * config.pulgada;
-  const x = config.centerLine - pumpWidth / 2;
+  const fullPumpW = pump.diameter * config.pulgada;
+  const pumpWidth = config.halfSection ? fullPumpW / 2 : fullPumpW;
+  const x = config.halfSection
+    ? (config.halfSide === 'right' ? config.centerLine : config.centerLine - pumpWidth)
+    : config.centerLine - fullPumpW / 2;
   const y = config.depthToPos(pump.depth);
   // Altura: escala real si hay longitud, mínimo visual de 20px para que no sea invisible
   const MIN_PUMP_H = 20;

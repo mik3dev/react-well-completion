@@ -180,17 +180,31 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
       {/* Mandrel labels — positioned outside the outermost casing */}
       {visible.mandrels && (() => {
         const casingPos = computeCasingPositions(well.casings, config);
-        // Find the rightmost casing edge (outermost casing x2)
-        let outerX2 = 0;
-        for (const pos of casingPos.values()) {
-          if (pos.x2 > outerX2) outerX2 = pos.x2;
+        const half = config.halfSection;
+        const onLeft = half && config.halfSide === 'left';
+        // Find the outer casing edge on the visible side
+        let outerEdge = 0;
+        if (onLeft) {
+          outerEdge = Infinity;
+          for (const pos of casingPos.values()) {
+            if (pos.x1 < outerEdge) outerEdge = pos.x1;
+          }
+        } else {
+          for (const pos of casingPos.values()) {
+            if (pos.x2 > outerEdge) outerEdge = pos.x2;
+          }
         }
         return well.mandrels.map(m => {
           const y = config.depthToPos(m.depth);
           const valvula = m.hasValve ? ' +VGL' : '';
           return (
             <g key={`label-mdr-${m.id}`}>
-              <Label x={outerX2 + 8} y={y} text={`M${m.segment}${valvula} @ ${m.depth}'`} />
+              <Label
+                x={onLeft ? outerEdge - 8 : outerEdge + 8}
+                y={y}
+                text={`M${m.segment}${valvula} @ ${m.depth}'`}
+                anchor={onLeft ? 'end' : 'start'}
+              />
             </g>
           );
         });
@@ -201,15 +215,30 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         const withYac = well.perforations.filter(p => p.yacimiento);
         if (withYac.length === 0) return null;
 
-        const { x1 } = diameterToX(config, minCasingDiameter);
+        const { x1, x2 } = diameterToX(config, minCasingDiameter);
         // Layout: casing wall ... interval text ... arena bracket ... yac bracket
-        // Interval text right-aligned close to casing; brackets to the left
+        // In half-section right, labels move to the right side of the casing
+        const half = config.halfSection;
+        const labelsOnRight = half && config.halfSide === 'right';
         const layoutCharW = FONT_SIZE * 0.55;
         const maxIntervalLen = Math.max(...withYac.map(p => `${p.top}' - ${p.base}' (${p.base - p.top}')`.length));
         const intervalTextW = maxIntervalLen * layoutCharW + 8;
-        const xInterval  = x1 - 20;                      // interval text (anchor=end, near casing)
-        const xArena     = x1 - intervalTextW - 10;      // arena bracket left of interval text
-        const xYac       = xArena - 50;                   // yacimiento bracket left of arena
+        let xInterval: number, xArena: number, xYac: number;
+        let anchorDir: 'start' | 'end';
+        let bracketDir: number; // +1 = brackets open right, -1 = brackets open left
+        if (labelsOnRight) {
+          xInterval = x2 + 20;
+          xArena    = x2 + intervalTextW + 10;
+          xYac      = xArena + 50;
+          anchorDir = 'start';
+          bracketDir = 1;
+        } else {
+          xInterval = x1 - 20;
+          xArena    = x1 - intervalTextW - 10;
+          xYac      = xArena - 50;
+          anchorDir = 'end';
+          bracketDir = -1;
+        }
         const bracketColor = '#555';
 
         // Group by yacimiento
@@ -233,15 +262,13 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
             byArena[k].push(p);
           });
 
-          const hasArenas = Object.keys(byArena).some(k => k !== '__none__');
-
           return (
             <g key={`yac-lbl-${yacName}`}>
               {/* Yacimiento bracket */}
-              <line x1={xYac} y1={yacTop}  x2={xYac + 6} y2={yacTop}  stroke={bracketColor} strokeWidth={0.8} />
-              <line x1={xYac} y1={yacBase} x2={xYac + 6} y2={yacBase} stroke={bracketColor} strokeWidth={0.8} />
+              <line x1={xYac} y1={yacTop}  x2={xYac - 6 * bracketDir} y2={yacTop}  stroke={bracketColor} strokeWidth={0.8} />
+              <line x1={xYac} y1={yacBase} x2={xYac - 6 * bracketDir} y2={yacBase} stroke={bracketColor} strokeWidth={0.8} />
               <line x1={xYac} y1={yacTop}  x2={xYac}     y2={yacBase} stroke={bracketColor} strokeWidth={0.8} />
-              <Label x={xYac - 3} y={yacMid} text={yacName} anchor="end" bg />
+              <Label x={xYac + 3 * bracketDir} y={yacMid} text={yacName} anchor={anchorDir} bg />
 
               {Object.entries(byArena).map(([arenaName, aPerfs]) => {
                 const aTop  = config.depthToPos(Math.min(...aPerfs.map(p => p.top)));
@@ -253,24 +280,24 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
                     {/* Arena bracket (only when arena field is set) */}
                     {arenaName !== '__none__' && (
                       <>
-                        <line x1={xArena} y1={aTop}  x2={xArena + 5} y2={aTop}  stroke={bracketColor} strokeWidth={0.7} />
-                        <line x1={xArena} y1={aBase} x2={xArena + 5} y2={aBase} stroke={bracketColor} strokeWidth={0.7} />
+                        <line x1={xArena} y1={aTop}  x2={xArena - 5 * bracketDir} y2={aTop}  stroke={bracketColor} strokeWidth={0.7} />
+                        <line x1={xArena} y1={aBase} x2={xArena - 5 * bracketDir} y2={aBase} stroke={bracketColor} strokeWidth={0.7} />
                         <line x1={xArena} y1={aTop}  x2={xArena}     y2={aBase} stroke={bracketColor} strokeWidth={0.7} />
-                        <Label x={xArena - 3} y={aMid} text={arenaName} anchor="end" bg />
+                        <Label x={xArena + 3 * bracketDir} y={aMid} text={arenaName} anchor={anchorDir} bg />
                       </>
                     )}
                     {/* Interval list */}
                     {aPerfs.map(p => {
                       const yMid    = (config.depthToPos(p.top) + config.depthToPos(p.base)) / 2;
                       const espesor = p.base - p.top;
-                      const xText   = hasArenas ? xInterval : xInterval;
+                      const xText   = xInterval;
                       return (
                         <Label
                           key={`interval-${p.id}`}
                           x={xText}
                           y={yMid}
                           text={`${p.top}' - ${p.base}' (${espesor}')`}
-                          anchor="end"
+                          anchor={anchorDir}
                           bg
                         />
                       );
