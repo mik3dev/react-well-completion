@@ -8,8 +8,8 @@ interface Props {
 }
 
 export default function MandrelIcon({ x, y, tubingW, hasValve, side = 'right' }: Props) {
-  const sw = 2.5;
-  const color = hasValve ? '#c0392b' : '#7f8c8d';
+  const sw = 3.5;
+  const color = hasValve ? '#27ae60' : '#7f8c8d';
 
   // L dimensions
   const armLen = 12;  // horizontal arm extending from tubing
