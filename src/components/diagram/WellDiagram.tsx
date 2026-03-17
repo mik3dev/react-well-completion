@@ -14,6 +14,7 @@ import WireLayer from './layers/WireLayer';
 import EarthLayer from './layers/EarthLayer';
 import DepthAxisLayer from './layers/DepthAxisLayer';
 import LabelsLayer from './layers/LabelsLayer';
+import WellDetailLayer from './layers/WellDetailLayer';
 
 interface Props {
   well: Well;
@@ -83,6 +84,7 @@ export default function WellDiagram({ well }: Props) {
               <PumpLayer pump={well.pump} config={config} />
               <AccessoriesLayer well={well} config={config} minCasingDiameter={minCasingDiameter} />
               <LabelsLayer well={well} config={config} minCasingDiameter={minCasingDiameter} />
+              <WellDetailLayer well={well} config={config} />
             </g>
           </svg>
         )}

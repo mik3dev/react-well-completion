@@ -108,6 +108,10 @@ export interface Well {
   totalDepth: number;         // pies
   totalFreeDepth: number;     // pies
   liftMethod: LiftMethod;
+  latitude?: number;
+  longitude?: number;
+  estacionFlujo?: string;     // Estación de Flujo (EF)
+  mesaRotaria?: number;       // Mesa Rotaria — elevación en pies
   casings: Casing[];
   tubingString: TubingSegment[];
   rodString: RodSegment[];          // solo BM/BCP

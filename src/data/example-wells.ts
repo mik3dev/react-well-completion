@@ -7,6 +7,10 @@ export const exampleWells: Well[] = [
     totalDepth: 2000,
     totalFreeDepth: 1820,
     liftMethod: 'BM',
+    latitude: 9.3456,
+    longitude: -70.1234,
+    estacionFlujo: 'EF-12',
+    mesaRotaria: 45,
     casings: [
       { id: 'c1', diameter: 7, top: 0, base: 900, isLiner: false },
       { id: 'c2', diameter: 6.5, top: 850, base: 1300, isLiner: false },
@@ -51,6 +55,10 @@ export const exampleWells: Well[] = [
     totalDepth: 3000,
     totalFreeDepth: 2900,
     liftMethod: 'BCP',
+    latitude: 9.2810,
+    longitude: -70.0892,
+    estacionFlujo: 'EF-07',
+    mesaRotaria: 52,
     casings: [
       { id: 'c4', diameter: 7, top: 0, base: 1500, isLiner: false },
       { id: 'c5', diameter: 6.5, top: 1450, base: 2000, isLiner: false },
@@ -94,6 +102,10 @@ export const exampleWells: Well[] = [
     totalDepth: 4000,
     totalFreeDepth: 3500,
     liftMethod: 'GL',
+    latitude: 9.4120,
+    longitude: -70.2015,
+    estacionFlujo: 'EF-03',
+    mesaRotaria: 38,
     casings: [
       { id: 'c7', diameter: 9, top: 0, base: 2000, isLiner: false },
       { id: 'c8', diameter: 7, top: 1950, base: 2900, isLiner: false },
@@ -155,6 +167,10 @@ export const exampleWells: Well[] = [
     totalDepth: 10000,
     totalFreeDepth: 9500,
     liftMethod: 'BES',
+    latitude: 9.5033,
+    longitude: -70.3201,
+    estacionFlujo: 'EF-21',
+    mesaRotaria: 60,
     casings: [
       { id: 'c10', diameter: 11, top: 0, base: 2000, isLiner: false },
       { id: 'c11', diameter: 9, top: 1950, base: 6000, isLiner: false },

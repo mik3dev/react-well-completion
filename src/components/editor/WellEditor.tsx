@@ -41,6 +41,26 @@ export default function WellEditor() {
             Prof. Libre (ft)
             <input type="number" value={well.totalFreeDepth} onChange={e => updateWellMeta(well.id, { totalFreeDepth: +e.target.value })} />
           </label>
+          <label>
+            Latitud
+            <input type="number" step="0.0001" value={well.latitude ?? ''} placeholder="\u2014"
+              onChange={e => updateWellMeta(well.id, { latitude: e.target.value ? +e.target.value : undefined })} />
+          </label>
+          <label>
+            Longitud
+            <input type="number" step="0.0001" value={well.longitude ?? ''} placeholder="\u2014"
+              onChange={e => updateWellMeta(well.id, { longitude: e.target.value ? +e.target.value : undefined })} />
+          </label>
+          <label>
+            Estacion de Flujo (EF)
+            <input value={well.estacionFlujo ?? ''} placeholder="EF-01"
+              onChange={e => updateWellMeta(well.id, { estacionFlujo: e.target.value || undefined })} />
+          </label>
+          <label>
+            Mesa Rotaria (ft)
+            <input type="number" value={well.mesaRotaria ?? ''} placeholder="\u2014"
+              onChange={e => updateWellMeta(well.id, { mesaRotaria: e.target.value ? +e.target.value : undefined })} />
+          </label>
         </div>
       </section>
 

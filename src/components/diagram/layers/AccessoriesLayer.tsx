@@ -76,7 +76,6 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
       {well.gasAnchors.map((ga) => {
         const { x1, x2 } = diameterToX(config, ga.diameter);
         const y = config.depthToY(ga.depth);
-        const gaWidth = x2 - x1;
         const scaledH = ga.length > 0 ? config.depthToY(ga.depth + ga.length) - y : 0;
         const h = Math.max(scaledH, 20);
 

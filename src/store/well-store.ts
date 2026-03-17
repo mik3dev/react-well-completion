@@ -11,7 +11,7 @@ interface WellStore {
   addWell: (name: string, liftMethod: LiftMethod) => void;
   removeWell: (id: string) => void;
   selectWell: (id: string) => void;
-  updateWellMeta: (id: string, data: Partial<Pick<Well, 'name' | 'totalDepth' | 'totalFreeDepth' | 'liftMethod'>>) => void;
+  updateWellMeta: (id: string, data: Partial<Pick<Well, 'name' | 'totalDepth' | 'totalFreeDepth' | 'liftMethod' | 'latitude' | 'longitude' | 'estacionFlujo' | 'mesaRotaria'>>) => void;
 
   // Generic element operations on the selected well
   addElement: <K extends keyof Well>(field: K, element: Well[K] extends Array<infer T> ? T : never) => void;
