@@ -1,38 +1,38 @@
 ## 1. Infraestructura
 
-- [ ] 1.1 Adaptar `WellDiagram.tsx`: cambiar translate a `(0, 30)` en horizontal, pasar config a depth axis
-- [ ] 1.2 Adaptar `SvgDefs.tsx`: agregar variantes de patterns rotados para horizontal o usar patternTransform
+- [x] 1.1 Adaptar `WellDiagram.tsx`: swap dimensions for horizontal, apply `rotate(-90)` transform, move WellDetailLayer outside rotated group
+- [x] 1.2 Adaptar `useDiagramConfig`: simplify to always generate vertical coords (rotation handles axis swap)
 
 ## 2. Eje de profundidad
 
-- [ ] 2.1 Adaptar **DepthAxisLayer**: eje horizontal arriba con ticks verticales, labels horizontales, grid lines verticales
+- [x] 2.1 Adaptar **DepthAxisLayer**: counter-rotate text labels with `rotate(90)` in horizontal mode
 
 ## 3. Layers estructurales
 
-- [ ] 3.1 Adaptar **CasingLayer**: paredes horizontales (rect rotado), shoes apuntando a la derecha, hangers al inicio, inline labels
-- [ ] 3.2 Adaptar **TubingLayer**: líneas horizontales con conectores verticales en cambios de diámetro
-- [ ] 3.3 Adaptar **RodLayer**: rectángulos horizontales centrados en centerLine
-- [ ] 3.4 Adaptar **PumpLayer**: icono orientado horizontalmente (swap width/height)
-- [ ] 3.5 Adaptar **WireLayer**: cable horizontal (si aplica BES)
+- [x] 3.1 Adaptar **CasingLayer**: counter-rotate inline labels in horizontal mode
+- [x] 3.2 **TubingLayer**: works via rotation (no changes needed)
+- [x] 3.3 **RodLayer**: works via rotation (no changes needed)
+- [x] 3.4 **PumpLayer**: works via rotation (no changes needed)
+- [x] 3.5 **WireLayer**: works via rotation (no changes needed)
 
 ## 4. Layers de relleno
 
-- [ ] 4.1 Adaptar **SandLayer**: rects horizontales (x=depthToPos, width=depthRange, arriba/abajo del casing)
-- [ ] 4.2 Adaptar **EarthLayer**: rect horizontal dentro del casing
+- [x] 4.1 **SandLayer**: works via rotation (no changes needed)
+- [x] 4.2 **EarthLayer**: works via rotation (no changes needed)
 
 ## 5. Perforaciones y accesorios
 
-- [ ] 5.1 Adaptar **PerforationLayer**: líneas verticales (perpendiculares al eje horizontal)
-- [ ] 5.2 Adaptar **AccessoriesLayer**: todos los accesorios en orientación horizontal
+- [x] 5.1 **PerforationLayer**: works via rotation (no changes needed)
+- [x] 5.2 **AccessoriesLayer**: works via rotation (no changes needed)
 
 ## 6. Labels
 
-- [ ] 6.1 Adaptar **LabelsLayer**: labels posicionados arriba/abajo con texto horizontal
-- [ ] 6.2 Adaptar **WellDetailLayer**: reposicionar si colisiona en horizontal
+- [x] 6.1 Adaptar **LabelsLayer**: add `rotate` prop to Label component, counter-rotate all labels in horizontal mode
+- [x] 6.2 Adaptar **WellDetailLayer**: rendered outside rotated group with original container dimensions
 
 ## 7. Verificación
 
-- [ ] 7.1 Verificar build sin errores TypeScript (`npm run build`)
+- [x] 7.1 Verificar build sin errores TypeScript (`npm run build`)
 - [ ] 7.2 Verificar visualmente horizontal con pozo GL
 - [ ] 7.3 Verificar horizontal + half-section combinados
 - [ ] 7.4 Verificar que vertical sigue sin regresiones

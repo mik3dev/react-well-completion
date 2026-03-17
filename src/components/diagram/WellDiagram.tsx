@@ -37,7 +37,12 @@ export default function WellDiagram({ well }: Props) {
     return () => observer.disconnect();
   }, [measure]);
 
-  const config = useDiagramConfig(size.width - 50, size.height, well);
+  const isH = (well.orientation ?? 'vertical') === 'horizontal';
+  // For horizontal: swap dimensions so config generates vertical coords
+  // that get rotated by the SVG transform
+  const configW = isH ? size.height - 30 : size.width - 50;
+  const configH = isH ? size.width - 50 : size.height;
+  const config = useDiagramConfig(configW, configH, well);
 
   const minCasingDiameter = well.casings.length > 0
     ? Math.min(...well.casings.map(c => c.diameter))
@@ -62,8 +67,11 @@ export default function WellDiagram({ well }: Props) {
             style={{ display: 'block' }}
           >
             <SvgDefs />
-            {/* Offset for depth axis labels */}
-            <g transform="translate(45, 0)">
+            {/* Offset for depth axis labels; rotation for horizontal */}
+            <g transform={isH
+              ? `translate(45, ${30 + config.width}) rotate(-90)`
+              : 'translate(45, 0)'
+            }>
               <DepthAxisLayer config={config} />
               <SandLayer sands={well.sands} minCasingDiameter={minCasingDiameter} config={config} />
               <EarthLayer
@@ -84,8 +92,7 @@ export default function WellDiagram({ well }: Props) {
               <PumpLayer pump={well.pump} config={config} />
               <AccessoriesLayer well={well} config={config} minCasingDiameter={minCasingDiameter} />
               <LabelsLayer well={well} config={config} minCasingDiameter={minCasingDiameter} />
-              <WellDetailLayer well={well} config={config} />
-              {/* Línea de eje central en half-section */}
+              {/* Línea de eje central en half-section (always vertical in local coords) */}
               {config.halfSection && (
                 <line
                   x1={config.centerLine} y1={0}
@@ -95,6 +102,18 @@ export default function WellDiagram({ well }: Props) {
                 />
               )}
             </g>
+
+            {/* WellDetailLayer rendered outside rotation group so it stays fixed */}
+            {config && (
+              <g transform="translate(45, 0)">
+                <WellDetailLayer well={well} config={{
+                  ...config,
+                  // In horizontal, restore original container dimensions for positioning
+                  width: size.width - 50,
+                  height: size.height,
+                }} />
+              </g>
+            )}
           </svg>
         )}
       </div>

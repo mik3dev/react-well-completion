@@ -12,14 +12,15 @@ const FONT_SIZE = 9;
 const LABEL_COLOR = '#444';
 const LINE_COLOR = '#bbb';
 
-function Label({ x, y, text, anchor = 'start', bg = false }: { x: number; y: number; text: string; anchor?: 'start' | 'middle' | 'end'; bg?: boolean }) {
+function Label({ x, y, text, anchor = 'start', bg = false, rotate = 0 }: { x: number; y: number; text: string; anchor?: 'start' | 'middle' | 'end'; bg?: boolean; rotate?: number }) {
   const charW = FONT_SIZE * 0.42;
   const pad = 2;
   const w = text.length * charW + pad * 2;
   const h = FONT_SIZE + pad * 2;
   const rx = anchor === 'end' ? x - w : anchor === 'middle' ? x - w / 2 : x;
+  const t = rotate ? `rotate(${rotate}, ${x}, ${y})` : undefined;
   return (
-    <g>
+    <g transform={t}>
       {bg && <rect x={rx - 1} y={y - h / 2} width={w + 2} height={h} fill="white" fillOpacity={0.85} rx={1} />}
       <text
         x={x} y={y}
@@ -41,10 +42,14 @@ function LeaderLine({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2
 
 export default function LabelsLayer({ well, config, minCasingDiameter }: Props) {
   const visible = useLabelsStore(s => s.visible);
+  const isH = config.orientation === 'horizontal';
+  const rot = 0; // No counter-rotation: in horizontal mode, group rotation makes text read bottom-to-top
 
   const { width } = config;
-  const rightMargin = width + 8;  // labels a la derecha del diagrama
-  const leftMargin = -8;          // labels a la izquierda
+  // In horizontal mode, "right" in local coords maps to TOP of the rotated diagram.
+  // We want most labels BELOW the diagram, so swap margins in horizontal.
+  const rightMargin = isH ? -8 : width + 8;
+  const leftMargin = isH ? width + 8 : -8;
 
   return (
     <g className="layer-labels">
@@ -55,13 +60,19 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         const yBase = config.depthToPos(c.base);
         const yMid = (yTop + yBase) / 2;
         const label = `${c.diameter}" ${c.isLiner ? 'Liner' : 'Csg'}`;
+        // In horizontal, combine into one label to avoid overlap
+        const showDepths = !isH || (yBase - yTop > 40);
 
         return (
           <g key={`label-csg-${c.id}`}>
             <LeaderLine x1={x2 + 5} y1={yMid} x2={rightMargin - 2} y2={yMid} />
-            <Label x={rightMargin} y={yMid} text={label} />
-            <Label x={rightMargin} y={yTop + FONT_SIZE + 2} text={`${c.top}'`} />
-            <Label x={rightMargin} y={yBase - 2} text={`${c.base}'`} />
+            <Label rotate={rot} x={rightMargin} y={yMid} text={isH ? `${label} ${c.top}'-${c.base}'` : label} />
+            {showDepths && !isH && (
+              <>
+                <Label rotate={rot} x={rightMargin} y={yTop + FONT_SIZE + 2} text={`${c.top}'`} />
+                <Label rotate={rot} x={rightMargin} y={yBase - 2} text={`${c.base}'`} />
+              </>
+            )}
           </g>
         );
       })}
@@ -81,8 +92,14 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
             return (
               <g key={`label-tbg-${t.id}`}>
                 <LeaderLine x1={x1 - 5} y1={yMid} x2={leftMargin + 2} y2={yMid} />
-                <Label x={leftMargin} y={yMid - 5} text={`Tbg ${t.diameter}"`} anchor="end" />
-                <Label x={leftMargin} y={yMid + 5} text={`${t.length} ft`} anchor="end" />
+                {isH ? (
+                  <Label rotate={rot} x={leftMargin} y={yMid} text={`Tbg ${t.diameter}" ${t.length} ft`} anchor="end" />
+                ) : (
+                  <>
+                    <Label rotate={rot} x={leftMargin} y={yMid - 5} text={`Tbg ${t.diameter}"`} anchor="end" />
+                    <Label rotate={rot} x={leftMargin} y={yMid + 5} text={`${t.length} ft`} anchor="end" />
+                  </>
+                )}
               </g>
             );
           });
@@ -101,7 +118,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
 
             return (
               <g key={`label-rod-${r.id}`}>
-                <Label x={leftMargin - 50} y={yMid} text={`Rod ${r.diameter}" ${r.length}ft`} anchor="end" />
+                <Label rotate={rot} x={leftMargin - 50} y={yMid} text={`Rod ${r.diameter}" ${r.length}ft`} anchor="end" />
               </g>
             );
           });
@@ -118,7 +135,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         };
         return (
           <g>
-            <Label x={rightMargin} y={y} text={`${labels[well.pump.type]} @ ${well.pump.depth}'`} />
+            <Label rotate={rot} x={rightMargin} y={y} text={`${labels[well.pump.type]} @ ${well.pump.depth}'`} />
           </g>
         );
       })()}
@@ -130,15 +147,22 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         return (
           <g key={`label-sand-${s.id}`}>
             <LeaderLine x1={0} y1={yMid} x2={x1 - 5} y2={yMid} />
-            <Label x={4} y={yMid - 5} text={s.name} />
-            <Label x={4} y={yMid + 5} text={`${s.top}' - ${s.base}'`} />
+            {isH ? (
+              <Label rotate={rot} x={4} y={yMid} text={`${s.name} ${s.top}' - ${s.base}'`} />
+            ) : (
+              <>
+                <Label rotate={rot} x={4} y={yMid - 5} text={s.name} />
+                <Label rotate={rot} x={4} y={yMid + 5} text={`${s.top}' - ${s.base}'`} />
+              </>
+            )}
           </g>
         );
       })}
 
       {/* Perforation labels — right side, with anti-overlap */}
       {visible.perforations && (() => {
-        const MIN_SPACING = FONT_SIZE + 4;
+        // In horizontal mode, rotated text needs more spacing to avoid overlap
+        const MIN_SPACING = isH ? FONT_SIZE * 6 : FONT_SIZE + 4;
         const sorted = [...well.perforations].sort((a, b) => a.top - b.top);
         let lastY = -Infinity;
         return sorted.map(p => {
@@ -150,7 +174,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
           return (
             <g key={`label-perf-${p.id}`}>
               <LeaderLine x1={x2 + 5} y1={yMid} x2={rightMargin - 2} y2={yMid} />
-              <Label x={rightMargin} y={yMid} text={`${tipo} ${p.top}'-${p.base}'`} bg />
+              <Label rotate={rot} x={rightMargin} y={yMid} text={`${tipo} ${p.top}'-${p.base}'`} bg />
             </g>
           );
         });
@@ -161,7 +185,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         const y = config.depthToPos(p.depth);
         return (
           <g key={`label-pkr-${p.id}`}>
-            <Label x={rightMargin} y={y} text={`Packer @ ${p.depth}'`} />
+            <Label rotate={rot} x={rightMargin} y={y} text={`Packer @ ${p.depth}'`} />
           </g>
         );
       })}
@@ -172,7 +196,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         const tipo = n.type === 'polished' ? 'N.Pulido' : 'N.Asiento';
         return (
           <g key={`label-nip-${n.id}`}>
-            <Label x={rightMargin} y={y} text={`${tipo} ${n.diameter}" @ ${n.depth}'`} />
+            <Label rotate={rot} x={rightMargin} y={y} text={`${tipo} ${n.diameter}" @ ${n.depth}'`} />
           </g>
         );
       })}
@@ -182,9 +206,13 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         const casingPos = computeCasingPositions(well.casings, config);
         const half = config.halfSection;
         const onLeft = half && config.halfSide === 'left';
-        // Find the outer casing edge on the visible side
+        // In horizontal mode, position mandrel labels below (small x = bottom after rotation)
+        // In vertical mode, position outside the outermost casing
         let outerEdge = 0;
-        if (onLeft) {
+        if (isH) {
+          // Below diagram in local coords = small x values
+          outerEdge = -20;
+        } else if (onLeft) {
           outerEdge = Infinity;
           for (const pos of casingPos.values()) {
             if (pos.x1 < outerEdge) outerEdge = pos.x1;
@@ -194,16 +222,19 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
             if (pos.x2 > outerEdge) outerEdge = pos.x2;
           }
         }
-        return well.mandrels.map(m => {
+        return well.mandrels
+          .slice().sort((a, b) => a.depth - b.depth)
+          .map(m => {
           const y = config.depthToPos(m.depth);
           const valvula = m.hasValve ? ' +VGL' : '';
           return (
             <g key={`label-mdr-${m.id}`}>
               <Label
-                x={onLeft ? outerEdge - 8 : outerEdge + 8}
+                rotate={rot}
+                x={isH ? outerEdge : (onLeft ? outerEdge - 8 : outerEdge + 8)}
                 y={y}
                 text={`M${m.segment}${valvula} @ ${m.depth}'`}
-                anchor={onLeft ? 'end' : 'start'}
+                anchor={isH ? 'end' : (onLeft ? 'end' : 'start')}
               />
             </g>
           );
@@ -268,7 +299,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
               <line x1={xYac} y1={yacTop}  x2={xYac - 6 * bracketDir} y2={yacTop}  stroke={bracketColor} strokeWidth={0.8} />
               <line x1={xYac} y1={yacBase} x2={xYac - 6 * bracketDir} y2={yacBase} stroke={bracketColor} strokeWidth={0.8} />
               <line x1={xYac} y1={yacTop}  x2={xYac}     y2={yacBase} stroke={bracketColor} strokeWidth={0.8} />
-              <Label x={xYac + 3 * bracketDir} y={yacMid} text={yacName} anchor={anchorDir} bg />
+              <Label rotate={rot} x={xYac + 3 * bracketDir} y={yacMid} text={yacName} anchor={anchorDir} bg />
 
               {Object.entries(byArena).map(([arenaName, aPerfs]) => {
                 const aTop  = config.depthToPos(Math.min(...aPerfs.map(p => p.top)));
@@ -283,7 +314,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
                         <line x1={xArena} y1={aTop}  x2={xArena - 5 * bracketDir} y2={aTop}  stroke={bracketColor} strokeWidth={0.7} />
                         <line x1={xArena} y1={aBase} x2={xArena - 5 * bracketDir} y2={aBase} stroke={bracketColor} strokeWidth={0.7} />
                         <line x1={xArena} y1={aTop}  x2={xArena}     y2={aBase} stroke={bracketColor} strokeWidth={0.7} />
-                        <Label x={xArena + 3 * bracketDir} y={aMid} text={arenaName} anchor={anchorDir} bg />
+                        <Label rotate={rot} x={xArena + 3 * bracketDir} y={aMid} text={arenaName} anchor={anchorDir} bg />
                       </>
                     )}
                     {/* Interval list */}

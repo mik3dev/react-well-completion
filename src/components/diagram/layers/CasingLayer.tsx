@@ -146,24 +146,16 @@ export default function CasingLayer({ casings, config }: Props) {
             {/* Label inline */}
             {showLeft && (
               <text
-                x={x1 - WALL / 2 - 3}
-                y={labelY}
-                fontSize={7}
-                textAnchor="end"
-                fill="#333"
-                fontFamily="monospace"
+                x={x1 - WALL / 2 - 3} y={labelY}
+                fontSize={7} textAnchor="end" fill="#333" fontFamily="monospace"
               >
                 {inlineLabel}
               </text>
             )}
             {!showLeft && showRight && (
               <text
-                x={x2 + WALL / 2 + 3}
-                y={labelY}
-                fontSize={7}
-                textAnchor="start"
-                fill="#333"
-                fontFamily="monospace"
+                x={x2 + WALL / 2 + 3} y={labelY}
+                fontSize={7} textAnchor="start" fill="#333" fontFamily="monospace"
               >
                 {inlineLabel}
               </text>

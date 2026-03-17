@@ -37,15 +37,14 @@ export function useDiagramConfig(
     const depthToY = (depth: number) =>
       Math.pow(depth / maxDepth, DEPTH_GAMMA) * height;
 
-    // Abstract: depthToPos maps to primary axis
-    const depthToPos = orientation === 'vertical'
-      ? depthToY
-      : (depth: number) => Math.pow(depth / maxDepth, DEPTH_GAMMA) * width;
+    // depthToPos: always maps to Y axis (vertical coords).
+    // For horizontal mode, WellDiagram swaps input dimensions and applies SVG rotation.
+    const depthToPos = depthToY;
 
-    // centerLine: center of the secondary axis
-    const centerLine = orientation === 'vertical' ? centerX : height / 2;
+    // centerLine: always centerX (vertical coords)
+    const centerLine = centerX;
 
-    // Abstract: diameterToSpan maps to secondary axis
+    // diameterToSpan: always maps to X axis (vertical coords)
     const diameterToSpan = (diameter: number): { a: number; b: number } => {
       const halfW = (diameter * pulgada) / 2;
       if (halfSection) {
