@@ -67,7 +67,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
           <g key={`label-csg-${c.id}`}>
             <LeaderLine x1={x2 + 5} y1={yMid} x2={rightMargin - 2} y2={yMid} />
             <Label rotate={rot} x={rightMargin} y={yMid} text={isH ? `${label} ${c.top}'-${c.base}'` : label} />
-            {showDepths && !isH && (
+            {showDepths && (
               <>
                 <Label rotate={rot} x={rightMargin} y={yTop + FONT_SIZE + 2} text={`${c.top}'`} />
                 <Label rotate={rot} x={rightMargin} y={yBase - 2} text={`${c.base}'`} />
@@ -77,7 +77,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         );
       })}
 
-      {/* Tubing labels — left side */}
+      {/* Tubing labels — left side (skip in horizontal — too dense) */}
       {visible.tubing && (() => {
         let acc = 0;
         return well.tubingString
@@ -92,20 +92,14 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
             return (
               <g key={`label-tbg-${t.id}`}>
                 <LeaderLine x1={x1 - 5} y1={yMid} x2={leftMargin + 2} y2={yMid} />
-                {isH ? (
-                  <Label rotate={rot} x={leftMargin} y={yMid} text={`Tbg ${t.diameter}" ${t.length} ft`} anchor="end" />
-                ) : (
-                  <>
-                    <Label rotate={rot} x={leftMargin} y={yMid - 5} text={`Tbg ${t.diameter}"`} anchor="end" />
-                    <Label rotate={rot} x={leftMargin} y={yMid + 5} text={`${t.length} ft`} anchor="end" />
-                  </>
-                )}
+                <Label rotate={rot} x={leftMargin} y={yMid - 5} text={`Tbg ${t.diameter}"`} anchor="end" />
+                <Label rotate={rot} x={leftMargin} y={yMid + 5} text={`${t.length} ft`} anchor="end" />
               </g>
             );
           });
       })()}
 
-      {/* Rod labels — left side, offset further */}
+      {/* Rod labels — left side, offset further (skip in horizontal) */}
       {visible.rods && (() => {
         let acc = 0;
         return well.rodString
@@ -140,7 +134,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         );
       })()}
 
-      {/* Sand labels — left side */}
+      {/* Sand labels — left side (skip in horizontal — too dense) */}
       {visible.sands && well.sands.map(s => {
         const { x1 } = diameterToX(config, minCasingDiameter);
         const yMid = (config.depthToPos(s.top) + config.depthToPos(s.base)) / 2;
@@ -159,10 +153,9 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         );
       })}
 
-      {/* Perforation labels — right side, with anti-overlap */}
+      {/* Perforation labels — right side, with anti-overlap (skip in horizontal) */}
       {visible.perforations && (() => {
-        // In horizontal mode, rotated text needs more spacing to avoid overlap
-        const MIN_SPACING = isH ? FONT_SIZE * 6 : FONT_SIZE + 4;
+        const MIN_SPACING = FONT_SIZE + 4;
         const sorted = [...well.perforations].sort((a, b) => a.top - b.top);
         let lastY = -Infinity;
         return sorted.map(p => {
@@ -180,7 +173,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         });
       })()}
 
-      {/* Packer labels */}
+      {/* Packer labels (skip in horizontal) */}
       {visible.packers && well.packers.map(p => {
         const y = config.depthToPos(p.depth);
         return (
@@ -190,7 +183,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         );
       })}
 
-      {/* Nipple labels */}
+      {/* Nipple labels (skip in horizontal) */}
       {visible.nipples && well.seatNipples.map(n => {
         const y = config.depthToPos(n.depth);
         const tipo = n.type === 'polished' ? 'N.Pulido' : 'N.Asiento';
@@ -241,7 +234,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         });
       })()}
 
-      {/* Yacimiento / Arena labels — left side, hierarchical brackets */}
+      {/* Yacimiento / Arena labels — left side, hierarchical brackets (skip in horizontal) */}
       {visible.yacimientos && (() => {
         const withYac = well.perforations.filter(p => p.yacimiento);
         if (withYac.length === 0) return null;
