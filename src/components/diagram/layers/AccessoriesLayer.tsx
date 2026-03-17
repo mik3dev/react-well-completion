@@ -149,12 +149,10 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
         });
       })()}
 
-      {/* Mandrels (Gas Lift) */}
+      {/* Mandrels (Gas Lift) — side-pocket on right side of tubing */}
       {well.mandrels.map((mandrel) => {
-        const { x2 } = diameterToX(config, mandrel.diameter);
+        const { x1, x2 } = diameterToX(config, mandrel.diameter);
         const y = config.depthToY(mandrel.depth);
-        const mW = config.pulgada * 1.2;
-        const mH = mW * 1.5; // taller pocket
         const label = mandrel.hasValve ? 'Mandril + Válvula GL' : 'Mandril (sin válvula)';
 
         return (
@@ -163,7 +161,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
             onMouseMove={move}
             onMouseLeave={hide}
           >
-            <MandrelIcon x={x2 - mW * 0.3} y={y} width={mW} height={mH} hasValve={mandrel.hasValve} />
+            <MandrelIcon x={x1} y={y} tubingW={x2 - x1} hasValve={mandrel.hasValve} side="right" />
           </g>
         );
       })}

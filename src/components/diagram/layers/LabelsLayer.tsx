@@ -1,5 +1,5 @@
 import type { DiagramConfig, Well } from '../../../types';
-import { diameterToX } from '../../../hooks/use-diagram-config';
+import { diameterToX, computeCasingPositions } from '../../../hooks/use-diagram-config';
 import { useLabelsStore } from '../../../store/labels-store';
 
 interface Props {
@@ -177,17 +177,24 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         );
       })}
 
-      {/* Mandrel labels */}
-      {visible.mandrels && well.mandrels.map(m => {
-        const { x2 } = diameterToX(config, m.diameter);
-        const y = config.depthToY(m.depth);
-        const valvula = m.hasValve ? ' +VGL' : '';
-        return (
-          <g key={`label-mdr-${m.id}`}>
-            <Label x={x2 + config.pulgada + 4} y={y + 6} text={`M${m.segment}${valvula} @ ${m.depth}'`} />
-          </g>
-        );
-      })}
+      {/* Mandrel labels — positioned outside the outermost casing */}
+      {visible.mandrels && (() => {
+        const casingPos = computeCasingPositions(well.casings, config);
+        // Find the rightmost casing edge (outermost casing x2)
+        let outerX2 = 0;
+        for (const pos of casingPos.values()) {
+          if (pos.x2 > outerX2) outerX2 = pos.x2;
+        }
+        return well.mandrels.map(m => {
+          const y = config.depthToY(m.depth);
+          const valvula = m.hasValve ? ' +VGL' : '';
+          return (
+            <g key={`label-mdr-${m.id}`}>
+              <Label x={outerX2 + 8} y={y} text={`M${m.segment}${valvula} @ ${m.depth}'`} />
+            </g>
+          );
+        });
+      })()}
 
       {/* Yacimiento / Arena labels — left side, hierarchical brackets */}
       {visible.yacimientos && (() => {
