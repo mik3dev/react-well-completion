@@ -68,11 +68,16 @@ export default function WellDiagram({ well }: Props) {
           >
             <SvgDefs />
             {/* Offset for depth axis labels; rotation for horizontal */}
+            {/* In vertical: depth axis inside the group. In horizontal: rendered separately below */}
+            {!isH && (
+              <g transform="translate(45, 0)">
+                <DepthAxisLayer config={config} />
+              </g>
+            )}
             <g transform={isH
               ? `translate(45, ${30 + config.width}) rotate(-90)`
               : 'translate(45, 0)'
             }>
-              <DepthAxisLayer config={config} />
               <SandLayer sands={well.sands} minCasingDiameter={minCasingDiameter} config={config} />
               <EarthLayer
                 totalFreeDepth={well.totalFreeDepth}
@@ -102,6 +107,32 @@ export default function WellDiagram({ well }: Props) {
                 />
               )}
             </g>
+
+            {/* Horizontal depth axis — rendered outside rotation group at bottom */}
+            {isH && config && (() => {
+              const axisY = size.height - 20;
+              const ticks: number[] = [];
+              let interval = config.maxDepth / 10;
+              const mag = Math.pow(10, Math.floor(Math.log10(interval)));
+              const norm = interval / mag;
+              interval = norm <= 1 ? mag : norm <= 2 ? 2 * mag : norm <= 5 ? 5 * mag : 10 * mag;
+              for (let d = 0; d <= config.maxDepth; d += interval) ticks.push(d);
+              return (
+                <g>
+                  <line x1={45} y1={axisY} x2={size.width} y2={axisY} stroke="#ccc" strokeWidth={1} />
+                  {ticks.map(d => {
+                    // Map depth to horizontal position: same gamma as depthToPos but mapped to screen X
+                    const x = 45 + (config.maxDepth > 0 ? Math.pow(d / config.maxDepth, 1.5) * (size.width - 50) : 0);
+                    return (
+                      <g key={`htick-${d}`}>
+                        <line x1={x} y1={axisY} x2={x} y2={axisY + 6} stroke="#999" strokeWidth={1} />
+                        <text x={x} y={axisY + 16} fontSize={9} fill="#666" textAnchor="middle">{d}'</text>
+                      </g>
+                    );
+                  })}
+                </g>
+              );
+            })()}
 
             {/* WellDetailLayer rendered outside rotation group so it stays fixed */}
             {config && (
