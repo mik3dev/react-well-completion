@@ -15,8 +15,8 @@ export default function EarthLayer({ totalFreeDepth, totalDepth, minCasingDiamet
   if (!totalFreeDepth || totalFreeDepth >= totalDepth) return null;
 
   const { x1, x2 } = diameterToX(config, minCasingDiameter);
-  const y = config.depthToY(totalFreeDepth);
-  const h = config.depthToY(totalDepth) - y;
+  const y = config.depthToPos(totalFreeDepth);
+  const h = config.depthToPos(totalDepth) - y;
 
   return (
     <g className="layer-earth">

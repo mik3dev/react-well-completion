@@ -20,9 +20,9 @@ export default function RodLayer({ rodString, config }: Props) {
         const base = accDepth;
 
         const rodWidth = seg.diameter * config.pulgada;
-        const x = config.centerX - rodWidth / 2;
-        const y = config.depthToY(top);
-        const h = config.depthToY(base) - y;
+        const x = config.centerLine - rodWidth / 2;
+        const y = config.depthToPos(top);
+        const h = config.depthToPos(base) - y;
 
         const info = [
           'Tipo: Cabilla',

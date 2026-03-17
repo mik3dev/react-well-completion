@@ -43,8 +43,8 @@ export default function CasingLayer({ casings, config }: Props) {
     <g className="layer-casings">
       {sorted.map((casing, idx) => {
         const { x1, x2 } = positions[idx];
-        const y = config.depthToY(casing.top);
-        const h = config.depthToY(casing.base) - y;
+        const y = config.depthToPos(casing.top);
+        const h = config.depthToPos(casing.base) - y;
         const label = casing.isLiner ? 'Liner' : 'Casing';
         const hasHanger = casing.isLiner && casing.top > 0;
 
@@ -83,7 +83,7 @@ export default function CasingLayer({ casings, config }: Props) {
         // hangerGap dinámico: limitado al solapamiento real con el padre en px
         let hangerGap = 0;
         if (hasHanger && parentIdx >= 0) {
-          const overlapPx = config.depthToY(sorted[parentIdx].base) - y;
+          const overlapPx = config.depthToPos(sorted[parentIdx].base) - y;
           hangerGap = Math.min(hangerH, Math.max(overlapPx, hangerBlockH));
         }
 

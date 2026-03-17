@@ -5,7 +5,7 @@ interface Props {
 }
 
 export default function DepthAxisLayer({ config }: Props) {
-  const { maxDepth, height, width, depthToY } = config;
+  const { maxDepth, height, width, depthToPos } = config;
 
   // Calculate a nice tick interval
   const rawInterval = maxDepth / 10;
@@ -25,7 +25,7 @@ export default function DepthAxisLayer({ config }: Props) {
   return (
     <g className="layer-depth-axis">
       {ticks.map(depth => {
-        const y = depthToY(depth);
+        const y = depthToPos(depth);
         return (
           <g key={depth}>
             <line x1={0} y1={y} x2={8} y2={y} stroke="#999" strokeWidth={1} />

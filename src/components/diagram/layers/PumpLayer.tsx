@@ -12,12 +12,12 @@ export default function PumpLayer({ pump, config }: Props) {
   if (!pump) return null;
 
   const pumpWidth = pump.diameter * config.pulgada;
-  const x = config.centerX - pumpWidth / 2;
-  const y = config.depthToY(pump.depth);
+  const x = config.centerLine - pumpWidth / 2;
+  const y = config.depthToPos(pump.depth);
   // Altura: escala real si hay longitud, mínimo visual de 20px para que no sea invisible
   const MIN_PUMP_H = 20;
   const scaledH = pump.length > 0
-    ? config.depthToY(pump.depth + pump.length) - y
+    ? config.depthToPos(pump.depth + pump.length) - y
     : 0;
   const pumpHeight = Math.max(scaledH, MIN_PUMP_H);
 

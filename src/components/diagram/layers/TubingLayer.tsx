@@ -21,8 +21,8 @@ export default function TubingLayer({ tubingString, config }: Props) {
         const base = accDepth;
 
         const { x1, x2 } = diameterToX(config, seg.diameter);
-        const y1 = config.depthToY(top);
-        const y2 = config.depthToY(base);
+        const y1 = config.depthToPos(top);
+        const y2 = config.depthToPos(base);
 
         const info = [
           'Tipo: Tubing',

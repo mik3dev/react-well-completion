@@ -1,5 +1,5 @@
 import { useWellStore } from '../../store/well-store';
-import type { LiftMethod, Casing, TubingSegment, RodSegment } from '../../types';
+import type { LiftMethod, DiagramOrientation, HalfSide, Casing, TubingSegment, RodSegment } from '../../types';
 import { createCasing, createTubingSegment, createRodSegment, createPump, createSand, createPerforation, createPacker, createSeatNipple, createPlug, createGasAnchor, createMandrel, createSleeve, createPacking, createWire } from '../../utils/well-factory';
 
 const METHODS: { value: LiftMethod; label: string }[] = [
@@ -61,6 +61,27 @@ export default function WellEditor() {
             <input type="number" value={well.mesaRotaria ?? ''} placeholder="\u2014"
               onChange={e => updateWellMeta(well.id, { mesaRotaria: e.target.value ? +e.target.value : undefined })} />
           </label>
+          <label>
+            Orientación
+            <select value={well.orientation ?? 'vertical'} onChange={e => updateWellMeta(well.id, { orientation: e.target.value as DiagramOrientation })}>
+              <option value="vertical">Vertical</option>
+              <option value="horizontal">Horizontal</option>
+            </select>
+          </label>
+          <label>
+            Media Sección
+            <input type="checkbox" checked={well.halfSection ?? false}
+              onChange={e => updateWellMeta(well.id, { halfSection: e.target.checked })} />
+          </label>
+          {well.halfSection && (
+            <label>
+              Lado
+              <select value={well.halfSide ?? 'right'} onChange={e => updateWellMeta(well.id, { halfSide: e.target.value as HalfSide })}>
+                <option value="right">Derecha</option>
+                <option value="left">Izquierda</option>
+              </select>
+            </label>
+          )}
         </div>
       </section>
 

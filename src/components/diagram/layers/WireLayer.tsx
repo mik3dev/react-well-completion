@@ -17,7 +17,7 @@ export default function WireLayer({ wire, tubingString, config }: Props) {
   const { x1 } = diameterToX(config, firstTubDiam);
   const wireWidth = config.pulgada * 0.35;
   const wireX = x1 - wireWidth - 3;
-  const wireH = config.depthToY(wire.depth);
+  const wireH = config.depthToPos(wire.depth);
 
   return (
     <g className="layer-wire"

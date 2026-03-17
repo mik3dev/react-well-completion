@@ -102,6 +102,9 @@ export interface Wire {
   depth: number;          // pies (hasta donde llega el cable BES)
 }
 
+export type DiagramOrientation = 'vertical' | 'horizontal';
+export type HalfSide = 'right' | 'left';
+
 export interface Well {
   id: string;
   name: string;
@@ -112,6 +115,9 @@ export interface Well {
   longitude?: number;
   estacionFlujo?: string;     // Estación de Flujo (EF)
   mesaRotaria?: number;       // Mesa Rotaria — elevación en pies
+  orientation?: DiagramOrientation;   // default 'vertical'
+  halfSection?: boolean;              // default false
+  halfSide?: HalfSide;               // default 'right'
   casings: Casing[];
   tubingString: TubingSegment[];
   rodString: RodSegment[];          // solo BM/BCP

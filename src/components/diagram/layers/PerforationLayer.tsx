@@ -18,8 +18,8 @@ export default function PerforationLayer({ perforations, minCasingDiameter, conf
   return (
     <g className="layer-perforations">
       {perforations.map((perf) => {
-        const yTop = config.depthToY(perf.top);
-        const yBase = config.depthToY(perf.base);
+        const yTop = config.depthToPos(perf.top);
+        const yBase = config.depthToPos(perf.base);
         const intervalH = yBase - yTop;
         const isShoot = perf.type === 'shoot';
 

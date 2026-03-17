@@ -16,7 +16,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
     <g className="layer-accessories">
       {/* Packers */}
       {well.packers.map((packer) => {
-        const y = config.depthToY(packer.depth);
+        const y = config.depthToPos(packer.depth);
         const { x1, x2 } = diameterToX(config, packer.diameter);
         const packerW = config.pulgada * 1.5;
         const packerH = packerW * 1.2; // aspect ratio ~1.2:1
@@ -37,7 +37,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
 
       {/* Seat Nipples */}
       {well.seatNipples.map((nipple) => {
-        const y = config.depthToY(nipple.depth);
+        const y = config.depthToPos(nipple.depth);
         const { x1, x2 } = diameterToX(config, nipple.diameter);
         const nW = config.pulgada * 0.5;
         const nH = nW * 1.5; // taller than wide
@@ -57,7 +57,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
 
       {/* Plugs */}
       {well.plugs.map((plug) => {
-        const y = config.depthToY(plug.depth);
+        const y = config.depthToPos(plug.depth);
         const { x1, x2 } = diameterToX(config, minCasingDiameter);
         const plugH = config.pulgada * 0.6;
 
@@ -75,8 +75,8 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
       {/* Gas Anchors */}
       {well.gasAnchors.map((ga) => {
         const { x1, x2 } = diameterToX(config, ga.diameter);
-        const y = config.depthToY(ga.depth);
-        const scaledH = ga.length > 0 ? config.depthToY(ga.depth + ga.length) - y : 0;
+        const y = config.depthToPos(ga.depth);
+        const scaledH = ga.length > 0 ? config.depthToPos(ga.depth + ga.length) - y : 0;
         const h = Math.max(scaledH, 20);
 
         return (
@@ -93,7 +93,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
       {/* Sleeves — uniform height, full tubing width */}
       {well.sleeves.map((sleeve) => {
         const { x1, x2 } = diameterToX(config, sleeve.diameter);
-        const y = config.depthToY(sleeve.depth);
+        const y = config.depthToPos(sleeve.depth);
         const SLEEVE_H = config.pulgada * 0.6;
 
         return (
@@ -114,7 +114,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
         const casingPos = computeCasingPositions(well.casings, config);
         return well.packings.map((pk) => {
           const { x1: tbgX1, x2: tbgX2 } = diameterToX(config, pk.diameter);
-          const y = config.depthToY(pk.depth);
+          const y = config.depthToPos(pk.depth);
 
           // Find the smallest casing that contains this packing at pk.depth
           const containingCasing = well.casings
@@ -152,7 +152,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
       {/* Mandrels (Gas Lift) — side-pocket on right side of tubing */}
       {well.mandrels.map((mandrel) => {
         const { x1, x2 } = diameterToX(config, mandrel.diameter);
-        const y = config.depthToY(mandrel.depth);
+        const y = config.depthToPos(mandrel.depth);
         const label = mandrel.hasValve ? 'Mandril + Válvula GL' : 'Mandril (sin válvula)';
 
         return (
