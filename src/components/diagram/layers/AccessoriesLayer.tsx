@@ -90,12 +90,11 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
         );
       })}
 
-      {/* Sleeves */}
+      {/* Sleeves — uniform height, full tubing width */}
       {well.sleeves.map((sleeve) => {
         const { x1, x2 } = diameterToX(config, sleeve.diameter);
         const y = config.depthToY(sleeve.depth);
-        const sleeveWidth = x2 - x1;
-        const h = sleeveWidth * 0.8; // slightly wider than tall
+        const SLEEVE_H = config.pulgada * 0.6;
 
         return (
           <g key={sleeve.id}
@@ -103,7 +102,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
             onMouseMove={move}
             onMouseLeave={hide}
           >
-            <SleeveIcon x={x1} y={y} width={x2 - x1} height={h} />
+            <SleeveIcon x={x1} y={y - SLEEVE_H / 2} width={x2 - x1} height={SLEEVE_H} />
           </g>
         );
       })}
