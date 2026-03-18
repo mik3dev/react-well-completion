@@ -13,7 +13,9 @@ export type LabelCategory =
   | 'mandrels'
   | 'depths'
   | 'yacimientos'
-  | 'wellDetail';
+  | 'wellDetail'
+  | 'casingDetail'
+  | 'tubingDetail';
 
 export const LABEL_CATEGORIES: { key: LabelCategory; label: string }[] = [
   { key: 'casings', label: 'Casings' },
@@ -28,6 +30,8 @@ export const LABEL_CATEGORIES: { key: LabelCategory; label: string }[] = [
   { key: 'depths', label: 'Profundidades' },
   { key: 'yacimientos', label: 'Yacimientos' },
   { key: 'wellDetail', label: 'Detalle de Pozo' },
+  { key: 'casingDetail', label: 'Detalle de Casing' },
+  { key: 'tubingDetail', label: 'Detalle de Tuberías' },
 ];
 
 interface LabelsStore {
