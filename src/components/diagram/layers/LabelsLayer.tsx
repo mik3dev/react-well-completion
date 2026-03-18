@@ -46,9 +46,10 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
   const rot = 0; // No counter-rotation: in horizontal mode, group rotation makes text read bottom-to-top
 
   const { width } = config;
-  // In horizontal mode, "right" in local coords maps to TOP of the rotated diagram.
-  // We want most labels BELOW the diagram, so swap margins in horizontal.
-  const rightMargin = isH ? -8 : width + 8;
+  // In horizontal mode: local x maps to svgY via (30 + configWidth - x).
+  // Negative x → below diagram. Positive x near width → near top.
+  // configWidth has 100px bottom margin, so x=-60 maps to visible bottom area.
+  const rightMargin = isH ? -60 : width + 8;
   const leftMargin = isH ? width + 8 : -8;
 
   return (
@@ -199,22 +200,15 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         const casingPos = computeCasingPositions(well.casings, config);
         const half = config.halfSection;
         const onLeft = half && config.halfSide === 'left';
-        // In horizontal mode, position mandrel labels below (small x = bottom after rotation)
-        // In vertical mode, position outside the outermost casing
-        let outerEdge = 0;
-        if (isH) {
-          // Below diagram in local coords = small x values
-          outerEdge = -20;
-        } else if (onLeft) {
-          outerEdge = Infinity;
-          for (const pos of casingPos.values()) {
-            if (pos.x1 < outerEdge) outerEdge = pos.x1;
-          }
-        } else {
-          for (const pos of casingPos.values()) {
-            if (pos.x2 > outerEdge) outerEdge = pos.x2;
-          }
+        // Always position outside the outermost casing — rotation handles orientation
+        let outerX2 = 0;
+        let outerX1 = Infinity;
+        for (const pos of casingPos.values()) {
+          if (pos.x2 > outerX2) outerX2 = pos.x2;
+          if (pos.x1 < outerX1) outerX1 = pos.x1;
         }
+        const useLeft = onLeft;
+        const edge = useLeft ? outerX1 : outerX2;
         return well.mandrels
           .slice().sort((a, b) => a.depth - b.depth)
           .map(m => {
@@ -224,10 +218,10 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
             <g key={`label-mdr-${m.id}`}>
               <Label
                 rotate={rot}
-                x={isH ? outerEdge : (onLeft ? outerEdge - 8 : outerEdge + 8)}
+                x={useLeft ? edge - 8 : edge + 8}
                 y={y}
                 text={`M${m.segment}${valvula} @ ${m.depth}'`}
-                anchor={isH ? 'end' : (onLeft ? 'end' : 'start')}
+                anchor={useLeft ? 'end' : 'start'}
               />
             </g>
           );
@@ -250,7 +244,14 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         let xInterval: number, xArena: number, xYac: number;
         let anchorDir: 'start' | 'end';
         let bracketDir: number; // +1 = brackets open right, -1 = brackets open left
-        if (labelsOnRight) {
+        if (isH) {
+          // In horizontal mode, place below diagram (negative x = bottom after rotation)
+          xInterval = -20;
+          xArena    = -20 - intervalTextW - 10;
+          xYac      = xArena - 50;
+          anchorDir = 'end';
+          bracketDir = -1;
+        } else if (labelsOnRight) {
           xInterval = x2 + 20;
           xArena    = x2 + intervalTextW + 10;
           xYac      = xArena + 50;
