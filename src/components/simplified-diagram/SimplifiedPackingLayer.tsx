@@ -19,7 +19,6 @@ export default function SimplifiedPackingLayer({ packings, casings, config }: Pr
         const { x1: tbgX1, x2: tbgX2 } = diameterToX(config, pk.diameter);
         const y = config.depthToPos(pk.depth);
 
-        // Find containing casing
         const containingCasing = casings
           .filter(c => c.top <= pk.depth && c.base >= pk.depth)
           .sort((a, b) => a.diameter - b.diameter)[0];
@@ -35,23 +34,22 @@ export default function SimplifiedPackingLayer({ packings, casings, config }: Pr
           csgX2 = fallback.x2;
         }
 
-        const leftW = tbgX1 - (csgX1 + WALL / 2);
-        const rightW = (csgX2 - WALL / 2) - tbgX2;
+        const half = PK_H / 2;
+        // Left X: between casing wall and tubing left wall
+        const lx1 = csgX1 + WALL / 2;
+        const lx2 = tbgX1;
+        // Right X: between tubing right wall and casing wall
+        const rx1 = tbgX2;
+        const rx2 = csgX2 - WALL / 2;
 
         return (
           <g key={pk.id}>
-            {/* Left packing */}
-            <rect
-              x={csgX1 + WALL / 2} y={y - PK_H / 2}
-              width={Math.max(leftW, 3)} height={PK_H}
-              fill="#999" stroke="#555" strokeWidth={0.5}
-            />
-            {/* Right packing */}
-            <rect
-              x={tbgX2} y={y - PK_H / 2}
-              width={Math.max(rightW, 3)} height={PK_H}
-              fill="#999" stroke="#555" strokeWidth={0.5}
-            />
+            {/* Left X */}
+            <line x1={lx1} y1={y - half} x2={lx2} y2={y + half} stroke="#555" strokeWidth={1.5} />
+            <line x1={lx1} y1={y + half} x2={lx2} y2={y - half} stroke="#555" strokeWidth={1.5} />
+            {/* Right X */}
+            <line x1={rx1} y1={y - half} x2={rx2} y2={y + half} stroke="#555" strokeWidth={1.5} />
+            <line x1={rx1} y1={y + half} x2={rx2} y2={y - half} stroke="#555" strokeWidth={1.5} />
           </g>
         );
       })}
