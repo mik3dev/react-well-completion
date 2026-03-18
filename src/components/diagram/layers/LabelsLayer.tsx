@@ -46,11 +46,10 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
   const rot = 0; // No counter-rotation: in horizontal mode, group rotation makes text read bottom-to-top
 
   const { width } = config;
-  // In horizontal mode: local x maps to svgY via (30 + configWidth - x).
-  // Negative x → below diagram. Positive x near width → near top.
-  // configWidth has 100px bottom margin, so x=-60 maps to visible bottom area.
-  const rightMargin = isH ? -60 : width + 8;
-  const leftMargin = isH ? width + 8 : -8;
+  // Use same margins for both orientations — rotation handles placement.
+  // Labels at rightMargin appear "to the right" in vertical, "above" in horizontal.
+  const rightMargin = width + 8;
+  const leftMargin = -8;
 
   return (
     <g className="layer-labels">
@@ -244,14 +243,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         let xInterval: number, xArena: number, xYac: number;
         let anchorDir: 'start' | 'end';
         let bracketDir: number; // +1 = brackets open right, -1 = brackets open left
-        if (isH) {
-          // In horizontal mode, place below diagram (negative x = bottom after rotation)
-          xInterval = -20;
-          xArena    = -20 - intervalTextW - 10;
-          xYac      = xArena - 50;
-          anchorDir = 'end';
-          bracketDir = -1;
-        } else if (labelsOnRight) {
+        if (labelsOnRight) {
           xInterval = x2 + 20;
           xArena    = x2 + intervalTextW + 10;
           xYac      = xArena + 50;

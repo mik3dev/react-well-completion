@@ -40,8 +40,8 @@ export default function WellDiagram({ well }: Props) {
   const isH = (well.orientation ?? 'vertical') === 'horizontal';
   // For horizontal: swap dimensions so config generates vertical coords
   // that get rotated by the SVG transform
-  // In horizontal, leave 100px bottom margin for labels (rightMargin maps to bottom after rotation)
-  const configW = isH ? size.height - 130 : size.width - 50;
+  // In horizontal, leave margin for depth axis at bottom
+  const configW = isH ? size.height - 60 : size.width - 50;
   const configH = isH ? size.width - 50 : size.height;
   const config = useDiagramConfig(configW, configH, well);
 
