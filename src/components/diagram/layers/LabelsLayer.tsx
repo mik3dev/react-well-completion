@@ -53,8 +53,8 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
 
   return (
     <g className="layer-labels">
-      {/* Casing labels — right side */}
-      {visible.casings && well.casings.map(c => {
+      {/* Casing labels — right side (skip in horizontal: inline labels from CasingLayer suffice) */}
+      {visible.casings && !isH && well.casings.map(c => {
         const { x2 } = diameterToX(config, c.diameter);
         const yTop = config.depthToPos(c.top);
         const yBase = config.depthToPos(c.base);
@@ -118,8 +118,8 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
           });
       })()}
 
-      {/* Pump label */}
-      {visible.pump && well.pump && (() => {
+      {/* Pump label (skip in horizontal) */}
+      {visible.pump && !isH && well.pump && (() => {
         const y = config.depthToPos(well.pump.depth);
         const labels: Record<string, string> = {
           BM: 'B. Mecánica',
@@ -153,8 +153,8 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
         );
       })}
 
-      {/* Perforation labels — right side, with anti-overlap (skip in horizontal) */}
-      {visible.perforations && (() => {
+      {/* Perforation labels — right side (skip in horizontal: yacimiento brackets show interval info) */}
+      {visible.perforations && !isH && (() => {
         const MIN_SPACING = FONT_SIZE + 4;
         const sorted = [...well.perforations].sort((a, b) => a.top - b.top);
         let lastY = -Infinity;
@@ -174,7 +174,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
       })()}
 
       {/* Packer labels (skip in horizontal) */}
-      {visible.packers && well.packers.map(p => {
+      {visible.packers && !isH && well.packers.map(p => {
         const y = config.depthToPos(p.depth);
         return (
           <g key={`label-pkr-${p.id}`}>
@@ -184,7 +184,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter }: Props) 
       })}
 
       {/* Nipple labels (skip in horizontal) */}
-      {visible.nipples && well.seatNipples.map(n => {
+      {visible.nipples && !isH && well.seatNipples.map(n => {
         const y = config.depthToPos(n.depth);
         const tipo = n.type === 'polished' ? 'N.Pulido' : 'N.Asiento';
         return (
