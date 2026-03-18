@@ -4,7 +4,12 @@ import { useWellStore } from '../store/well-store';
 import { exampleWells } from '../data/example-wells';
 import { useLabelsStore, LABEL_CATEGORIES } from '../store/labels-store';
 
-export default function Toolbar() {
+interface ToolbarProps {
+  showSimplified: boolean;
+  onToggleSimplified: () => void;
+}
+
+export default function Toolbar({ showSimplified, onToggleSimplified }: ToolbarProps) {
   const { exportPng, exportSvg, copyToClipboard } = useExport();
   const { importWells, exportWells, wells } = useWellStore();
   const { visible, toggle, showAll, hideAll } = useLabelsStore();
@@ -51,6 +56,12 @@ export default function Toolbar() {
         <button onClick={exportPng} disabled={wells.length === 0}>Exportar PNG</button>
         <button onClick={exportSvg} disabled={wells.length === 0}>Exportar SVG</button>
         <button onClick={copyToClipboard} disabled={wells.length === 0}>Copiar Imagen</button>
+        <button
+          onClick={onToggleSimplified}
+          className={showSimplified ? 'active' : ''}
+        >
+          Simplificado
+        </button>
         <div className="toolbar__labels-wrapper">
           <button
             onClick={() => setShowLabelsMenu(!showLabelsMenu)}
