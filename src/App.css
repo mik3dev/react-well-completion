@@ -154,14 +154,6 @@ body {
   overflow: hidden;
 }
 
-.app__simplified {
-  width: 200px;
-  min-width: 200px;
-  border-left: 1px solid var(--border-color);
-  background: white;
-  overflow: hidden;
-}
-
 .app__placeholder {
   display: flex;
   align-items: center;

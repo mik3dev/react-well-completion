@@ -21,18 +21,13 @@ export default function App() {
         </aside>
         <main className="app__diagram">
           {well ? (
-            <WellDiagram well={well} />
+            showSimplified ? <SimplifiedDiagram well={well} /> : <WellDiagram well={well} />
           ) : (
             <div className="app__placeholder">
               <p>Selecciona o crea un pozo para visualizar el diagrama</p>
             </div>
           )}
         </main>
-        {showSimplified && well && (
-          <aside className="app__simplified">
-            <SimplifiedDiagram well={well} />
-          </aside>
-        )}
       </div>
     </div>
   );
