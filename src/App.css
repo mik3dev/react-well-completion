@@ -10,7 +10,11 @@
   --border-color: #e0e0e0;
   --bg-sidebar: #fafafa;
   --bg-main: #fff;
-  --accent: #1976d2;
+  --primary-dark: #123763;
+  --primary: #205394;
+  --primary-light: #377AF3;
+  --accent: #205394;
+  --accent-hover: #dce6f7;
   --danger: #d32f2f;
   --text: #333;
   --text-muted: #888;
@@ -37,10 +41,12 @@ body {
   justify-content: space-between;
   padding: 0 16px;
   border-bottom: 1px solid var(--border-color);
-  background: #f5f5f5;
+  background: var(--primary-dark);
+  color: white;
 }
 
 .toolbar h2 {
+  color: white;
   font-size: 15px;
   font-weight: 600;
 }
@@ -52,16 +58,17 @@ body {
 
 .toolbar__actions button {
   padding: 4px 10px;
-  border: 1px solid var(--border-color);
-  background: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: var(--primary);
+  color: white;
   border-radius: var(--radius);
   cursor: pointer;
   font-size: 12px;
 }
 
 .toolbar__actions button:hover:not(:disabled) {
-  background: #e3f2fd;
-  border-color: var(--accent);
+  background: var(--primary-light);
+  border-color: var(--primary-light);
 }
 
 .toolbar__actions button:disabled {
@@ -70,9 +77,9 @@ body {
 }
 
 .toolbar__actions button.active {
-  background: #e3f2fd;
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--primary-light);
+  border-color: var(--primary-light);
+  color: white;
 }
 
 .toolbar__labels-wrapper {
@@ -85,6 +92,7 @@ body {
   right: 0;
   margin-top: 4px;
   background: white;
+  color: var(--text);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
   box-shadow: 0 4px 12px rgba(0,0,0,0.12);
@@ -107,12 +115,14 @@ body {
   font-size: 11px;
   border: 1px solid var(--border-color);
   background: white;
+  color: var(--text);
   border-radius: var(--radius);
   cursor: pointer;
 }
 
 .toolbar__labels-actions button:hover {
-  background: #e3f2fd;
+  background: var(--primary);
+  color: white;
 }
 
 .toolbar__labels-item {
@@ -122,10 +132,11 @@ body {
   padding: 3px 10px;
   cursor: pointer;
   font-size: 12px;
+  color: var(--text);
 }
 
 .toolbar__labels-item:hover {
-  background: #f5f5f5;
+  background: var(--accent-hover);
 }
 
 .toolbar__labels-item input[type="checkbox"] {
@@ -232,7 +243,7 @@ body {
 }
 
 .well-selector__list li:hover {
-  background: #e3f2fd;
+  background: var(--accent-hover);
 }
 
 .well-selector__list li.active {
@@ -284,7 +295,7 @@ body {
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 4px;
-  color: var(--text-muted);
+  color: var(--primary-dark);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -337,9 +348,9 @@ body {
 .editor-table th {
   text-align: left;
   font-size: 10px;
-  color: var(--text-muted);
+  color: var(--primary);
   padding: 2px 4px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--primary-light);
 }
 
 .editor-table td {

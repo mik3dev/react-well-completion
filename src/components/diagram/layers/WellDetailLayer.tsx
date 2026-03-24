@@ -46,9 +46,9 @@ function KVBlock({ title, rows, x, y }: KVBlockProps) {
     <g transform={`translate(${x}, ${y})`}>
       <rect x={2} y={2} width={BOX_W} height={boxH} fill="rgba(0,0,0,0.08)" rx={3} />
       <rect width={BOX_W} height={boxH} fill="white" stroke="#333" strokeWidth={1.2} rx={3} />
-      <rect width={BOX_W} height={HEADER_H} fill="#2c3e50" rx={3} />
-      <rect y={HEADER_H - 4} width={BOX_W} height={4} fill="#2c3e50" />
-      <rect y={HEADER_H} width={BOX_W} height={1.5} fill="#e74c3c" />
+      <rect width={BOX_W} height={HEADER_H} fill="#205394" rx={3} />
+      <rect y={HEADER_H - 4} width={BOX_W} height={4} fill="#205394" />
+      <rect y={HEADER_H} width={BOX_W} height={1.5} fill="#377AF3" />
       <text
         x={BOX_W / 2} y={HEADER_H / 2}
         fill="white" fontSize={10} fontWeight="bold"
@@ -60,7 +60,7 @@ function KVBlock({ title, rows, x, y }: KVBlockProps) {
         const ry = HEADER_H + 1.5 + i * ROW_H;
         return (
           <g key={row.label} transform={`translate(0, ${ry})`}>
-            {i % 2 === 0 && <rect x={1} width={BOX_W - 2} height={ROW_H} fill="#f8f9fa" />}
+            {i % 2 === 0 && <rect x={1} width={BOX_W - 2} height={ROW_H} fill="#f0f4fb" />}
             {i > 0 && <line x1={8} y1={0} x2={BOX_W - 8} y2={0} stroke="#e9ecef" strokeWidth={0.5} />}
             <text x={10} y={ROW_H / 2} fontSize={FONT_LABEL} fill="#888" dominantBaseline="middle" fontFamily="sans-serif">{row.label}</text>
             <text x={BOX_W - 10} y={ROW_H / 2} fontSize={FONT_VALUE} fill="#222" fontWeight="600" dominantBaseline="middle" textAnchor="end" fontFamily="sans-serif">{row.value}</text>
@@ -103,9 +103,9 @@ function TableBlock({ title, headers, colWidths, rows, x, y }: TableBlockProps) 
     <g transform={`translate(${x}, ${y})`}>
       <rect x={2} y={2} width={BOX_W} height={boxH} fill="rgba(0,0,0,0.08)" rx={3} />
       <rect width={BOX_W} height={boxH} fill="white" stroke="#333" strokeWidth={1.2} rx={3} />
-      <rect width={BOX_W} height={HEADER_H} fill="#2c3e50" rx={3} />
-      <rect y={HEADER_H - 4} width={BOX_W} height={4} fill="#2c3e50" />
-      <rect y={HEADER_H} width={BOX_W} height={1.5} fill="#e74c3c" />
+      <rect width={BOX_W} height={HEADER_H} fill="#205394" rx={3} />
+      <rect y={HEADER_H - 4} width={BOX_W} height={4} fill="#205394" />
+      <rect y={HEADER_H} width={BOX_W} height={1.5} fill="#377AF3" />
       <text
         x={BOX_W / 2} y={HEADER_H / 2}
         fill="white" fontSize={10} fontWeight="bold"
@@ -115,13 +115,13 @@ function TableBlock({ title, headers, colWidths, rows, x, y }: TableBlockProps) 
 
       {/* Column headers */}
       <g transform={`translate(0, ${HEADER_H + 1.5})`}>
-        <rect x={1} width={BOX_W - 2} height={COL_HEADER_H} fill="#eaecee" />
+        <rect x={1} width={BOX_W - 2} height={COL_HEADER_H} fill="#e8eef8" />
         {headers.map((h, ci) => (
           <text
             key={h}
             x={colX[ci] + (colWidths[ci] * BOX_W) / 2}
             y={COL_HEADER_H / 2}
-            fontSize={FONT_COL} fill="#555" fontWeight="bold"
+            fontSize={FONT_COL} fill="#205394" fontWeight="bold"
             textAnchor="middle" dominantBaseline="middle"
             fontFamily="sans-serif"
           >{h}</text>
@@ -134,7 +134,7 @@ function TableBlock({ title, headers, colWidths, rows, x, y }: TableBlockProps) 
         const ry = HEADER_H + 1.5 + COL_HEADER_H + i * ROW_H;
         return (
           <g key={i} transform={`translate(0, ${ry})`}>
-            {i % 2 === 0 && <rect x={1} width={BOX_W - 2} height={ROW_H} fill="#f8f9fa" />}
+            {i % 2 === 0 && <rect x={1} width={BOX_W - 2} height={ROW_H} fill="#f0f4fb" />}
             {i > 0 && <line x1={8} y1={0} x2={BOX_W - 8} y2={0} stroke="#e9ecef" strokeWidth={0.5} />}
             {row.map((cell, ci) => (
               <text
