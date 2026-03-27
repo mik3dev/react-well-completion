@@ -1,9 +1,11 @@
 import type { DiagramConfig, Well, LiftMethod, LabelCategory } from '../../types';
+import type { BrandTheme } from '../../theme';
 
 interface Props {
   well: Well;
   config: DiagramConfig;
   visible: Record<LabelCategory, boolean>;
+  theme: BrandTheme;
 }
 
 const LIFT_LABELS: Record<LiftMethod, string> = {
@@ -40,18 +42,18 @@ interface KVBlockProps {
   y: number;
 }
 
-function KVBlock({ title, rows, x, y }: KVBlockProps) {
+function KVBlock({ title, rows, x, y, theme }: KVBlockProps & { theme: BrandTheme }) {
   const boxH = HEADER_H + 1.5 + rows.length * ROW_H + 1;
   return (
     <g transform={`translate(${x}, ${y})`}>
       <rect x={2} y={2} width={BOX_W} height={boxH} fill="rgba(0,0,0,0.08)" rx={3} />
       <rect width={BOX_W} height={boxH} fill="white" stroke="#333" strokeWidth={1.2} rx={3} />
-      <rect width={BOX_W} height={HEADER_H} fill="#205394" rx={3} />
-      <rect y={HEADER_H - 4} width={BOX_W} height={4} fill="#205394" />
-      <rect y={HEADER_H} width={BOX_W} height={1.5} fill="#377AF3" />
+      <rect width={BOX_W} height={HEADER_H} fill={theme.headerBg} rx={3} />
+      <rect y={HEADER_H - 4} width={BOX_W} height={4} fill={theme.headerBg} />
+      <rect y={HEADER_H} width={BOX_W} height={1.5} fill={theme.accent} />
       <text
         x={BOX_W / 2} y={HEADER_H / 2}
-        fill="white" fontSize={10} fontWeight="bold"
+        fill={theme.headerText} fontSize={10} fontWeight="bold"
         textAnchor="middle" dominantBaseline="middle"
         fontFamily="sans-serif" letterSpacing={1.5}
       >{title}</text>
@@ -88,7 +90,7 @@ interface TableBlockProps {
   y: number;
 }
 
-function TableBlock({ title, headers, colWidths, rows, x, y }: TableBlockProps) {
+function TableBlock({ title, headers, colWidths, rows, x, y, theme }: TableBlockProps & { theme: BrandTheme }) {
   const boxH = HEADER_H + 1.5 + COL_HEADER_H + rows.length * ROW_H + 1;
 
   // compute absolute x offsets from fractional widths
@@ -103,12 +105,12 @@ function TableBlock({ title, headers, colWidths, rows, x, y }: TableBlockProps) 
     <g transform={`translate(${x}, ${y})`}>
       <rect x={2} y={2} width={BOX_W} height={boxH} fill="rgba(0,0,0,0.08)" rx={3} />
       <rect width={BOX_W} height={boxH} fill="white" stroke="#333" strokeWidth={1.2} rx={3} />
-      <rect width={BOX_W} height={HEADER_H} fill="#205394" rx={3} />
-      <rect y={HEADER_H - 4} width={BOX_W} height={4} fill="#205394" />
-      <rect y={HEADER_H} width={BOX_W} height={1.5} fill="#377AF3" />
+      <rect width={BOX_W} height={HEADER_H} fill={theme.headerBg} rx={3} />
+      <rect y={HEADER_H - 4} width={BOX_W} height={4} fill={theme.headerBg} />
+      <rect y={HEADER_H} width={BOX_W} height={1.5} fill={theme.accent} />
       <text
         x={BOX_W / 2} y={HEADER_H / 2}
-        fill="white" fontSize={10} fontWeight="bold"
+        fill={theme.headerText} fontSize={10} fontWeight="bold"
         textAnchor="middle" dominantBaseline="middle"
         fontFamily="sans-serif" letterSpacing={1.5}
       >{title}</text>
@@ -121,7 +123,7 @@ function TableBlock({ title, headers, colWidths, rows, x, y }: TableBlockProps) 
             key={h}
             x={colX[ci] + (colWidths[ci] * BOX_W) / 2}
             y={COL_HEADER_H / 2}
-            fontSize={FONT_COL} fill="#205394" fontWeight="bold"
+            fontSize={FONT_COL} fill={theme.headerBg} fontWeight="bold"
             textAnchor="middle" dominantBaseline="middle"
             fontFamily="sans-serif"
           >{h}</text>
@@ -161,7 +163,7 @@ function tableBlockHeight(rowCount: number): number {
 
 /* ─── Main Component ─── */
 
-export default function WellDetailLayer({ well, config, visible }: Props) {
+export default function WellDetailLayer({ well, config, visible, theme }: Props) {
   if (config.width < 300) return null;
 
   const x = config.width - BOX_W - 10;
@@ -236,7 +238,7 @@ export default function WellDetailLayer({ well, config, visible }: Props) {
   return (
     <g className="layer-well-detail">
       {showWell && (
-        <KVBlock title="DETALLE DE POZO" rows={wellRows} x={x} y={wellY} />
+        <KVBlock title="DETALLE DE POZO" rows={wellRows} x={x} y={wellY} theme={theme} />
       )}
       {showCasing && (
         <TableBlock
@@ -245,6 +247,7 @@ export default function WellDetailLayer({ well, config, visible }: Props) {
           colWidths={[0.17, 0.13, 0.15, 0.17, 0.17, 0.21]}
           rows={casingRows}
           x={x} y={casingY}
+          theme={theme}
         />
       )}
       {showTubing && (
@@ -254,6 +257,7 @@ export default function WellDetailLayer({ well, config, visible }: Props) {
           colWidths={[0.15, 0.25, 0.25, 0.35]}
           rows={tubingRows}
           x={x} y={tubingY}
+          theme={theme}
         />
       )}
     </g>

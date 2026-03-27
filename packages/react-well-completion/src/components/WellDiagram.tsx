@@ -2,6 +2,8 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import type { Well, LabelCategory } from '../types';
 import { ALL_LABEL_CATEGORIES } from '../types';
 import { useDiagramConfig } from '../hooks/use-diagram-config';
+import type { BrandTheme } from '../theme';
+import { defaultTheme } from '../theme';
 import { TooltipProvider } from './Tooltip';
 import SvgDefs from './SvgDefs';
 import SandLayer from './layers/SandLayer';
@@ -20,9 +22,11 @@ import WellDetailLayer from './layers/WellDetailLayer';
 export interface WellDiagramProps {
   well: Well;
   labels?: Partial<Record<LabelCategory, boolean>>;
+  theme?: Partial<BrandTheme>;
 }
 
-export default function WellDiagram({ well, labels }: WellDiagramProps) {
+export default function WellDiagram({ well, labels, theme }: WellDiagramProps) {
+  const mergedTheme: BrandTheme = { ...defaultTheme, ...theme };
   const defaultLabels = Object.fromEntries(
     ALL_LABEL_CATEGORIES.map(k => [k, true])
   ) as Record<LabelCategory, boolean>;
@@ -149,7 +153,7 @@ export default function WellDiagram({ well, labels }: WellDiagramProps) {
                   // In horizontal, restore original container dimensions for positioning
                   width: size.width - 50,
                   height: size.height,
-                }} visible={mergedLabels} />
+                }} visible={mergedLabels} theme={mergedTheme} />
               </g>
             )}
           </svg>
