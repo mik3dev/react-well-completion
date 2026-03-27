@@ -1,4 +1,4 @@
-import type { DiagramConfig, Well, LiftMethod } from '../../../types';
+import type { DiagramConfig, Well, LiftMethod } from 'react-well-completion';
 import { useLabelsStore } from '../../../store/labels-store';
 
 interface Props {

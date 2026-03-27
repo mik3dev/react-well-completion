@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useWellStore } from '../../store/well-store';
-import type { LiftMethod } from '../../types';
+import type { LiftMethod } from 'react-well-completion';
 
 const METHODS: { value: LiftMethod; label: string }[] = [
   { value: 'BM', label: 'Bomba Mecánica' },

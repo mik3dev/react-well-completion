@@ -1,5 +1,5 @@
-import type { DiagramConfig, Sand } from '../../../types';
-import { diameterToX } from '../../../hooks/use-diagram-config';
+import type { DiagramConfig, Sand } from 'react-well-completion';
+import { diameterToX } from 'react-well-completion';
 import { useTooltip } from '../Tooltip';
 
 interface Props {

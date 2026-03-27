@@ -1,5 +1,5 @@
-import type { DiagramConfig, Casing } from '../../../types';
-import { computeCasingPositions } from '../../../hooks/use-diagram-config';
+import type { DiagramConfig, Casing } from 'react-well-completion';
+import { computeCasingPositions } from 'react-well-completion';
 import { useTooltip } from '../Tooltip';
 import { ShoeIcon, HangerIcon } from '../icons';
 

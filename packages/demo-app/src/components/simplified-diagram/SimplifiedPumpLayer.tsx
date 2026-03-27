@@ -1,4 +1,4 @@
-import type { DiagramConfig, Pump } from '../../types';
+import type { DiagramConfig, Pump } from 'react-well-completion';
 
 interface Props {
   pump: Pump | null;

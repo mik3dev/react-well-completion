@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Well, Pump, Wire, LiftMethod } from '../types';
-import { createWell } from '../utils/well-factory';
+import type { Well, Pump, Wire, LiftMethod } from 'react-well-completion';
+import { createWell } from 'react-well-completion';
 
 interface WellStore {
   wells: Well[];

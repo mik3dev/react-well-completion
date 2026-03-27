@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import type { Well } from '../../types';
-import { useDiagramConfig } from '../../hooks/use-diagram-config';
+import type { Well } from 'react-well-completion';
+import { useDiagramConfig } from 'react-well-completion';
 import SimplifiedCasingLayer from './SimplifiedCasingLayer';
 import SimplifiedTubingLayer from './SimplifiedTubingLayer';
 import SimplifiedPerforationLayer from './SimplifiedPerforationLayer';

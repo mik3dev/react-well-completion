@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import type { Well } from '../../types';
-import { useDiagramConfig } from '../../hooks/use-diagram-config';
+import type { Well } from 'react-well-completion';
+import { useDiagramConfig } from 'react-well-completion';
 import { TooltipProvider } from './Tooltip';
 import SvgDefs from './SvgDefs';
 import SandLayer from './layers/SandLayer';

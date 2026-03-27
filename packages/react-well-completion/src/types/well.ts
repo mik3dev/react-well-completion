@@ -133,3 +133,42 @@ export interface Well {
   sands: Sand[];
   wire: Wire | null;                // solo BES
 }
+
+export type LabelCategory =
+  | 'casings'
+  | 'tubing'
+  | 'rods'
+  | 'pump'
+  | 'perforations'
+  | 'sands'
+  | 'packers'
+  | 'nipples'
+  | 'mandrels'
+  | 'depths'
+  | 'yacimientos'
+  | 'wellDetail'
+  | 'casingDetail'
+  | 'tubingDetail';
+
+export const ALL_LABEL_CATEGORIES: LabelCategory[] = [
+  'casings', 'tubing', 'rods', 'pump', 'perforations',
+  'sands', 'packers', 'nipples', 'mandrels', 'depths',
+  'yacimientos', 'wellDetail', 'casingDetail', 'tubingDetail',
+];
+
+export const LABEL_CATEGORIES: { key: LabelCategory; label: string }[] = [
+  { key: 'casings', label: 'Casings' },
+  { key: 'tubing', label: 'Tubing' },
+  { key: 'rods', label: 'Cabillas' },
+  { key: 'pump', label: 'Bomba' },
+  { key: 'perforations', label: 'Perforaciones' },
+  { key: 'sands', label: 'Arenas' },
+  { key: 'packers', label: 'Packers' },
+  { key: 'nipples', label: 'Niples' },
+  { key: 'mandrels', label: 'Mandriles GL' },
+  { key: 'depths', label: 'Profundidades' },
+  { key: 'yacimientos', label: 'Yacimientos' },
+  { key: 'wellDetail', label: 'Detalle de Pozo' },
+  { key: 'casingDetail', label: 'Detalle de Casing' },
+  { key: 'tubingDetail', label: 'Detalle de Tuberias' },
+];

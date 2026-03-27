@@ -1,4 +1,4 @@
-import type { DiagramConfig, Pump } from '../../../types';
+import type { DiagramConfig, Pump } from 'react-well-completion';
 import { useTooltip } from '../Tooltip';
 import { BmPumpIcon, BcpPumpIcon, BesPumpIcon } from '../icons';
 

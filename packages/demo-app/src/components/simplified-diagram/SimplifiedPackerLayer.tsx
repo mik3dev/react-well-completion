@@ -1,5 +1,5 @@
-import type { DiagramConfig, Packer } from '../../types';
-import { diameterToX } from '../../hooks/use-diagram-config';
+import type { DiagramConfig, Packer } from 'react-well-completion';
+import { diameterToX } from 'react-well-completion';
 
 interface Props {
   packers: Packer[];

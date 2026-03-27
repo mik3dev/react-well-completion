@@ -1,5 +1,5 @@
-import type { DiagramConfig, Well } from '../../../types';
-import { diameterToX, computeCasingPositions } from '../../../hooks/use-diagram-config';
+import type { DiagramConfig, Well } from 'react-well-completion';
+import { diameterToX, computeCasingPositions } from 'react-well-completion';
 import { useTooltip } from '../Tooltip';
 import { PackerIcon, NippleIcon, PlugIcon, GasAnchorIcon, SleeveIcon, PackingIcon, MandrelIcon } from '../icons';
 

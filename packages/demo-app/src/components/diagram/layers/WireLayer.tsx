@@ -1,5 +1,5 @@
-import type { DiagramConfig, Wire, TubingSegment } from '../../../types';
-import { diameterToX } from '../../../hooks/use-diagram-config';
+import type { DiagramConfig, Wire, TubingSegment } from 'react-well-completion';
+import { diameterToX } from 'react-well-completion';
 import { useTooltip } from '../Tooltip';
 import { WireIcon } from '../icons';
 

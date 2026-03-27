@@ -1,4 +1,4 @@
-import type { Well } from '../types';
+import type { Well } from 'react-well-completion';
 
 export const exampleWells: Well[] = [
   {
