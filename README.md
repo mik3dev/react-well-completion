@@ -1,73 +1,358 @@
-# React + TypeScript + Vite
+# Well Completion Diagram
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Herramienta de visualizacion de diagramas de completacion de pozos petroleros. Renderiza diagramas SVG interactivos de equipos de subsuelo y soporta 4 metodos de levantamiento: **BM** (Bombeo Mecanico), **BCP** (Bomba de Cavidad Progresiva), **BES** (Bomba Electrosumergible), **GL** (Gas Lift).
 
-Currently, two official plugins are available:
+## Estructura del Proyecto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Este es un **monorepo pnpm** con dos paquetes:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+packages/
+├── react-well-completion/   # Libreria React (publicable en npm)
+└── demo-app/                # Aplicacion de demostracion
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+| Paquete | Descripcion | Dependencias clave |
+|---------|-------------|-------------------|
+| `react-well-completion` | Componentes SVG puros. Recibe datos via props, sin stores ni estado global | `react` (peer), `uuid` |
+| `demo-app` | App SPA con editor, toolbar, exportacion PNG/SVG | `zustand`, `html-to-image`, `react-well-completion` |
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Requisitos
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **Node.js** >= 18
+- **pnpm** >= 9
+
+## Instalacion y Desarrollo
+
+```bash
+# Instalar dependencias
+pnpm install
+
+# Desarrollo (demo-app con HMR)
+pnpm dev
+
+# Build completo (libreria + demo-app)
+pnpm build
+
+# Build solo libreria
+pnpm build:lib
+
+# Lint
+pnpm lint
+
+# Preview del build de produccion
+pnpm --filter demo-app preview
 ```
+
+---
+
+## Uso de la Libreria
+
+### Instalacion
+
+```bash
+npm install react-well-completion
+```
+
+### Ejemplo Basico — Pozo con Bombeo Mecanico
+
+```tsx
+import { WellDiagram, createWell, createCasing, createTubingSegment, createPump, createPerforation } from 'react-well-completion';
+import type { Well } from 'react-well-completion';
+
+// Construir el pozo usando factory functions
+const well: Well = {
+  ...createWell('Pozo-001', 'BM'),
+  totalDepth: 5000,
+  totalFreeDepth: 4800,
+  casings: [
+    createCasing({ diameter: 9.625, top: 0, base: 3000, isLiner: false, weight: 47, grade: 'N-80' }),
+    createCasing({ diameter: 7, top: 0, base: 5000, isLiner: false, weight: 26, grade: 'J-55' }),
+    createCasing({ diameter: 5.5, top: 4500, base: 5000, isLiner: true }),
+  ],
+  tubingString: [
+    createTubingSegment({ segment: 1, diameter: 3.5, length: 3000 }),
+    createTubingSegment({ segment: 2, diameter: 2.875, length: 1500 }),
+  ],
+  rodString: [
+    { id: 'r1', segment: 1, diameter: 1, length: 2500 },
+    { id: 'r2', segment: 2, diameter: 0.875, length: 2000 },
+  ],
+  pump: createPump({ type: 'BM', depth: 4500, diameter: 2.5, length: 50 }),
+  perforations: [
+    createPerforation({ top: 4600, base: 4700, type: 'shoot', yacimiento: 'Fm. Oficina', arena: 'O-12' }),
+    createPerforation({ top: 4750, base: 4850, type: 'shoot', yacimiento: 'Fm. Oficina', arena: 'O-14' }),
+  ],
+  packers: [],
+  seatNipples: [],
+  plugs: [],
+  gasAnchors: [],
+  mandrels: [],
+  sleeves: [],
+  packings: [],
+  sands: [],
+  wire: null,
+};
+
+function App() {
+  return (
+    <div style={{ width: '100%', height: '100vh' }}>
+      <WellDiagram well={well} />
+    </div>
+  );
+}
+```
+
+### Ejemplo — Pozo Gas Lift con Mandriles
+
+```tsx
+import { WellDiagram, createWell, createCasing, createTubingSegment, createMandrel, createPerforation } from 'react-well-completion';
+
+const glWell = {
+  ...createWell('GL-003', 'GL'),
+  totalDepth: 8000,
+  totalFreeDepth: 7500,
+  casings: [
+    createCasing({ diameter: 13.375, top: 0, base: 2000, isLiner: false, weight: 68, grade: 'K-55' }),
+    createCasing({ diameter: 9.625, top: 0, base: 6000, isLiner: false, weight: 47, grade: 'N-80' }),
+    createCasing({ diameter: 7, top: 5500, base: 8000, isLiner: true }),
+  ],
+  tubingString: [
+    createTubingSegment({ segment: 1, diameter: 3.5, length: 7000 }),
+  ],
+  rodString: [],
+  pump: null,
+  mandrels: [
+    createMandrel({ segment: 1, depth: 2000, diameter: 1, hasValve: true }),
+    createMandrel({ segment: 2, depth: 3500, diameter: 1, hasValve: true }),
+    createMandrel({ segment: 3, depth: 5000, diameter: 1, hasValve: true }),
+    createMandrel({ segment: 4, depth: 6500, diameter: 1, hasValve: false }),
+  ],
+  perforations: [
+    createPerforation({ top: 7200, base: 7400, type: 'shoot', yacimiento: 'Fm. Merecure' }),
+    createPerforation({ top: 7500, base: 7700, type: 'shoot', yacimiento: 'Fm. Merecure' }),
+  ],
+  packers: [],
+  seatNipples: [],
+  plugs: [],
+  gasAnchors: [],
+  sleeves: [],
+  packings: [],
+  sands: [],
+  wire: null,
+};
+
+function App() {
+  return <WellDiagram well={glWell} />;
+}
+```
+
+### Diagrama Simplificado
+
+El `SimplifiedDiagram` muestra una version esquematica en escala de grises, ideal para reportes e impresion:
+
+```tsx
+import { SimplifiedDiagram } from 'react-well-completion';
+
+function Report({ well }) {
+  return (
+    <div style={{ width: 400, height: 600 }}>
+      <SimplifiedDiagram well={well} />
+    </div>
+  );
+}
+```
+
+### Controlando Visibilidad de Labels
+
+Por defecto todas las etiquetas estan visibles. Puedes ocultar las que no necesites:
+
+```tsx
+<WellDiagram
+  well={well}
+  labels={{
+    casings: true,           // Etiquetas de casing (diametro, tipo)
+    tubing: true,            // Etiquetas de tuberia
+    rods: false,             // Ocultar cabillas
+    pump: true,              // Etiqueta de bomba
+    perforations: true,      // Intervalos perforados
+    sands: false,            // Ocultar arenas
+    packers: true,           // Packers
+    nipples: false,          // Ocultar niples
+    mandrels: true,          // Mandriles GL
+    depths: true,            // Marcadores de profundidad
+    yacimientos: true,       // Brackets de yacimiento/arena
+    wellDetail: true,        // Tabla "Detalle de Pozo"
+    casingDetail: true,      // Tabla "Detalle de Casing"
+    tubingDetail: false,     // Ocultar tabla de tuberias
+  }}
+/>
+```
+
+### Personalizacion de Colores (Theme)
+
+Los colores de las tablas de detalle son configurables:
+
+```tsx
+// Theme por defecto
+<WellDiagram well={well} />
+
+// Theme personalizado
+<WellDiagram
+  well={well}
+  theme={{
+    headerBg: '#1a1a2e',     // Fondo del header de las tablas
+    accent: '#e94560',        // Linea de acento bajo el header
+    headerText: '#ffffff',    // Color del texto del header
+  }}
+/>
+
+// Solo cambiar un color (los demas usan defaults)
+<WellDiagram
+  well={well}
+  theme={{ accent: '#27ae60' }}
+/>
+```
+
+### Orientacion Horizontal
+
+Ambos diagramas soportan orientacion horizontal configurando el campo `orientation` del pozo:
+
+```tsx
+const well = {
+  ...createWell('Pozo-H', 'BM'),
+  orientation: 'horizontal',  // 'vertical' (default) | 'horizontal'
+  // ... resto de datos
+};
+
+<WellDiagram well={well} />
+```
+
+### Media Seccion (Half Section)
+
+Para mostrar solo la mitad del diagrama (corte en seccion):
+
+```tsx
+const well = {
+  ...createWell('Pozo-HS', 'GL'),
+  halfSection: true,
+  halfSide: 'right',  // 'right' (default) | 'left'
+  // ... resto de datos
+};
+```
+
+---
+
+## API Reference
+
+### Componentes
+
+| Componente | Props | Descripcion |
+|---|---|---|
+| `WellDiagram` | `well: Well`, `labels?: Partial<Record<LabelCategory, boolean>>`, `theme?: Partial<BrandTheme>` | Diagrama completo con labels, tablas de detalle, tooltips |
+| `SimplifiedDiagram` | `well: Well` | Diagrama esquematico en escala de grises |
+
+### Tipos Principales
+
+```typescript
+type LiftMethod = 'BM' | 'BCP' | 'BES' | 'GL';
+
+type DiagramOrientation = 'vertical' | 'horizontal';
+
+interface Well {
+  id: string;
+  name: string;
+  totalDepth: number;          // pies
+  totalFreeDepth: number;      // pies
+  liftMethod: LiftMethod;
+  latitude?: number;
+  longitude?: number;
+  estacionFlujo?: string;
+  mesaRotaria?: number;        // pies
+  orientation?: DiagramOrientation;
+  halfSection?: boolean;
+  halfSide?: 'right' | 'left';
+  casings: Casing[];
+  tubingString: TubingSegment[];
+  rodString: RodSegment[];     // solo BM/BCP
+  pump: Pump | null;
+  packers: Packer[];
+  seatNipples: SeatNipple[];
+  plugs: Plug[];
+  gasAnchors: GasAnchor[];
+  mandrels: Mandrel[];         // solo GL
+  sleeves: Sleeve[];
+  packings: Packing[];
+  perforations: Perforation[];
+  sands: Sand[];
+  wire: Wire | null;           // solo BES
+}
+
+interface BrandTheme {
+  headerBg: string;            // default '#205394'
+  accent: string;              // default '#377AF3'
+  headerText: string;          // default '#FFFFFF'
+}
+```
+
+### Factory Functions
+
+Todas las factories generan un `id` UUID automaticamente:
+
+| Factory | Campos requeridos |
+|---------|------------------|
+| `createWell(name, liftMethod)` | Nombre del pozo, metodo de levantamiento |
+| `createCasing({ diameter, top, base, isLiner })` | Diametro OD (pulg), tope/base (pies), si es liner |
+| `createTubingSegment({ segment, diameter, length })` | Numero de segmento, diametro OD, longitud (pies) |
+| `createRodSegment({ segment, diameter, length })` | Numero de segmento, diametro, longitud |
+| `createPump({ type, depth, diameter, length })` | Tipo (BM/BCP/BES/GL), profundidad, diametro, longitud |
+| `createPacker({ depth, diameter })` | Profundidad, diametro |
+| `createMandrel({ segment, depth, diameter, hasValve })` | Segmento, profundidad, diametro, si tiene valvula |
+| `createPerforation({ top, base, type })` | Tope/base (pies), tipo ('shoot' o 'slot') |
+| `createSand({ name, segment, top, base })` | Nombre, segmento, tope/base |
+| `createWire({ depth })` | Profundidad del cable BES |
+| `createSeatNipple({ depth, diameter, od, type })` | Profundidad, diametro, OD, tipo |
+| `createPlug({ depth })` | Profundidad |
+| `createGasAnchor({ depth, diameter, length })` | Profundidad, diametro, longitud |
+| `createSleeve({ depth, diameter })` | Profundidad, diametro |
+| `createPacking({ depth, diameter, od })` | Profundidad, diametro, OD |
+
+### Hook Avanzado
+
+```typescript
+import { useDiagramConfig } from 'react-well-completion';
+
+// Para usuarios avanzados que necesitan calcular coordenadas del diagrama
+const config = useDiagramConfig(width, height, well);
+// config.depthToPos(depth)        — convierte profundidad a posicion Y
+// config.diameterToSpan(diameter)  — convierte diametro a span horizontal
+// config.centerLine               — centro del eje del diagrama
+```
+
+---
+
+## Metodos de Levantamiento
+
+| Codigo | Metodo | Componentes especificos | Campos relevantes en Well |
+|--------|--------|------------------------|--------------------------|
+| `BM` | Bombeo Mecanico | Cabillas, bomba mecanica, ancla de gas | `rodString`, `pump`, `gasAnchors` |
+| `BCP` | Cavidad Progresiva | Cabillas, bomba BCP | `rodString`, `pump` |
+| `BES` | Electrosumergible | Cable BES, bomba BES | `wire`, `pump` |
+| `GL` | Gas Lift | Mandriles con/sin valvula | `mandrels` |
+
+### Componentes Comunes a Todos los Metodos
+
+- **Casings**: Revestimientos del pozo (conductor, superficie, produccion, liner)
+- **Tubing**: Sarta de tuberia de produccion
+- **Perforations**: Intervalos canhoneados o ranurados
+- **Packers**: Empacaduras de aislamiento
+- **Seat Nipples**: Niples de asiento (regular y pulido)
+- **Plugs**: Tapones
+- **Sands**: Formaciones arenosas
+- **Packings**: Empacaduras de la sarta
+
+---
+
+## Licencia
+
+MIT
