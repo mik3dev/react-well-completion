@@ -1,11 +1,11 @@
-import type { DiagramConfig, Well } from 'react-well-completion';
+import type { DiagramConfig, Well, LabelCategory } from 'react-well-completion';
 import { diameterToX, computeCasingPositions } from 'react-well-completion';
-import { useLabelsStore } from '../../../store/labels-store';
 
 interface Props {
   well: Well;
   config: DiagramConfig;
   minCasingDiameter: number;
+  visible: Record<LabelCategory, boolean>;
 }
 
 const FONT_SIZE = 9;
@@ -40,8 +40,7 @@ function LeaderLine({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2
   return <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={LINE_COLOR} strokeWidth={0.5} strokeDasharray="2,2" />;
 }
 
-export default function LabelsLayer({ well, config, minCasingDiameter }: Props) {
-  const visible = useLabelsStore(s => s.visible);
+export default function LabelsLayer({ well, config, minCasingDiameter, visible }: Props) {
   const isH = config.orientation === 'horizontal';
   const rot = 0; // No counter-rotation: in horizontal mode, group rotation makes text read bottom-to-top
 

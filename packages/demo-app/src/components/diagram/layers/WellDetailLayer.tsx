@@ -1,9 +1,9 @@
-import type { DiagramConfig, Well, LiftMethod } from 'react-well-completion';
-import { useLabelsStore } from '../../../store/labels-store';
+import type { DiagramConfig, Well, LiftMethod, LabelCategory } from 'react-well-completion';
 
 interface Props {
   well: Well;
   config: DiagramConfig;
+  visible: Record<LabelCategory, boolean>;
 }
 
 const LIFT_LABELS: Record<LiftMethod, string> = {
@@ -161,8 +161,7 @@ function tableBlockHeight(rowCount: number): number {
 
 /* ─── Main Component ─── */
 
-export default function WellDetailLayer({ well, config }: Props) {
-  const visible = useLabelsStore(s => s.visible);
+export default function WellDetailLayer({ well, config, visible }: Props) {
   if (config.width < 300) return null;
 
   const x = config.width - BOX_W - 10;

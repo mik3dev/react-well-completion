@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import type { Well } from 'react-well-completion';
-import { useDiagramConfig } from 'react-well-completion';
+import type { Well, LabelCategory } from 'react-well-completion';
+import { useDiagramConfig, ALL_LABEL_CATEGORIES } from 'react-well-completion';
 import { TooltipProvider } from './Tooltip';
 import SvgDefs from './SvgDefs';
 import SandLayer from './layers/SandLayer';
@@ -18,9 +18,14 @@ import WellDetailLayer from './layers/WellDetailLayer';
 
 interface Props {
   well: Well;
+  labels?: Partial<Record<LabelCategory, boolean>>;
 }
 
-export default function WellDiagram({ well }: Props) {
+export default function WellDiagram({ well, labels }: Props) {
+  const defaultLabels = Object.fromEntries(
+    ALL_LABEL_CATEGORIES.map(k => [k, true])
+  ) as Record<LabelCategory, boolean>;
+  const mergedLabels = { ...defaultLabels, ...labels };
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
@@ -97,7 +102,7 @@ export default function WellDiagram({ well }: Props) {
               <WireLayer wire={well.wire} tubingString={well.tubingString} config={config} />
               <PumpLayer pump={well.pump} config={config} />
               <AccessoriesLayer well={well} config={config} minCasingDiameter={minCasingDiameter} />
-              <LabelsLayer well={well} config={config} minCasingDiameter={minCasingDiameter} />
+              <LabelsLayer well={well} config={config} minCasingDiameter={minCasingDiameter} visible={mergedLabels} />
               {/* Línea de eje central en half-section (always vertical in local coords) */}
               {config.halfSection && (
                 <line
@@ -143,7 +148,7 @@ export default function WellDiagram({ well }: Props) {
                   // In horizontal, restore original container dimensions for positioning
                   width: size.width - 50,
                   height: size.height,
-                }} />
+                }} visible={mergedLabels} />
               </g>
             )}
           </svg>

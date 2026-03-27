@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useWellStore } from './store/well-store';
+import { useLabelsStore } from './store/labels-store';
 import Toolbar from './components/Toolbar';
 import WellSelector from './components/editor/WellSelector';
 import WellEditor from './components/editor/WellEditor';
@@ -9,6 +10,7 @@ import './App.css';
 
 export default function App() {
   const well = useWellStore(s => s.wells.find(w => w.id === s.selectedWellId));
+  const visible = useLabelsStore(s => s.visible);
   const [showSimplified, setShowSimplified] = useState(false);
 
   return (
@@ -21,7 +23,7 @@ export default function App() {
         </aside>
         <main className="app__diagram">
           {well ? (
-            showSimplified ? <SimplifiedDiagram well={well} /> : <WellDiagram well={well} />
+            showSimplified ? <SimplifiedDiagram well={well} /> : <WellDiagram well={well} labels={visible} />
           ) : (
             <div className="app__placeholder">
               <p>Selecciona o crea un pozo para visualizar el diagrama</p>
