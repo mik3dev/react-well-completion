@@ -1,4 +1,4 @@
-import type { DiagramConfig, RodSegment } from 'react-well-completion';
+import type { DiagramConfig, RodSegment } from '../../types';
 import { useTooltip } from '../Tooltip';
 
 interface Props {

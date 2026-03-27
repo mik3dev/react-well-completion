@@ -22,3 +22,9 @@ export {
 
 // Hook
 export { useDiagramConfig, diameterToX, computeCasingPositions, computeCasingSpans } from './hooks/use-diagram-config';
+
+// Components
+export { default as WellDiagram } from './components/WellDiagram';
+export type { WellDiagramProps } from './components/WellDiagram';
+export { default as SimplifiedDiagram } from './components/simplified/SimplifiedDiagram';
+export type { SimplifiedDiagramProps } from './components/simplified/SimplifiedDiagram';

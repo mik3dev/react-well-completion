@@ -1,5 +1,5 @@
-import type { DiagramConfig, Well, LabelCategory } from 'react-well-completion';
-import { diameterToX, computeCasingPositions } from 'react-well-completion';
+import type { DiagramConfig, Well, LabelCategory } from '../../types';
+import { diameterToX, computeCasingPositions } from '../../hooks/use-diagram-config';
 
 interface Props {
   well: Well;

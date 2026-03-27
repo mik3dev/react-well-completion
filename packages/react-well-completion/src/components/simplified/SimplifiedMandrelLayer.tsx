@@ -1,5 +1,5 @@
-import type { DiagramConfig, Mandrel } from 'react-well-completion';
-import { diameterToX } from 'react-well-completion';
+import type { DiagramConfig, Mandrel } from '../../types';
+import { diameterToX } from '../../hooks/use-diagram-config';
 
 interface Props {
   mandrels: Mandrel[];

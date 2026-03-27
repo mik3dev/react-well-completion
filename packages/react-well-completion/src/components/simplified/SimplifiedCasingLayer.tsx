@@ -1,5 +1,5 @@
-import type { DiagramConfig, Casing } from 'react-well-completion';
-import { computeCasingPositions } from 'react-well-completion';
+import type { DiagramConfig, Casing } from '../../types';
+import { computeCasingPositions } from '../../hooks/use-diagram-config';
 
 interface Props {
   casings: Casing[];

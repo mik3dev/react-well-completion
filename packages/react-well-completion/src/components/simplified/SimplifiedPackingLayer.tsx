@@ -1,5 +1,5 @@
-import type { DiagramConfig, Packing, Casing } from 'react-well-completion';
-import { diameterToX, computeCasingPositions } from 'react-well-completion';
+import type { DiagramConfig, Packing, Casing } from '../../types';
+import { diameterToX, computeCasingPositions } from '../../hooks/use-diagram-config';
 
 interface Props {
   packings: Packing[];

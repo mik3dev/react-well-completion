@@ -1,5 +1,5 @@
-import type { DiagramConfig, Perforation } from 'react-well-completion';
-import { diameterToX } from 'react-well-completion';
+import type { DiagramConfig, Perforation } from '../../types';
+import { diameterToX } from '../../hooks/use-diagram-config';
 
 interface Props {
   perforations: Perforation[];

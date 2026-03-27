@@ -1,4 +1,4 @@
-import type { DiagramConfig, Well, LiftMethod, LabelCategory } from 'react-well-completion';
+import type { DiagramConfig, Well, LiftMethod, LabelCategory } from '../../types';
 
 interface Props {
   well: Well;

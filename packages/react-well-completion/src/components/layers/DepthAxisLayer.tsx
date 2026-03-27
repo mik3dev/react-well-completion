@@ -1,4 +1,4 @@
-import type { DiagramConfig } from 'react-well-completion';
+import type { DiagramConfig } from '../../types';
 
 interface Props {
   config: DiagramConfig;

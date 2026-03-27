@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import type { Well, LabelCategory } from 'react-well-completion';
-import { useDiagramConfig, ALL_LABEL_CATEGORIES } from 'react-well-completion';
+import type { Well, LabelCategory } from '../types';
+import { ALL_LABEL_CATEGORIES } from '../types';
+import { useDiagramConfig } from '../hooks/use-diagram-config';
 import { TooltipProvider } from './Tooltip';
 import SvgDefs from './SvgDefs';
 import SandLayer from './layers/SandLayer';
@@ -16,12 +17,12 @@ import DepthAxisLayer from './layers/DepthAxisLayer';
 import LabelsLayer from './layers/LabelsLayer';
 import WellDetailLayer from './layers/WellDetailLayer';
 
-interface Props {
+export interface WellDiagramProps {
   well: Well;
   labels?: Partial<Record<LabelCategory, boolean>>;
 }
 
-export default function WellDiagram({ well, labels }: Props) {
+export default function WellDiagram({ well, labels }: WellDiagramProps) {
   const defaultLabels = Object.fromEntries(
     ALL_LABEL_CATEGORIES.map(k => [k, true])
   ) as Record<LabelCategory, boolean>;

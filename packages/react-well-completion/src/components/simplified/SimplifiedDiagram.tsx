@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import type { Well } from 'react-well-completion';
-import { useDiagramConfig } from 'react-well-completion';
+import type { Well } from '../../types';
+import { useDiagramConfig } from '../../hooks/use-diagram-config';
 import SimplifiedCasingLayer from './SimplifiedCasingLayer';
 import SimplifiedTubingLayer from './SimplifiedTubingLayer';
 import SimplifiedPerforationLayer from './SimplifiedPerforationLayer';
@@ -10,11 +10,11 @@ import SimplifiedMandrelLayer from './SimplifiedMandrelLayer';
 import SimplifiedPumpLayer from './SimplifiedPumpLayer';
 import SimplifiedDepthAxis from './SimplifiedDepthAxis';
 
-interface Props {
+export interface SimplifiedDiagramProps {
   well: Well;
 }
 
-export default function SimplifiedDiagram({ well }: Props) {
+export default function SimplifiedDiagram({ well }: SimplifiedDiagramProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
