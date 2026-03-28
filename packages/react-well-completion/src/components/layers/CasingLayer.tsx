@@ -1,6 +1,6 @@
 import type { DiagramConfig, Casing } from '../../types';
 import { computeCasingPositions } from '../../hooks/use-diagram-config';
-import { useTooltip } from '../Tooltip';
+import { useTooltip } from '../tooltip-context';
 import { ShoeIcon, HangerIcon } from '../icons';
 
 interface Props {

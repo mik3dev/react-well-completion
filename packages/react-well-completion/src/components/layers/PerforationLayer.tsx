@@ -1,6 +1,6 @@
 import type { DiagramConfig, Perforation } from '../../types';
 import { diameterToX } from '../../hooks/use-diagram-config';
-import { useTooltip } from '../Tooltip';
+import { useTooltip } from '../tooltip-context';
 
 interface Props {
   perforations: Perforation[];

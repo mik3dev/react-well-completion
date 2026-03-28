@@ -1,5 +1,5 @@
 import type { DiagramConfig, Pump } from '../../types';
-import { useTooltip } from '../Tooltip';
+import { useTooltip } from '../tooltip-context';
 import { BmPumpIcon, BcpPumpIcon, BesPumpIcon } from '../icons';
 
 interface Props {

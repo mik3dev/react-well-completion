@@ -1,6 +1,6 @@
 import type { DiagramConfig } from '../../types';
 import { diameterToX } from '../../hooks/use-diagram-config';
-import { useTooltip } from '../Tooltip';
+import { useTooltip } from '../tooltip-context';
 
 interface Props {
   totalFreeDepth: number;

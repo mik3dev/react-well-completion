@@ -1,5 +1,5 @@
 import type { DiagramConfig, RodSegment } from '../../types';
-import { useTooltip } from '../Tooltip';
+import { useTooltip } from '../tooltip-context';
 
 interface Props {
   rodString: RodSegment[];
@@ -10,14 +10,15 @@ export default function RodLayer({ rodString, config }: Props) {
   const { show, move, hide } = useTooltip();
   const sorted = [...rodString].sort((a, b) => a.segment - b.segment);
 
-  let accDepth = 0;
+  const depths = sorted.reduce<{ top: number; base: number }[]>((acc, seg) => {
+    const top = acc.length > 0 ? acc[acc.length - 1].base : 0;
+    return [...acc, { top, base: top + seg.length }];
+  }, []);
 
   return (
     <g className="layer-rods">
-      {sorted.map((seg) => {
-        const top = accDepth;
-        accDepth += seg.length;
-        const base = accDepth;
+      {sorted.map((seg, segIdx) => {
+        const { top, base } = depths[segIdx];
 
         const fullRodW = seg.diameter * config.pulgada;
         const rodWidth = config.halfSection ? fullRodW / 2 : fullRodW;

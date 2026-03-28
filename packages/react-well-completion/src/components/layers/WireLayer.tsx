@@ -1,6 +1,6 @@
 import type { DiagramConfig, Wire, TubingSegment } from '../../types';
 import { diameterToX } from '../../hooks/use-diagram-config';
-import { useTooltip } from '../Tooltip';
+import { useTooltip } from '../tooltip-context';
 import { WireIcon } from '../icons';
 
 interface Props {

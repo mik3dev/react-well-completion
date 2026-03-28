@@ -1,6 +1,6 @@
 import type { DiagramConfig, Well } from '../../types';
 import { diameterToX, computeCasingPositions } from '../../hooks/use-diagram-config';
-import { useTooltip } from '../Tooltip';
+import { useTooltip } from '../tooltip-context';
 import { PackerIcon, NippleIcon, PlugIcon, GasAnchorIcon, SleeveIcon, PackingIcon, MandrelIcon } from '../icons';
 
 interface Props {

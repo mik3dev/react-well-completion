@@ -8,14 +8,16 @@ interface Props {
 
 export default function SimplifiedTubingLayer({ tubingString, config }: Props) {
   const sorted = [...tubingString].sort((a, b) => a.segment - b.segment);
-  let accDepth = 0;
+
+  const depths = sorted.reduce<{ top: number; base: number }[]>((acc, seg) => {
+    const top = acc.length > 0 ? acc[acc.length - 1].base : 0;
+    return [...acc, { top, base: top + seg.length }];
+  }, []);
 
   return (
     <g>
       {sorted.map((seg, idx) => {
-        const top = accDepth;
-        accDepth += seg.length;
-        const base = accDepth;
+        const { top, base } = depths[idx];
 
         const { x1, x2 } = diameterToX(config, seg.diameter);
         const y1 = config.depthToPos(top);

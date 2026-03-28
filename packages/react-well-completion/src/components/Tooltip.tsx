@@ -1,25 +1,7 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import type { ReactNode, MouseEvent } from 'react';
-
-interface TooltipData {
-  x: number;
-  y: number;
-  lines: string[];
-}
-
-interface TooltipContextValue {
-  show: (e: MouseEvent, lines: string[]) => void;
-  move: (e: MouseEvent) => void;
-  hide: () => void;
-}
-
-const TooltipContext = createContext<TooltipContextValue | null>(null);
-
-export function useTooltip() {
-  const ctx = useContext(TooltipContext);
-  if (!ctx) throw new Error('useTooltip must be inside TooltipProvider');
-  return ctx;
-}
+import { TooltipContext } from './tooltip-context';
+import type { TooltipData } from './tooltip-context';
 
 export function TooltipProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<TooltipData | null>(null);
