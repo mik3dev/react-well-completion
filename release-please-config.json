@@ -1,0 +1,11 @@
+{
+  "packages": {
+    "packages/react-well-completion": {
+      "release-type": "node",
+      "package-name": "react-well-completion",
+      "changelog-path": "CHANGELOG.md",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    }
+  }
+}
