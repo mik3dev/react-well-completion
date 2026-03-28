@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/mik3dev/react-well-completion/compare/react-well-completion-v0.1.1...react-well-completion-v0.1.2) (2026-03-28)
+
+
+### Bug Fixes
+
+* scope package name to @mik3dev/react-well-completion ([8c90a73](https://github.com/mik3dev/react-well-completion/commit/8c90a736624f4c5746c06489fc6bfc29cb89f617))
+
 ## [0.1.1](https://github.com/mik3dev/react-well-completion/compare/react-well-completion-v0.1.0...react-well-completion-v0.1.1) (2026-03-28)
 
 
