@@ -47,6 +47,6 @@ jobs:
         run: pnpm build:lib
 
       - name: Publish to GitHub Packages
-        run: pnpm --filter react-well-completion publish --no-git-checks
+        run: pnpm --filter @mik3dev/react-well-completion publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,4 +1,4 @@
-import type { Well } from 'react-well-completion';
+import type { Well } from '@mik3dev/react-well-completion';
 
 export const exampleWells: Well[] = [
   {

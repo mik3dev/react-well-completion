@@ -10,6 +10,9 @@ importers:
 
   packages/demo-app:
     dependencies:
+      '@mik3dev/react-well-completion':
+        specifier: workspace:*
+        version: link:../react-well-completion
       html-to-image:
         specifier: ^1.11.13
         version: 1.11.13
@@ -19,9 +22,6 @@ importers:
       react-dom:
         specifier: ^19.2.0
         version: 19.2.4(react@19.2.4)
-      react-well-completion:
-        specifier: workspace:*
-        version: link:../react-well-completion
       uuid:
         specifier: ^13.0.0
         version: 13.0.0

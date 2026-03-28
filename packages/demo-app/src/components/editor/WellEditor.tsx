@@ -1,6 +1,6 @@
 import { useWellStore } from '../../store/well-store';
-import type { LiftMethod, DiagramOrientation, HalfSide, Casing, TubingSegment, RodSegment } from 'react-well-completion';
-import { createCasing, createTubingSegment, createRodSegment, createPump, createSand, createPerforation, createPacker, createSeatNipple, createPlug, createGasAnchor, createMandrel, createSleeve, createPacking, createWire } from 'react-well-completion';
+import type { LiftMethod, DiagramOrientation, HalfSide, Casing, TubingSegment, RodSegment } from '@mik3dev/react-well-completion';
+import { createCasing, createTubingSegment, createRodSegment, createPump, createSand, createPerforation, createPacker, createSeatNipple, createPlug, createGasAnchor, createMandrel, createSleeve, createPacking, createWire } from '@mik3dev/react-well-completion';
 
 const METHODS: { value: LiftMethod; label: string }[] = [
   { value: 'BM', label: 'Bomba Mecánica' },

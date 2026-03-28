@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --filter demo-app dev",
-    "build": "pnpm --filter react-well-completion build && pnpm --filter demo-app build",
-    "build:lib": "pnpm --filter react-well-completion build",
+    "build": "pnpm --filter @mik3dev/react-well-completion build && pnpm --filter demo-app build",
+    "build:lib": "pnpm --filter @mik3dev/react-well-completion build",
     "lint": "pnpm --filter demo-app lint"
   }
 }

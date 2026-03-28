@@ -1,5 +1,5 @@
 {
-  "name": "react-well-completion",
+  "name": "@mik3dev/react-well-completion",
   "version": "0.1.1",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      'react-well-completion': resolve(__dirname, '../react-well-completion/src/index.ts'),
+      '@mik3dev/react-well-completion': resolve(__dirname, '../react-well-completion/src/index.ts'),
     },
   },
 })

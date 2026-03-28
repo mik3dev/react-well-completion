@@ -4,7 +4,7 @@ import { useLabelsStore } from './store/labels-store';
 import Toolbar from './components/Toolbar';
 import WellSelector from './components/editor/WellSelector';
 import WellEditor from './components/editor/WellEditor';
-import { WellDiagram, SimplifiedDiagram } from 'react-well-completion';
+import { WellDiagram, SimplifiedDiagram } from '@mik3dev/react-well-completion';
 import './App.css';
 
 export default function App() {

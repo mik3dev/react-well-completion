@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { LabelCategory } from 'react-well-completion';
-import { LABEL_CATEGORIES } from 'react-well-completion';
+import type { LabelCategory } from '@mik3dev/react-well-completion';
+import { LABEL_CATEGORIES } from '@mik3dev/react-well-completion';
 
 export type { LabelCategory };
 export { LABEL_CATEGORIES };
