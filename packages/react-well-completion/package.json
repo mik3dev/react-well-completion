@@ -1,6 +1,6 @@
 {
   "name": "react-well-completion",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -36,6 +36,8 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "license": "MIT"
 }
