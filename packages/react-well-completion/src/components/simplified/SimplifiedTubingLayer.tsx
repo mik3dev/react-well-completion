@@ -10,6 +10,9 @@ export default function SimplifiedTubingLayer({ tubingString, config }: Props) {
   const sorted = [...tubingString].sort((a, b) => a.segment - b.segment);
 
   const depths = sorted.reduce<{ top: number; base: number }[]>((acc, seg) => {
+    if (seg.top != null && seg.base != null) {
+      return [...acc, { top: seg.top, base: seg.base }];
+    }
     const top = acc.length > 0 ? acc[acc.length - 1].base : 0;
     return [...acc, { top, base: top + seg.length }];
   }, []);
