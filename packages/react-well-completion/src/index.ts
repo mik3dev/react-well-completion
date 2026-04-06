@@ -20,6 +20,10 @@ export {
   createPerforation, createSand, createWire,
 } from './utils/well-factory';
 
+// Parser
+export { parseBackendWell, parseFractionalDiameter } from './utils/parse-backend-well';
+export type { ParseBackendWellOverrides } from './utils/parse-backend-well';
+
 // Hook
 export { useDiagramConfig, diameterToX, computeCasingPositions, computeCasingSpans } from './hooks/use-diagram-config';
 
