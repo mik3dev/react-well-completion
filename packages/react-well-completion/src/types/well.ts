@@ -16,6 +16,10 @@ export interface TubingSegment {
   segment: number;        // orden del segmento (1, 2, 3...)
   diameter: number;       // pulgadas OD
   length: number;         // pies
+  top?: number;           // pies (opcional — si viene del backend)
+  base?: number;          // pies (opcional — si viene del backend)
+  weight?: number;        // lb/ft
+  grade?: string;         // e.g. 'P-110'
 }
 
 export interface RodSegment {
@@ -64,13 +68,16 @@ export interface Mandrel {
   segment: number;
   depth: number;          // pies
   diameter: number;       // pulgadas
-  hasValve: boolean;      // si tiene válvula GL instalada
+  valveType: 'operating' | 'dummy' | null;
+  ptrPsi?: number;        // presion de apertura
+  flowDiameter?: string;  // diametro de flujo
 }
 
 export interface Sleeve {
   id: string;
   depth: number;          // pies
   diameter: number;       // pulgadas
+  comment?: string;       // e.g. "Tope de Circulación"
 }
 
 export interface Packing {
@@ -132,6 +139,7 @@ export interface Well {
   perforations: Perforation[];
   sands: Sand[];
   wire: Wire | null;                // solo BES
+  metadata?: Record<string, unknown>;
 }
 
 export type LabelCategory =
