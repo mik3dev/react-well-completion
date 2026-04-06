@@ -3,13 +3,14 @@ interface Props {
   x: number;       // left edge of tubing
   y: number;       // center Y of the mandrel
   tubingW: number; // full tubing width
-  hasValve: boolean;
+  valveType: 'operating' | 'dummy' | null;
   side?: 'right' | 'left';
 }
 
-export default function MandrelIcon({ x, y, tubingW, hasValve, side = 'right' }: Props) {
+export default function MandrelIcon({ x, y, tubingW, valveType, side = 'right' }: Props) {
   const sw = 3.5;
-  const color = hasValve ? '#27ae60' : '#7f8c8d';
+  const color = valveType === 'operating' ? '#27ae60' : valveType === 'dummy' ? '#95a5a6' : '#7f8c8d';
+  const dashArray = valveType === 'dummy' ? '4,3' : undefined;
 
   // L dimensions
   const armLen = 12;  // horizontal arm extending from tubing
@@ -31,13 +32,13 @@ export default function MandrelIcon({ x, y, tubingW, hasValve, side = 'right' }:
       <line
         x1={wallX} y1={y}
         x2={armEndX} y2={y}
-        stroke={color} strokeWidth={sw} strokeLinecap="round"
+        stroke={color} strokeWidth={sw} strokeLinecap="round" strokeDasharray={dashArray}
       />
       {/* Vertical leg */}
       <line
         x1={armEndX} y1={y}
         x2={armEndX} y2={legEndY}
-        stroke={color} strokeWidth={sw} strokeLinecap="round"
+        stroke={color} strokeWidth={sw} strokeLinecap="round" strokeDasharray={dashArray}
       />
     </g>
   );

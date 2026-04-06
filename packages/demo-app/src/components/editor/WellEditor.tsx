@@ -334,7 +334,7 @@ export default function WellEditor() {
         <section className="editor-section">
           <div className="editor-section__header">
             <h4>Mandriles GL</h4>
-            <button onClick={() => addElement('mandrels', createMandrel({ segment: well.mandrels.length + 1, depth: 1000, diameter: 4, hasValve: false }))}>+ Agregar</button>
+            <button onClick={() => addElement('mandrels', createMandrel({ segment: well.mandrels.length + 1, depth: 1000, diameter: 4, valveType: null }))}>+ Agregar</button>
           </div>
           <table className="editor-table">
             <thead><tr><th>#</th><th>Prof.</th><th>Diám.</th><th>Válvula</th><th></th></tr></thead>
@@ -344,7 +344,7 @@ export default function WellEditor() {
                   <td><input type="number" value={m.segment} onChange={e => updateElement('mandrels', m.id, { segment: +e.target.value })} /></td>
                   <td><input type="number" value={m.depth} onChange={e => updateElement('mandrels', m.id, { depth: +e.target.value })} /></td>
                   <td><input type="number" step="0.5" value={m.diameter} onChange={e => updateElement('mandrels', m.id, { diameter: +e.target.value })} /></td>
-                  <td><input type="checkbox" checked={m.hasValve} onChange={e => updateElement('mandrels', m.id, { hasValve: e.target.checked })} /></td>
+                  <td><select value={m.valveType ?? ''} onChange={e => updateElement('mandrels', m.id, { valveType: (e.target.value || null) as 'operating' | 'dummy' | null })}><option value="">Sin válvula</option><option value="operating">Operante</option><option value="dummy">Dummy</option></select></td>
                   <td><button className="btn-delete" onClick={() => removeElement('mandrels', m.id)}>×</button></td>
                 </tr>
               ))}

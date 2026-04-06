@@ -211,7 +211,7 @@ export default function LabelsLayer({ well, config, minCasingDiameter, visible }
           .slice().sort((a, b) => a.depth - b.depth)
           .map(m => {
           const y = config.depthToPos(m.depth);
-          const valvula = m.hasValve ? ' +VGL' : '';
+          const valvula = m.valveType === 'operating' ? ' +VGL' : m.valveType === 'dummy' ? ' +Dummy' : '';
           return (
             <g key={`label-mdr-${m.id}`}>
               <Label

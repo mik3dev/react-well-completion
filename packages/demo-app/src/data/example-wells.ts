@@ -128,12 +128,12 @@ export const exampleWells: Well[] = [
     plugs: [],
     gasAnchors: [],
     mandrels: [
-      { id: 'm1', segment: 1, depth: 2000, diameter: 4, hasValve: true },
-      { id: 'm2', segment: 2, depth: 1900, diameter: 4, hasValve: false },
-      { id: 'm3', segment: 3, depth: 1800, diameter: 4, hasValve: false },
-      { id: 'm4', segment: 4, depth: 1700, diameter: 4, hasValve: true },
-      { id: 'm5', segment: 5, depth: 1600, diameter: 4, hasValve: false },
-      { id: 'm6', segment: 6, depth: 1500, diameter: 4, hasValve: true },
+      { id: 'm1', segment: 1, depth: 2000, diameter: 4, valveType: 'operating' },
+      { id: 'm2', segment: 2, depth: 1900, diameter: 4, valveType: null },
+      { id: 'm3', segment: 3, depth: 1800, diameter: 4, valveType: null },
+      { id: 'm4', segment: 4, depth: 1700, diameter: 4, valveType: 'operating' },
+      { id: 'm5', segment: 5, depth: 1600, diameter: 4, valveType: null },
+      { id: 'm6', segment: 6, depth: 1500, diameter: 4, valveType: 'operating' },
     ],
     sleeves: [
       { id: 'sl1', depth: 1900, diameter: 4 },

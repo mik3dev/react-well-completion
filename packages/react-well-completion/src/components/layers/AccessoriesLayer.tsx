@@ -156,7 +156,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
       {well.mandrels.map((mandrel) => {
         const { x1, x2 } = diameterToX(config, mandrel.diameter);
         const y = config.depthToPos(mandrel.depth);
-        const label = mandrel.hasValve ? 'Mandril + Válvula GL' : 'Mandril (sin válvula)';
+        const label = mandrel.valveType === 'operating' ? 'Mandril + Válvula GL' : mandrel.valveType === 'dummy' ? 'Mandril + Válvula Dummy' : 'Mandril (sin válvula)';
 
         return (
           <g key={mandrel.id}
@@ -164,7 +164,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
             onMouseMove={move}
             onMouseLeave={hide}
           >
-            <MandrelIcon x={x1} y={y} tubingW={x2 - x1} hasValve={mandrel.hasValve} side={half ? config.halfSide : 'right'} />
+            <MandrelIcon x={x1} y={y} tubingW={x2 - x1} valveType={mandrel.valveType} side={half ? config.halfSide : 'right'} />
           </g>
         );
       })}
