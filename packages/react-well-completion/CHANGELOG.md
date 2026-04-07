@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.3](https://github.com/mik3dev/react-well-completion/compare/react-well-completion-v0.1.2...react-well-completion-v0.1.3) (2026-04-06)
+
+
+### Features
+
+* add parseBackendWell function and parseFractionalDiameter utility ([fda320f](https://github.com/mik3dev/react-well-completion/commit/fda320f6aa674151416a7810ded1d4f26bc36c6f))
+* export parseBackendWell and parseFractionalDiameter from library ([d3838a6](https://github.com/mik3dev/react-well-completion/commit/d3838a6c8f96170fed882cccd0e7d156538adf1c))
+* support optional top/base in TubingSegment rendering ([fc366e0](https://github.com/mik3dev/react-well-completion/commit/fc366e0fb9658fabbc548ece73c6256e5e9ccaba))
+* update types for backend compatibility (TubingSegment, Mandrel, Sleeve, Well) ([a4982c5](https://github.com/mik3dev/react-well-completion/commit/a4982c5ce9598b0395bf00aaace369d892f75c2e))
+
 ## [0.1.2](https://github.com/mik3dev/react-well-completion/compare/react-well-completion-v0.1.1...react-well-completion-v0.1.2) (2026-03-28)
 
 
