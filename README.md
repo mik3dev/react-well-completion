@@ -123,10 +123,10 @@ const glWell = {
   rodString: [],
   pump: null,
   mandrels: [
-    createMandrel({ segment: 1, depth: 2000, diameter: 1, hasValve: true }),
-    createMandrel({ segment: 2, depth: 3500, diameter: 1, hasValve: true }),
-    createMandrel({ segment: 3, depth: 5000, diameter: 1, hasValve: true }),
-    createMandrel({ segment: 4, depth: 6500, diameter: 1, hasValve: false }),
+    createMandrel({ segment: 1, depth: 2000, diameter: 1, valveType: 'operating' }),
+    createMandrel({ segment: 2, depth: 3500, diameter: 1, valveType: 'operating' }),
+    createMandrel({ segment: 3, depth: 5000, diameter: 1, valveType: 'dummy' }),
+    createMandrel({ segment: 4, depth: 6500, diameter: 1, valveType: null }),
   ],
   perforations: [
     createPerforation({ top: 7200, base: 7400, type: 'shoot', yacimiento: 'Fm. Merecure' }),
@@ -307,7 +307,7 @@ Todas las factories generan un `id` UUID automaticamente:
 | `createRodSegment({ segment, diameter, length })` | Numero de segmento, diametro, longitud |
 | `createPump({ type, depth, diameter, length })` | Tipo (BM/BCP/BES/GL), profundidad, diametro, longitud |
 | `createPacker({ depth, diameter })` | Profundidad, diametro |
-| `createMandrel({ segment, depth, diameter, hasValve })` | Segmento, profundidad, diametro, si tiene valvula |
+| `createMandrel({ segment, depth, diameter, valveType })` | Segmento, profundidad, diametro, tipo de valvula (`'operating' \| 'dummy' \| null`) |
 | `createPerforation({ top, base, type })` | Tope/base (pies), tipo ('shoot' o 'slot') |
 | `createSand({ name, segment, top, base })` | Nombre, segmento, tope/base |
 | `createWire({ depth })` | Profundidad del cable BES |
@@ -316,6 +316,56 @@ Todas las factories generan un `id` UUID automaticamente:
 | `createGasAnchor({ depth, diameter, length })` | Profundidad, diametro, longitud |
 | `createSleeve({ depth, diameter })` | Profundidad, diametro |
 | `createPacking({ depth, diameter, od })` | Profundidad, diametro, OD |
+
+### Parser de Datos del Backend
+
+Si recibes datos desde un backend en formato crudo (con nombres en español, fracciones como strings, etc.), usa `parseBackendWell` para convertirlos a un `Well` listo para renderizar:
+
+```tsx
+import { WellDiagram, parseBackendWell } from 'react-well-completion';
+
+async function loadWell() {
+  const response = await fetch('/api/wells/VLG3922');
+  const json = await response.json();
+
+  // Convierte el JSON crudo del backend a un objeto Well tipado
+  const well = parseBackendWell(json);
+
+  return <WellDiagram well={well} />;
+}
+```
+
+#### Con Overrides
+
+Si el backend envia datos incompletos (ej. `Profundidad Total: 0` o un `Tipo de Trabajo` desconocido), puedes pasar overrides:
+
+```tsx
+const well = parseBackendWell(json, {
+  totalDepth: 16500,      // Override del totalDepth calculado
+  liftMethod: 'GL',       // Override del lift method
+});
+```
+
+#### Que hace el parser
+
+- **Mapea nombres de campos**: `Pozo → name`, `HUD → totalFreeDepth`, `Tipo de Trabajo → liftMethod`
+- **Parsea diametros fraccionales**: `"13 3/8\""` → `13.375`, `"9 5/8\""` → `9.625`
+- **Mapea lift methods**: `CVGL → GL`, `BME → BM`, etc.
+- **Calcula `totalDepth`**: Si el backend envia 0, usa el max de bases de casings/perforations/tubing
+- **Distribuye `EquipoDeFondo` por tipo**: `Niple → seatNipples`, `Manga → sleeves`, `Empacadura → packers`
+- **Infiere `valveType` de mandriles**: `PTR PSI` presente → `'operating'`, `Tipo Válvula: 'Dummy'` → `'dummy'`, ninguno → `null`
+- **Preserva campos extras en metadata**: Comentarios, fechas, FieldId, y tipos no reconocidos de equipo de fondo van a `well.metadata`
+
+#### Utilidad: parseFractionalDiameter
+
+```tsx
+import { parseFractionalDiameter } from 'react-well-completion';
+
+parseFractionalDiameter('13 3/8"');  // 13.375
+parseFractionalDiameter('9 5/8"');   // 9.625
+parseFractionalDiameter('3/8');      // 0.375
+parseFractionalDiameter('3.5');      // 3.5
+```
 
 ### Hook Avanzado
 

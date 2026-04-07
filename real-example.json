@@ -1,0 +1,125 @@
+{
+  "HUD": 8500,
+  "TDS": "JOSE 1",
+  "Pozo": "VLG3922",
+  "Liner": [],
+  "Casing": [
+    {
+      "OD": "13 3/8\"",
+      "Weight": 15.5,
+      "posicion": 1,
+      "Base (pies)": 3974,
+      "Tope (pies)": 0
+    },
+    {
+      "OD": "9 5/8\"",
+      "Grado": "HC 110",
+      "Weight": 53.5,
+      "posicion": 2,
+      "Base (pies)": 14507,
+      "Tope (pies)": 0
+    },
+    {
+      "Grado": "P-110",
+      "Weight": 35,
+      "posicion": 3,
+      "Base (pies)": 16178,
+      "Tope (pies)": 13873
+    }
+  ],
+  "Tubing": [
+    {
+      "ID": 2.9,
+      "OD": 3.5,
+      "Grado": "P-110",
+      "Weight": 10.3,
+      "posicion": 1,
+      "Base (pies)": 14712,
+      "Tope (pies)": 0
+    }
+  ],
+  "FieldId": "4787c192-ac17-11f0-9add-00505652cca1",
+  "fileName": "Formato OilFielNet Diagramas Mecánicos_Carga Pozos Prueba.xlsx",
+  "Fecha HUD": "",
+  "sheetName": "VLG3922",
+  "Comentario": "Comentario de Diagrama 3",
+  "sheetIndex": 1,
+  "EquipoDeFondo": [
+    { "Tipo": "Niple", "posicion": 1, "Profundidad (pies)": 281 },
+    {
+      "Tipo": "Manga",
+      "posicion": 2,
+      "Comentario": "Tope de Circulación",
+      "Profundidad (pies)": 13973
+    },
+    {
+      "Tipo": "Manga",
+      "posicion": 3,
+      "Comentario": "Manga de Circulación (Abierto)",
+      "Profundidad (pies)": 14636
+    },
+    {
+      "Tipo": "Empacadura Permanente",
+      "posicion": 4,
+      "Profundidad (pies)": 14669
+    },
+    { "Tipo": "Cuello Flotador", "posicion": 5, "Profundidad (pies)": 16127 }
+  ],
+  "Fecha Trabajo": "2026-03-10",
+  "Perforaciones": [
+    { "Base": 15692, "Tope": 15688, "posicion": 1, "Yacimiento": "B-4.0" },
+    { "Base": 15712, "Tope": 15698, "posicion": 2, "Yacimiento": "B-4.0" },
+    { "Base": 15747, "Tope": 15742, "posicion": 3, "Yacimiento": "B-4.1" },
+    { "Base": 15798, "Tope": 15778, "posicion": 4, "Yacimiento": "B-4.2" },
+    { "Base": 15874, "Tope": 15837, "posicion": 5, "Yacimiento": "B-4.3" },
+    { "Base": 15888, "Tope": 15880, "posicion": 6, "Yacimiento": "B-4.4" },
+    { "Base": 15910, "Tope": 15896, "posicion": 7, "Yacimiento": "B-4.4" },
+    { "Base": 16012, "Tope": 15992, "posicion": 8, "Yacimiento": "B-4.6" },
+    { "Base": 16038, "Tope": 16028, "posicion": 9, "Yacimiento": "B-4.6" },
+    { "Base": 16090, "Tope": 16063, "posicion": 10, "Yacimiento": "B-4.7" }
+  ],
+  "Fecha Programa": "2026-01-10",
+  "Potencial Antes": 5,
+  "Tipo de Trabajo": "CVGL",
+  "MadrilesValvulas": [
+    {
+      "PTR PSI": 1360,
+      "posicion": 1,
+      "PROF_TVD_1": 2920,
+      "Tamaño (pulg)": 1,
+      "Diámetro flujo": "12/64\"",
+      "Fecha de Instalación": "28/11/2017"
+    },
+    {
+      "posicion": 2,
+      "PROF_TVD_1": 5562,
+      "Tipo Válvula": "Dummy",
+      "Fecha de Instalación": "23/12/2022"
+    },
+    {
+      "posicion": 3,
+      "PROF_TVD_1": 7988,
+      "Tipo Válvula": "Dummy",
+      "Tamaño (pulg)": 1.5,
+      "Fecha de Instalación": "23/12/2022"
+    },
+    {
+      "PTR PSI": 1310,
+      "posicion": 4,
+      "PROF_TVD_1": 10287,
+      "Tamaño (pulg)": 1.5,
+      "Diámetro flujo": "12/64\"",
+      "Fecha de Instalación": "2025-08-05"
+    },
+    {
+      "PTR PSI": 1295,
+      "posicion": 5,
+      "PROF_TVD_1": 12367,
+      "Tamaño (pulg)": 1.5,
+      "Diámetro flujo": "12/64\"",
+      "Fecha de Instalación": "2025-08-05"
+    }
+  ],
+  "Profundidad Total": 0,
+  "Potencial Esperado": 100
+}
