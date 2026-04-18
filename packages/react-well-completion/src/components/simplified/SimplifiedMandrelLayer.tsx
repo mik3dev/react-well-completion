@@ -1,12 +1,27 @@
-import type { DiagramConfig, Mandrel } from '../../types';
+import type { DiagramConfig, Mandrel, TubingSegment } from '../../types';
 import { diameterToX } from '../../hooks/use-diagram-config';
 
 interface Props {
   mandrels: Mandrel[];
+  tubingString?: TubingSegment[];
   config: DiagramConfig;
 }
 
-export default function SimplifiedMandrelLayer({ mandrels, config }: Props) {
+function resolveDiameter(
+  componentDiameter: number,
+  depth: number,
+  tubing: TubingSegment[],
+): number {
+  if (componentDiameter > 0) return componentDiameter;
+  if (tubing.length === 0) return 0;
+  const seg = tubing.find(t =>
+    t.top != null && t.base != null && depth >= t.top && depth <= t.base,
+  );
+  if (seg) return seg.diameter;
+  return tubing[0].diameter;
+}
+
+export default function SimplifiedMandrelLayer({ mandrels, tubingString = [], config }: Props) {
   const sw = 3.5;
   const armLen = 12;
   const legLen = 10;
@@ -14,7 +29,8 @@ export default function SimplifiedMandrelLayer({ mandrels, config }: Props) {
   return (
     <g>
       {mandrels.map(m => {
-        const { x1, x2 } = diameterToX(config, m.diameter);
+        const effectiveDiameter = resolveDiameter(m.diameter, m.depth, tubingString);
+        const { x1, x2 } = diameterToX(config, effectiveDiameter);
         const tubingW = x2 - x1;
         const y = config.depthToPos(m.depth);
         const color = m.valveType === 'operating' ? '#555' : m.valveType === 'dummy' ? '#888' : '#aaa';

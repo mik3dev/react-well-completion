@@ -117,6 +117,21 @@ describe('parseBackendWell', () => {
     expect(well.mandrels[2].valveType).toBeNull();
   });
 
+  it('assigns tubing diameter to mandrels (not Tamaño)', () => {
+    const well = parseBackendWell(sampleJson);
+    // All mandreles are at depths within the tubing (0-14712), so diameter should be 3.5
+    expect(well.mandrels[0].diameter).toBe(3.5);
+    expect(well.mandrels[1].diameter).toBe(3.5);
+    expect(well.mandrels[2].diameter).toBe(3.5);
+  });
+
+  it('stores Tamaño (pulg) as valveDiameter on mandrels', () => {
+    const well = parseBackendWell(sampleJson);
+    expect(well.mandrels[0].valveDiameter).toBe(1);   // Tamaño: 1
+    expect(well.mandrels[1].valveDiameter).toBeUndefined(); // sin Tamaño
+    expect(well.mandrels[2].valveDiameter).toBeUndefined(); // sin Tamaño
+  });
+
   it('distributes EquipoDeFondo by type', () => {
     const well = parseBackendWell(sampleJson);
     expect(well.seatNipples).toHaveLength(1);
@@ -125,6 +140,28 @@ describe('parseBackendWell', () => {
     expect(well.sleeves[0].comment).toBe('Tope de Circulación');
     expect(well.packers).toHaveLength(1);
     expect(well.packers[0].depth).toBe(14669);
+  });
+
+  it('assigns tubing diameter to EquipoDeFondo items at tubing depths', () => {
+    const well = parseBackendWell(sampleJson);
+    // Niple @ 281 — within tubing (0-14712) → 3.5
+    expect(well.seatNipples[0].diameter).toBe(3.5);
+    expect(well.seatNipples[0].od).toBe(3.5);
+    // Manga @ 13973 — within tubing → 3.5
+    expect(well.sleeves[0].diameter).toBe(3.5);
+    // Empacadura Permanente @ 14669 — below tubing base (14712) — but still within since 14669 < 14712 → 3.5
+    expect(well.packers[0].diameter).toBe(3.5);
+  });
+
+  it('falls back to first tubing segment diameter when depth is outside any segment', () => {
+    const jsonWithDeepItem = {
+      ...sampleJson,
+      EquipoDeFondo: [
+        { Tipo: 'Empacadura Permanente', posicion: 1, 'Profundidad (pies)': 20000 },
+      ],
+    };
+    const well = parseBackendWell(jsonWithDeepItem);
+    expect(well.packers[0].diameter).toBe(3.5); // first tubing segment as fallback
   });
 
   it('puts Cuello Flotador in metadata.equipoDeFondoExtra', () => {

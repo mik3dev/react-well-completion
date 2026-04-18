@@ -75,9 +75,9 @@ export default function SimplifiedDiagram({ well }: SimplifiedDiagramProps) {
               minCasingDiameter={minCasingDiameter}
               config={config}
             />
-            <SimplifiedPackerLayer packers={well.packers} config={config} />
-            <SimplifiedPackingLayer packings={well.packings} casings={well.casings} config={config} />
-            <SimplifiedMandrelLayer mandrels={well.mandrels} config={config} />
+            <SimplifiedPackerLayer packers={well.packers} tubingString={well.tubingString} config={config} />
+            <SimplifiedPackingLayer packings={well.packings} casings={well.casings} tubingString={well.tubingString} config={config} />
+            <SimplifiedMandrelLayer mandrels={well.mandrels} tubingString={well.tubingString} config={config} />
             <SimplifiedPumpLayer pump={well.pump} config={config} />
           </g>
 

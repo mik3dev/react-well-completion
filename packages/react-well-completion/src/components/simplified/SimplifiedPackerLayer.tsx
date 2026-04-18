@@ -1,12 +1,27 @@
-import type { DiagramConfig, Packer } from '../../types';
+import type { DiagramConfig, Packer, TubingSegment } from '../../types';
 import { diameterToX } from '../../hooks/use-diagram-config';
 
 interface Props {
   packers: Packer[];
+  tubingString?: TubingSegment[];
   config: DiagramConfig;
 }
 
-export default function SimplifiedPackerLayer({ packers, config }: Props) {
+function resolveDiameter(
+  componentDiameter: number,
+  depth: number,
+  tubing: TubingSegment[],
+): number {
+  if (componentDiameter > 0) return componentDiameter;
+  if (tubing.length === 0) return 0;
+  const seg = tubing.find(t =>
+    t.top != null && t.base != null && depth >= t.top && depth <= t.base,
+  );
+  if (seg) return seg.diameter;
+  return tubing[0].diameter;
+}
+
+export default function SimplifiedPackerLayer({ packers, tubingString = [], config }: Props) {
   const PK_H = config.pulgada * 0.7;
 
   return (
@@ -19,7 +34,8 @@ export default function SimplifiedPackerLayer({ packers, config }: Props) {
       </defs>
       {packers.map(packer => {
         const y = config.depthToPos(packer.depth);
-        const { x1, x2 } = diameterToX(config, packer.diameter);
+        const effectiveDiameter = resolveDiameter(packer.diameter, packer.depth, tubingString);
+        const { x1, x2 } = diameterToX(config, effectiveDiameter);
         const pkW = config.pulgada * 1.2;
 
         return (

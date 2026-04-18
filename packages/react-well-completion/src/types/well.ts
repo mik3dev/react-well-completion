@@ -67,7 +67,8 @@ export interface Mandrel {
   id: string;
   segment: number;
   depth: number;          // pies
-  diameter: number;       // pulgadas
+  diameter: number;       // pulgadas — diametro del tubing donde se instala (para posicion)
+  valveDiameter?: number; // pulgadas — diametro de la valvula GL instalada (solo informativo)
   valveType: 'operating' | 'dummy' | null;
   ptrPsi?: number;        // presion de apertura
   flowDiameter?: string;  // diametro de flujo

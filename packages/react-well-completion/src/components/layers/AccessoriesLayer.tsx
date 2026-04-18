@@ -1,4 +1,4 @@
-import type { DiagramConfig, Well } from '../../types';
+import type { DiagramConfig, TubingSegment, Well } from '../../types';
 import { diameterToX, computeCasingPositions } from '../../hooks/use-diagram-config';
 import { useTooltip } from '../tooltip-context';
 import { PackerIcon, NippleIcon, PlugIcon, GasAnchorIcon, SleeveIcon, PackingIcon, MandrelIcon } from '../icons';
@@ -7,6 +7,26 @@ interface Props {
   well: Well;
   config: DiagramConfig;
   minCasingDiameter: number;
+}
+
+/**
+ * Resuelve el diametro a usar para posicionar un accesorio de fondo.
+ * Si el componente trae diameter > 0, lo usa. Si es 0 (dato faltante),
+ * busca el diametro del tubing a esa profundidad.
+ */
+function resolveDiameter(
+  componentDiameter: number,
+  depth: number,
+  tubing: TubingSegment[],
+): number {
+  if (componentDiameter > 0) return componentDiameter;
+  if (tubing.length === 0) return 0;
+
+  const seg = tubing.find(t =>
+    t.top != null && t.base != null && depth >= t.top && depth <= t.base,
+  );
+  if (seg) return seg.diameter;
+  return tubing[0].diameter;
 }
 
 export default function AccessoriesLayer({ well, config, minCasingDiameter }: Props) {
@@ -20,11 +40,12 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
       {/* Packers */}
       {well.packers.map((packer) => {
         const y = config.depthToPos(packer.depth);
-        const { x1, x2 } = diameterToX(config, packer.diameter);
+        const effectiveDiameter = resolveDiameter(packer.diameter, packer.depth, well.tubingString);
+        const { x1, x2 } = diameterToX(config, effectiveDiameter);
         const packerW = config.pulgada * 1.5;
         const packerH = packerW * 1.2; // aspect ratio ~1.2:1
 
-        const info = ['Tipo: Packer', `Profundidad: ${packer.depth} ft`, `Diámetro: ${packer.diameter}"`];
+        const info = ['Tipo: Packer', `Profundidad: ${packer.depth} ft`, `Diámetro: ${effectiveDiameter}"`];
 
         return (
           <g key={packer.id}
@@ -41,14 +62,15 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
       {/* Seat Nipples */}
       {well.seatNipples.map((nipple) => {
         const y = config.depthToPos(nipple.depth);
-        const { x1, x2 } = diameterToX(config, nipple.diameter);
+        const effectiveDiameter = resolveDiameter(nipple.diameter, nipple.depth, well.tubingString);
+        const { x1, x2 } = diameterToX(config, effectiveDiameter);
         const nW = config.pulgada * 0.5;
         const nH = nW * 1.5; // taller than wide
         const label = nipple.type === 'polished' ? 'Niple Pulido' : 'Niple de Asiento';
 
         return (
           <g key={nipple.id}
-            onMouseEnter={e => show(e, [label, `Profundidad: ${nipple.depth} ft`, `Diámetro: ${nipple.diameter}"`])}
+            onMouseEnter={e => show(e, [label, `Profundidad: ${nipple.depth} ft`, `Diámetro: ${effectiveDiameter}"`])}
             onMouseMove={move}
             onMouseLeave={hide}
           >
@@ -95,13 +117,18 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
 
       {/* Sleeves — uniform height, full tubing width */}
       {well.sleeves.map((sleeve) => {
-        const { x1, x2 } = diameterToX(config, sleeve.diameter);
+        const effectiveDiameter = resolveDiameter(sleeve.diameter, sleeve.depth, well.tubingString);
+        const { x1, x2 } = diameterToX(config, effectiveDiameter);
         const y = config.depthToPos(sleeve.depth);
         const SLEEVE_H = config.pulgada * 0.6;
 
+        const info = sleeve.comment
+          ? ['Tipo: Manga', `Profundidad: ${sleeve.depth} ft`, `Diámetro: ${effectiveDiameter}"`, sleeve.comment]
+          : ['Tipo: Manga', `Profundidad: ${sleeve.depth} ft`, `Diámetro: ${effectiveDiameter}"`];
+
         return (
           <g key={sleeve.id}
-            onMouseEnter={e => show(e, ['Tipo: Manga', `Profundidad: ${sleeve.depth} ft`, `Diámetro: ${sleeve.diameter}"`])}
+            onMouseEnter={e => show(e, info)}
             onMouseMove={move}
             onMouseLeave={hide}
           >
@@ -116,7 +143,8 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
         const WALL = 5;
         const casingPos = computeCasingPositions(well.casings, config);
         return well.packings.map((pk) => {
-          const { x1: tbgX1, x2: tbgX2 } = diameterToX(config, pk.diameter);
+          const effectiveDiameter = resolveDiameter(pk.diameter, pk.depth, well.tubingString);
+          const { x1: tbgX1, x2: tbgX2 } = diameterToX(config, effectiveDiameter);
           const y = config.depthToPos(pk.depth);
 
           // Find the smallest casing that contains this packing at pk.depth
@@ -131,7 +159,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
             csgX1 = pos.x1;
             csgX2 = pos.x2;
           } else {
-            const fallback = diameterToX(config, pk.od || pk.diameter + 2);
+            const fallback = diameterToX(config, pk.od || effectiveDiameter + 2);
             csgX1 = fallback.x1;
             csgX2 = fallback.x2;
           }
@@ -141,7 +169,7 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
 
           return (
             <g key={pk.id}
-              onMouseEnter={e => show(e, ['Tipo: Empacadura', `Profundidad: ${pk.depth} ft`, `Diámetro: ${pk.diameter}"`])}
+              onMouseEnter={e => show(e, ['Tipo: Empacadura', `Profundidad: ${pk.depth} ft`, `Diámetro: ${effectiveDiameter}"`])}
               onMouseMove={move}
               onMouseLeave={hide}
             >
@@ -154,13 +182,25 @@ export default function AccessoriesLayer({ well, config, minCasingDiameter }: Pr
 
       {/* Mandrels (Gas Lift) — side-pocket on right side of tubing */}
       {well.mandrels.map((mandrel) => {
-        const { x1, x2 } = diameterToX(config, mandrel.diameter);
+        const effectiveDiameter = resolveDiameter(mandrel.diameter, mandrel.depth, well.tubingString);
+        const { x1, x2 } = diameterToX(config, effectiveDiameter);
         const y = config.depthToPos(mandrel.depth);
         const label = mandrel.valveType === 'operating' ? 'Mandril + Válvula GL' : mandrel.valveType === 'dummy' ? 'Mandril + Válvula Dummy' : 'Mandril (sin válvula)';
 
+        const info = [label, `#${mandrel.segment}`, `Profundidad: ${mandrel.depth} ft`];
+        if (mandrel.valveDiameter != null) {
+          info.push(`Diám. Válvula: ${mandrel.valveDiameter}"`);
+        }
+        if (mandrel.ptrPsi != null) {
+          info.push(`PTR: ${mandrel.ptrPsi} psi`);
+        }
+        if (mandrel.flowDiameter) {
+          info.push(`Diám. Flujo: ${mandrel.flowDiameter}`);
+        }
+
         return (
           <g key={mandrel.id}
-            onMouseEnter={e => show(e, [label, `#${mandrel.segment}`, `Profundidad: ${mandrel.depth} ft`])}
+            onMouseEnter={e => show(e, info)}
             onMouseMove={move}
             onMouseLeave={hide}
           >

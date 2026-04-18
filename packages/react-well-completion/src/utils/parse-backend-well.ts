@@ -93,7 +93,21 @@ function parsePerforations(raw: Record<string, unknown>[]): Perforation[] {
   }));
 }
 
-function parseMandrels(raw: Record<string, unknown>[]): Mandrel[] {
+/**
+ * Resuelve el diametro del tubing a una profundidad dada.
+ * Si ningun segmento contiene la profundidad, cae al primer segmento.
+ * Retorna 0 si no hay tubing definido.
+ */
+function getTubingDiameterAt(depth: number, tubing: TubingSegment[]): number {
+  if (tubing.length === 0) return 0;
+  const seg = tubing.find(t =>
+    t.top != null && t.base != null && depth >= t.top && depth <= t.base
+  );
+  if (seg) return seg.diameter;
+  return tubing[0].diameter;
+}
+
+function parseMandrels(raw: Record<string, unknown>[], tubing: TubingSegment[]): Mandrel[] {
   return raw.map(m => {
     const hasPtr = typeof m['PTR PSI'] === 'number';
     const isDummy = typeof m['Tipo Válvula'] === 'string'
@@ -102,11 +116,16 @@ function parseMandrels(raw: Record<string, unknown>[]): Mandrel[] {
     const valveType: 'operating' | 'dummy' | null =
       hasPtr ? 'operating' : isDummy ? 'dummy' : null;
 
+    const depth = getNumber(m, 'PROF_TVD_1');
+    const rawValveSize = m['Tamaño (pulg)'];
+    const valveDiameter = typeof rawValveSize === 'number' ? rawValveSize : undefined;
+
     return {
       id: uuid(),
       segment: getNumber(m, 'posicion'),
-      depth: getNumber(m, 'PROF_TVD_1'),
-      diameter: getNumber(m, 'Tamaño (pulg)'),
+      depth,
+      diameter: getTubingDiameterAt(depth, tubing),
+      valveDiameter,
       valveType,
       ptrPsi: hasPtr ? m['PTR PSI'] as number : undefined,
       flowDiameter: typeof m['Diámetro flujo'] === 'string' ? m['Diámetro flujo'] as string : undefined,
@@ -121,24 +140,31 @@ interface EquipoDeFondoResult {
   extras: Record<string, unknown>[];
 }
 
-function parseEquipoDeFondo(raw: Record<string, unknown>[]): EquipoDeFondoResult {
+function parseEquipoDeFondo(raw: Record<string, unknown>[], tubing: TubingSegment[]): EquipoDeFondoResult {
   const result: EquipoDeFondoResult = { seatNipples: [], sleeves: [], packers: [], extras: [] };
 
   for (const item of raw) {
     const tipo = getString(item, 'Tipo').toLowerCase();
     const depth = getNumber(item, 'Profundidad (pies)');
+    const tubingDiameter = getTubingDiameterAt(depth, tubing);
 
     if (tipo === 'niple') {
-      result.seatNipples.push({ id: uuid(), depth, diameter: 0, od: 0, type: 'regular' });
+      result.seatNipples.push({
+        id: uuid(),
+        depth,
+        diameter: tubingDiameter,
+        od: tubingDiameter,
+        type: 'regular',
+      });
     } else if (tipo === 'manga') {
       result.sleeves.push({
         id: uuid(),
         depth,
-        diameter: 0,
+        diameter: tubingDiameter,
         comment: typeof item['Comentario'] === 'string' ? item['Comentario'] as string : undefined,
       });
     } else if (tipo.includes('empacadura')) {
-      result.packers.push({ id: uuid(), depth, diameter: 0 });
+      result.packers.push({ id: uuid(), depth, diameter: tubingDiameter });
     } else {
       result.extras.push(item);
     }
@@ -163,8 +189,8 @@ export function parseBackendWell(
   ];
   const tubing = parseTubing(getArray(json, 'Tubing'));
   const perforations = parsePerforations(getArray(json, 'Perforaciones'));
-  const mandrels = parseMandrels(getArray(json, 'MadrilesValvulas'));
-  const equipo = parseEquipoDeFondo(getArray(json, 'EquipoDeFondo'));
+  const mandrels = parseMandrels(getArray(json, 'MadrilesValvulas'), tubing);
+  const equipo = parseEquipoDeFondo(getArray(json, 'EquipoDeFondo'), tubing);
 
   const rawTotalDepth = getNumber(json, 'Profundidad Total');
   const allBases = [

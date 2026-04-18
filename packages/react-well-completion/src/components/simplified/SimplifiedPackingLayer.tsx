@@ -1,22 +1,38 @@
-import type { DiagramConfig, Packing, Casing } from '../../types';
+import type { DiagramConfig, Packing, Casing, TubingSegment } from '../../types';
 import { diameterToX, computeCasingPositions } from '../../hooks/use-diagram-config';
 
 interface Props {
   packings: Packing[];
   casings: Casing[];
+  tubingString?: TubingSegment[];
   config: DiagramConfig;
 }
 
 const WALL = 4;
 
-export default function SimplifiedPackingLayer({ packings, casings, config }: Props) {
+function resolveDiameter(
+  componentDiameter: number,
+  depth: number,
+  tubing: TubingSegment[],
+): number {
+  if (componentDiameter > 0) return componentDiameter;
+  if (tubing.length === 0) return 0;
+  const seg = tubing.find(t =>
+    t.top != null && t.base != null && depth >= t.top && depth <= t.base,
+  );
+  if (seg) return seg.diameter;
+  return tubing[0].diameter;
+}
+
+export default function SimplifiedPackingLayer({ packings, casings, tubingString = [], config }: Props) {
   const PK_H = config.pulgada * 0.6;
   const casingPos = computeCasingPositions(casings, config);
 
   return (
     <g>
       {packings.map(pk => {
-        const { x1: tbgX1, x2: tbgX2 } = diameterToX(config, pk.diameter);
+        const effectiveDiameter = resolveDiameter(pk.diameter, pk.depth, tubingString);
+        const { x1: tbgX1, x2: tbgX2 } = diameterToX(config, effectiveDiameter);
         const y = config.depthToPos(pk.depth);
 
         const containingCasing = casings
@@ -29,7 +45,7 @@ export default function SimplifiedPackingLayer({ packings, casings, config }: Pr
           csgX1 = pos.x1;
           csgX2 = pos.x2;
         } else {
-          const fallback = diameterToX(config, pk.od || pk.diameter + 2);
+          const fallback = diameterToX(config, pk.od || effectiveDiameter + 2);
           csgX1 = fallback.x1;
           csgX2 = fallback.x2;
         }
