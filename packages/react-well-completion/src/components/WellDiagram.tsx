@@ -89,11 +89,12 @@ export default function WellDiagram({ well, labels, theme }: WellDiagramProps) {
               ? `translate(45, ${30 + config.width}) rotate(-90)`
               : 'translate(45, 0)'
             }>
-              <SandLayer sands={well.sands} minCasingDiameter={minCasingDiameter} config={config} />
+              <SandLayer sands={well.sands} casings={well.casings} config={config} />
               <EarthLayer
                 totalFreeDepth={well.totalFreeDepth}
                 totalDepth={well.totalDepth}
-                minCasingDiameter={minCasingDiameter}
+                casings={well.casings}
+                tubingString={well.tubingString}
                 config={config}
               />
               <CasingLayer casings={well.casings} config={config} />
