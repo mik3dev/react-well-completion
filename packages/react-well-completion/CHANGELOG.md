@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.5](https://github.com/mik3dev/react-well-completion/compare/react-well-completion-v0.1.4...react-well-completion-v0.1.5) (2026-04-18)
+
+
+### Bug Fixes
+
+* perforations render at correct casing wall, extending outward only ([bf4f11f](https://github.com/mik3dev/react-well-completion/commit/bf4f11f7b772ccbcfe0e0668a335ad6286f537da))
+* render earth/formation outside casings, not inside ([17d2d84](https://github.com/mik3dev/react-well-completion/commit/17d2d841f6c8d2d5afab79beb00101b927160b31))
+
 ## [0.1.4](https://github.com/mik3dev/react-well-completion/compare/react-well-completion-v0.1.3...react-well-completion-v0.1.4) (2026-04-18)
 
 
