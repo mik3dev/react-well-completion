@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.4](https://github.com/mik3dev/react-well-completion/compare/react-well-completion-v0.1.3...react-well-completion-v0.1.4) (2026-04-18)
+
+
+### Bug Fixes
+
+* position mandrels and bottom-hole equipment on tubing diameter ([f68a10b](https://github.com/mik3dev/react-well-completion/commit/f68a10be719fb9b3fddc483bad7966422c8aebc9))
+* render earth and sand fills relative to depth-specific casings ([ad98432](https://github.com/mik3dev/react-well-completion/commit/ad98432a4ea0cfbb0b0f7c288489c9731c88c8b5))
+
 ## [0.1.3](https://github.com/mik3dev/react-well-completion/compare/react-well-completion-v0.1.2...react-well-completion-v0.1.3) (2026-04-06)
 
 
