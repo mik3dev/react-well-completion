@@ -36,10 +36,6 @@ export default function SimplifiedDiagram({ well }: SimplifiedDiagramProps) {
   const configH = isH ? size.width - 40 : size.height;
   const config = useDiagramConfig(configW, configH, well);
 
-  const minCasingDiameter = well.casings.length > 0
-    ? Math.min(...well.casings.map(c => c.diameter))
-    : 0;
-
   return (
     <div
       ref={containerRef}
@@ -72,7 +68,7 @@ export default function SimplifiedDiagram({ well }: SimplifiedDiagramProps) {
             <SimplifiedTubingLayer tubingString={well.tubingString} config={config} />
             <SimplifiedPerforationLayer
               perforations={well.perforations}
-              minCasingDiameter={minCasingDiameter}
+              casings={well.casings}
               config={config}
             />
             <SimplifiedPackerLayer packers={well.packers} tubingString={well.tubingString} config={config} />

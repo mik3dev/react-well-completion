@@ -99,7 +99,7 @@ export default function WellDiagram({ well, labels, theme }: WellDiagramProps) {
               <CasingLayer casings={well.casings} config={config} />
               <PerforationLayer
                 perforations={well.perforations}
-                minCasingDiameter={minCasingDiameter}
+                casings={well.casings}
                 config={config}
               />
               <TubingLayer tubingString={well.tubingString} config={config} />
