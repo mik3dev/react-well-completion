@@ -94,7 +94,6 @@ export default function WellDiagram({ well, labels, theme }: WellDiagramProps) {
                 totalFreeDepth={well.totalFreeDepth}
                 totalDepth={well.totalDepth}
                 casings={well.casings}
-                tubingString={well.tubingString}
                 config={config}
               />
               <CasingLayer casings={well.casings} config={config} />
