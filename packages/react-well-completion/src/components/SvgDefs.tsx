@@ -9,20 +9,20 @@ export default function SvgDefs() {
 
       {/* Earth/formation fill */}
       <pattern id="earthFill" patternUnits="userSpaceOnUse" width="60" height="60">
-        <rect width="60" height="60" fill="#795235" />
-        <circle cx="8" cy="12" r="1.2" fill="#8B5A3A" opacity="0.7" />
-        <circle cx="22" cy="5" r="0.8" fill="#B4875E" opacity="0.6" />
-        <circle cx="35" cy="18" r="1.5" fill="#7A4C2F" opacity="0.8" />
-        <circle cx="48" cy="8" r="1" fill="#A0724C" opacity="0.6" />
-        <circle cx="15" cy="28" r="1.8" fill="#8B5A3A" opacity="0.7" />
-        <circle cx="42" cy="35" r="1.2" fill="#6F4528" opacity="0.8" />
-        <circle cx="28" cy="45" r="0.9" fill="#B4875E" opacity="0.6" />
-        <circle cx="52" cy="48" r="1.4" fill="#7A4C2F" opacity="0.7" />
-        <path d="M5,25 Q20,22 35,28 T55,24" stroke="#7A4C2F" strokeWidth="1.5" fill="none" opacity="0.5" />
-        <path d="M10,40 Q25,38 40,42 T58,38" stroke="#6F4528" strokeWidth="1.2" fill="none" opacity="0.4" />
-        <ellipse cx="18" cy="15" rx="4" ry="2" fill="#6F4528" opacity="0.3" />
-        <ellipse cx="45" cy="25" rx="3" ry="1.5" fill="#8B5A3A" opacity="0.4" />
-        <path d="M50,15 Q52,13 54,15 Q55,17 53,18 Q51,20 50,18 Q48,17 50,15Z" fill="#5A3D25" opacity="0.8" />
+        <rect width="60" height="60" fill="#C49B7C" />
+        <circle cx="8" cy="12" r="1.2" fill="#B88A6A" opacity="0.6" />
+        <circle cx="22" cy="5" r="0.8" fill="#D9B698" opacity="0.55" />
+        <circle cx="35" cy="18" r="1.5" fill="#A87D5E" opacity="0.7" />
+        <circle cx="48" cy="8" r="1" fill="#CEA484" opacity="0.55" />
+        <circle cx="15" cy="28" r="1.8" fill="#B88A6A" opacity="0.6" />
+        <circle cx="42" cy="35" r="1.2" fill="#9E7658" opacity="0.7" />
+        <circle cx="28" cy="45" r="0.9" fill="#D9B698" opacity="0.55" />
+        <circle cx="52" cy="48" r="1.4" fill="#A87D5E" opacity="0.6" />
+        <path d="M5,25 Q20,22 35,28 T55,24" stroke="#A87D5E" strokeWidth="1.5" fill="none" opacity="0.4" />
+        <path d="M10,40 Q25,38 40,42 T58,38" stroke="#9E7658" strokeWidth="1.2" fill="none" opacity="0.35" />
+        <ellipse cx="18" cy="15" rx="4" ry="2" fill="#9E7658" opacity="0.25" />
+        <ellipse cx="45" cy="25" rx="3" ry="1.5" fill="#B88A6A" opacity="0.35" />
+        <path d="M50,15 Q52,13 54,15 Q55,17 53,18 Q51,20 50,18 Q48,17 50,15Z" fill="#8A6A50" opacity="0.6" />
       </pattern>
 
       {/* Sand pattern A */}
