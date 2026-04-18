@@ -385,3 +385,131 @@ body {
 .btn-delete:hover {
   opacity: 0.7;
 }
+
+/* ---- Modal ---- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal {
+  background: white;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 720px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  color: var(--text);
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal__header h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--primary-dark);
+}
+
+.modal__close {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text);
+  padding: 0 6px;
+}
+
+.modal__body {
+  flex: 1;
+  overflow: auto;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal__hint {
+  margin: 0;
+  font-size: 12px;
+  color: #555;
+}
+
+.modal__hint code {
+  background: #f0f4fb;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.modal__textarea {
+  width: 100%;
+  min-height: 300px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  color: var(--text);
+  background: #fafafa;
+}
+
+.modal__error {
+  background: #fdecea;
+  color: #b71c1c;
+  border: 1px solid #f5c6c3;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 18px;
+  border-top: 1px solid #eee;
+}
+
+.modal__footer button {
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.modal__footer button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal__footer .modal__primary {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.modal__footer .modal__primary:hover:not(:disabled) {
+  background: var(--primary-light);
+  border-color: var(--primary-light);
+}

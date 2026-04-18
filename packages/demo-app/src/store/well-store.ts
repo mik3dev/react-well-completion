@@ -27,6 +27,7 @@ interface WellStore {
 
   // Import/Export
   importWells: (wells: Well[]) => void;
+  appendWell: (well: Well) => void;
   exportWells: () => Well[];
 }
 
@@ -115,6 +116,11 @@ export const useWellStore = create<WellStore>()(
         wells,
         selectedWellId: wells.length > 0 ? wells[0].id : null,
       }),
+
+      appendWell: (well) => set(s => ({
+        wells: [...s.wells, well],
+        selectedWellId: well.id,
+      })),
 
       exportWells: () => get().wells,
     }),

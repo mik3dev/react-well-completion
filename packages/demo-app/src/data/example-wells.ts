@@ -1,4 +1,11 @@
 import type { Well } from '@mik3dev/react-well-completion';
+import { parseBackendWell } from '@mik3dev/react-well-completion';
+import vlg3922Backend from './vlg3922-backend.json';
+
+const vlg3922Well: Well = {
+  ...parseBackendWell(vlg3922Backend.variables as Record<string, unknown>),
+  id: 'example-vlg3922',
+};
 
 export const exampleWells: Well[] = [
   {
@@ -209,4 +216,5 @@ export const exampleWells: Well[] = [
     ],
     wire: { id: 'w1', depth: 7200 },
   },
+  vlg3922Well,
 ];

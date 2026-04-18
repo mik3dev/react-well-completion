@@ -3,6 +3,7 @@ import { useExport } from '../hooks/use-export';
 import { useWellStore } from '../store/well-store';
 import { exampleWells } from '../data/example-wells';
 import { useLabelsStore, LABEL_CATEGORIES } from '../store/labels-store';
+import BackendJsonModal from './BackendJsonModal';
 
 interface ToolbarProps {
   showSimplified: boolean;
@@ -14,6 +15,7 @@ export default function Toolbar({ showSimplified, onToggleSimplified }: ToolbarP
   const { importWells, exportWells, wells } = useWellStore();
   const { visible, toggle, showAll, hideAll } = useLabelsStore();
   const [showLabelsMenu, setShowLabelsMenu] = useState(false);
+  const [showBackendModal, setShowBackendModal] = useState(false);
   const anyVisible = Object.values(visible).some(Boolean);
 
   const handleExportJson = () => {
@@ -52,6 +54,7 @@ export default function Toolbar({ showSimplified, onToggleSimplified }: ToolbarP
           <button onClick={handleLoadExamples}>Cargar Ejemplos</button>
         )}
         <button onClick={handleImportJson}>Importar JSON</button>
+        <button onClick={() => setShowBackendModal(true)}>Importar Backend JSON</button>
         <button onClick={handleExportJson} disabled={wells.length === 0}>Exportar JSON</button>
         <button onClick={exportPng} disabled={wells.length === 0}>Exportar PNG</button>
         <button onClick={exportSvg} disabled={wells.length === 0}>Exportar SVG</button>
@@ -89,6 +92,7 @@ export default function Toolbar({ showSimplified, onToggleSimplified }: ToolbarP
           )}
         </div>
       </div>
+      <BackendJsonModal open={showBackendModal} onClose={() => setShowBackendModal(false)} />
     </div>
   );
 }
