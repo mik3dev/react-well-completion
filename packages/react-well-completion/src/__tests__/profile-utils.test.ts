@@ -5,6 +5,7 @@ import {
   valueToPos,
   getProfileColor,
   DEFAULT_PROFILE_COLORS,
+  formatTooltipValue,
 } from '../components/profiles/profile-utils';
 import type { ProfilePoint } from '../types';
 
@@ -160,5 +161,27 @@ describe('getProfileColor', () => {
 
   it('exposes a non-empty palette', () => {
     expect(DEFAULT_PROFILE_COLORS.length).toBeGreaterThan(0);
+  });
+});
+
+describe('formatTooltipValue', () => {
+  it('keeps integers integer', () => {
+    expect(formatTooltipValue(42)).toBe('42');
+    expect(formatTooltipValue(0)).toBe('0');
+    expect(formatTooltipValue(-5)).toBe('-5');
+  });
+
+  it('rounds fractional values to 2 decimals', () => {
+    expect(formatTooltipValue(3.14159)).toBe('3.14');
+    expect(formatTooltipValue(0.005)).toBe('0.01');
+  });
+
+  it('omits trailing zeros after rounding', () => {
+    expect(formatTooltipValue(3.10)).toBe('3.1');
+    expect(formatTooltipValue(2.500001)).toBe('2.5');
+  });
+
+  it('handles very small floats', () => {
+    expect(formatTooltipValue(0.001)).toBe('0');
   });
 });

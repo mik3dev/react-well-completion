@@ -94,3 +94,13 @@ export function getProfileColor(
   if (profile.color) return profile.color;
   return DEFAULT_PROFILE_COLORS[index % DEFAULT_PROFILE_COLORS.length];
 }
+
+/**
+ * Formats a numeric value for tooltip display: integers stay integer,
+ * fractions are rounded to 2 decimals with trailing zeros stripped.
+ */
+export function formatTooltipValue(v: number): string {
+  if (Number.isInteger(v)) return String(v);
+  // Round to 2 decimals, then drop trailing zeros via parseFloat.
+  return String(parseFloat(v.toFixed(2)));
+}
