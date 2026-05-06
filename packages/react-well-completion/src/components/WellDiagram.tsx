@@ -1,8 +1,10 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import type { Well, LabelCategory } from '../types';
 import { ALL_LABEL_CATEGORIES } from '../types';
+import type { Profile, ProfileLayout } from '../types';
 import { useDiagramConfig } from '../hooks/use-diagram-config';
 import type { BrandTheme } from '../theme';
+import ProfilePanel from './profiles/ProfilePanel';
 import { defaultTheme } from '../theme';
 import { TooltipProvider } from './Tooltip';
 import SvgDefs from './SvgDefs';
@@ -23,9 +25,24 @@ export interface WellDiagramProps {
   well: Well;
   labels?: Partial<Record<LabelCategory, boolean>>;
   theme?: Partial<BrandTheme>;
+  profiles?: Profile[];
+  profileLayout?: ProfileLayout;
+  profileTrackWidth?: number;
 }
 
-export default function WellDiagram({ well, labels, theme }: WellDiagramProps) {
+const DEFAULT_PROFILE_TRACK_WIDTH = 140;
+
+export default function WellDiagram({
+  well,
+  labels,
+  theme,
+  profiles,
+  profileLayout: _profileLayout = 'tracks',
+  profileTrackWidth = DEFAULT_PROFILE_TRACK_WIDTH,
+}: WellDiagramProps) {
+  const safeProfiles = profiles ?? [];
+  const hasProfiles = safeProfiles.length > 0;
+  const panelWidth = hasProfiles ? safeProfiles.length * profileTrackWidth : 0;
   const mergedTheme: BrandTheme = { ...defaultTheme, ...theme };
   const defaultLabels = Object.fromEntries(
     ALL_LABEL_CATEGORIES.map(k => [k, true])
@@ -51,7 +68,10 @@ export default function WellDiagram({ well, labels, theme }: WellDiagramProps) {
   // For horizontal: swap dimensions so config generates vertical coords
   // that get rotated by the SVG transform
   // Fixed margins: 45px left for vertical depth axis, 120px bottom for horizontal labels + depth axis
-  const configW = isH ? size.height - 100 : size.width - 50;
+  // When profiles are present, reserve panelWidth in vertical mode (panel is to the right).
+  const configW = isH
+    ? size.height - 100
+    : size.width - 50 - panelWidth;
   const configH = isH ? size.width - 50 : size.height;
   const config = useDiagramConfig(configW, configH, well);
 
@@ -154,6 +174,21 @@ export default function WellDiagram({ well, labels, theme }: WellDiagramProps) {
                   width: size.width - 50,
                   height: size.height,
                 }} visible={mergedLabels} theme={mergedTheme} />
+              </g>
+            )}
+
+            {/* Profile panel — vertical: positioned to the right of the diagram */}
+            {hasProfiles && !isH && config && (
+              <g transform={`translate(${size.width - panelWidth}, 0)`}>
+                <ProfilePanel
+                  profiles={safeProfiles}
+                  trackWidth={profileTrackWidth}
+                  panelHeight={config.height}
+                  panelWidth={panelWidth}
+                  depthToPos={config.depthToPos}
+                  totalDepth={well.totalDepth}
+                  orientation="vertical"
+                />
               </g>
             )}
           </svg>

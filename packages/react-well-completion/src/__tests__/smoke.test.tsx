@@ -97,4 +97,35 @@ describe('WellDiagram render', () => {
 
     expect(container.querySelector('div')).not.toBeNull();
   });
+
+  it('renders with profiles prop without crashing (vertical)', () => {
+    const well = {
+      ...createWell('Test-Profiles', 'BM'),
+      totalDepth: 5000,
+      totalFreeDepth: 4800,
+      casings: [
+        createCasing({ diameter: 7, top: 0, base: 5000, isLiner: false }),
+      ],
+    };
+    const profiles = [
+      {
+        id: 'p1', name: 'Presión', unit: 'psi',
+        data: [
+          { depth: 100, value: 500 },
+          { depth: 2500, value: 1500 },
+          { depth: 4900, value: 2400 },
+        ],
+      },
+    ];
+    const { container } = render(<WellDiagram well={well} profiles={profiles} />);
+    expect(container.querySelector('div')).not.toBeNull();
+  });
+
+  it('renders identically when profiles prop is omitted (regression)', () => {
+    const well = createWell('Test-No-Profiles', 'BM');
+    const { container: a } = render(<WellDiagram well={well} />);
+    const { container: b } = render(<WellDiagram well={well} profiles={[]} />);
+    expect(a.querySelector('rect.profile-track-border')).toBeNull();
+    expect(b.querySelector('rect.profile-track-border')).toBeNull();
+  });
 });
