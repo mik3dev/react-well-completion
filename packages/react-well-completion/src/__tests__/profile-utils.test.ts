@@ -1,8 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { sortAndFilterPoints } from '../components/profiles/profile-utils';
+import {
+  sortAndFilterPoints,
+  buildScale,
+  valueToPos,
+  getProfileColor,
+  DEFAULT_PROFILE_COLORS,
+} from '../components/profiles/profile-utils';
 import type { ProfilePoint } from '../types';
-
-import { buildScale } from '../components/profiles/profile-utils';
 
 describe('sortAndFilterPoints', () => {
   it('sorts points by depth ascending', () => {
@@ -112,5 +116,49 @@ describe('buildScale', () => {
     const result = buildScale([], undefined);
     expect(result.min).toBe(0);
     expect(result.max).toBe(1);
+  });
+});
+
+describe('valueToPos', () => {
+  it('maps min to a and max to b', () => {
+    expect(valueToPos(0, { min: 0, max: 100 }, 0, 200)).toBe(0);
+    expect(valueToPos(100, { min: 0, max: 100 }, 0, 200)).toBe(200);
+  });
+
+  it('maps midpoint linearly', () => {
+    expect(valueToPos(50, { min: 0, max: 100 }, 0, 200)).toBe(100);
+  });
+
+  it('returns midpoint when min === max (degenerate scale)', () => {
+    expect(valueToPos(42, { min: 42, max: 42 }, 0, 200)).toBe(100);
+    expect(valueToPos(99, { min: 42, max: 42 }, 0, 200)).toBe(100);
+  });
+
+  it('supports inverted axis range (a > b)', () => {
+    // For horizontal mode where min maps to bottom (high y) and max to top (low y)
+    expect(valueToPos(0, { min: 0, max: 100 }, 200, 0)).toBe(200);
+    expect(valueToPos(100, { min: 0, max: 100 }, 200, 0)).toBe(0);
+    expect(valueToPos(50, { min: 0, max: 100 }, 200, 0)).toBe(100);
+  });
+});
+
+describe('getProfileColor', () => {
+  it('returns explicit color when profile.color is defined', () => {
+    expect(getProfileColor({ color: '#abcdef' }, 99)).toBe('#abcdef');
+  });
+
+  it('returns palette color when profile.color is undefined', () => {
+    expect(getProfileColor({}, 0)).toBe(DEFAULT_PROFILE_COLORS[0]);
+    expect(getProfileColor({}, 1)).toBe(DEFAULT_PROFILE_COLORS[1]);
+  });
+
+  it('cycles palette after the last color', () => {
+    const len = DEFAULT_PROFILE_COLORS.length;
+    expect(getProfileColor({}, len)).toBe(DEFAULT_PROFILE_COLORS[0]);
+    expect(getProfileColor({}, len + 2)).toBe(DEFAULT_PROFILE_COLORS[2]);
+  });
+
+  it('exposes a non-empty palette', () => {
+    expect(DEFAULT_PROFILE_COLORS.length).toBeGreaterThan(0);
   });
 });

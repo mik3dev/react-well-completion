@@ -49,3 +49,48 @@ export function buildScale(
   }
   return { min, max };
 }
+
+/**
+ * Default palette used when a profile does not declare an explicit color.
+ * Cycles modulo length when more profiles than colors are provided.
+ */
+export const DEFAULT_PROFILE_COLORS = [
+  '#0ea5e9', // sky-500
+  '#ef4444', // red-500
+  '#10b981', // emerald-500
+  '#f59e0b', // amber-500
+  '#8b5cf6', // violet-500
+  '#ec4899', // pink-500
+] as const;
+
+/**
+ * Linear mapping from a value to a position along the secondary axis.
+ *
+ * `[a, b]` is the pixel range for `[min, max]`. When `a > b`, the axis is
+ * inverted (used for horizontal mode where min should map to bottom).
+ *
+ * Degenerate scale (`min === max`) returns `(a + b) / 2`.
+ */
+export function valueToPos(
+  v: number,
+  scale: { min: number; max: number },
+  a: number,
+  b: number,
+): number {
+  if (scale.min === scale.max) {
+    return (a + b) / 2;
+  }
+  return a + ((v - scale.min) / (scale.max - scale.min)) * (b - a);
+}
+
+/**
+ * Resolves the color for a profile given its index. Explicit `profile.color`
+ * always wins; otherwise the default palette is used (cycling).
+ */
+export function getProfileColor(
+  profile: { color?: string },
+  index: number,
+): string {
+  if (profile.color) return profile.color;
+  return DEFAULT_PROFILE_COLORS[index % DEFAULT_PROFILE_COLORS.length];
+}
