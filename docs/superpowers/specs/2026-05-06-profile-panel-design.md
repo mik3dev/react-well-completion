@@ -191,17 +191,19 @@ packages/react-well-completion/src/
 │   ├── WellDiagram.tsx               # Modificado: descuenta espacio y monta panel
 │   └── profiles/                     # Nuevo directorio
 │       ├── ProfilePanel.tsx          # Orquesta los tracks
-│       ├── ProfileTrack.tsx          # Header + ejes + área de curva
+│       ├── ProfileTrack.tsx          # Header + ejes + área de curva (llama buildScale inline)
 │       ├── ProfileCurve.tsx          # Polyline + hover dots
-│       └── profile-utils.ts          # sortAndFilterPoints, buildScale, paleta
-├── hooks/
-│   └── use-profile-scales.ts         # Memoiza scales por profile
+│       └── profile-utils.ts          # sortAndFilterPoints, buildScale, valueToPos, getProfileColor, formatTooltipValue
 ├── __tests__/
 │   ├── profile-utils.test.ts         # Tests unitarios puros
+│   ├── ProfileCurve.test.tsx         # Render tests para la curva
+│   ├── ProfileTrack.test.tsx         # Render tests para el track
 │   ├── ProfilePanel.test.tsx         # Tests de render
 │   └── smoke.test.tsx                # Extendido con profiles
 └── index.ts                          # Exporta tipos nuevos
 ```
+
+`buildScale` se llama inline desde `ProfileTrack` en cada render. Memoización dedicada (un hook custom) sería micro-optimización prematura: el cómputo es O(N) sobre un dataset pequeño (<500 puntos recomendados). Si el profiling futuro lo justifica, se introduce un `useMemo` localizado o un hook dedicado sin tocar el contrato externo.
 
 ### 5.1 Por qué separar `ProfileCurve` de `ProfileTrack`
 
