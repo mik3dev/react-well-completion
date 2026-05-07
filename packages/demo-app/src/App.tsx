@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useWellStore } from './store/well-store';
 import { useLabelsStore } from './store/labels-store';
-import { mockProfiles } from './data/example-wells';
+import { buildMockProfiles } from './data/example-wells';
 import Toolbar from './components/Toolbar';
 import WellSelector from './components/editor/WellSelector';
 import WellEditor from './components/editor/WellEditor';
@@ -13,6 +13,13 @@ export default function App() {
   const visible = useLabelsStore(s => s.visible);
   const [showSimplified, setShowSimplified] = useState(false);
 
+  // Synthesize mock profiles spanning the full depth of the selected well, so
+  // the curves visually cover the entire depth axis regardless of well depth.
+  const profiles = useMemo(
+    () => (well ? buildMockProfiles(well.totalDepth) : []),
+    [well?.totalDepth],
+  );
+
   return (
     <div className="app">
       <Toolbar showSimplified={showSimplified} onToggleSimplified={() => setShowSimplified(s => !s)} />
@@ -23,7 +30,7 @@ export default function App() {
         </aside>
         <main className="app__diagram">
           {well ? (
-            showSimplified ? <SimplifiedDiagram well={well} /> : <WellDiagram well={well} labels={visible} profiles={mockProfiles} />
+            showSimplified ? <SimplifiedDiagram well={well} /> : <WellDiagram well={well} labels={visible} profiles={profiles} />
           ) : (
             <div className="app__placeholder">
               <p>Selecciona o crea un pozo para visualizar el diagrama</p>

@@ -221,31 +221,45 @@ export const exampleWells: Well[] = [
 
 import type { Profile } from '@mik3dev/react-well-completion';
 
+const MOCK_POINT_COUNT = 24; // resolution of the synthesized curves
+
 /**
- * Mock profile data for demo / visual verification.
- * Synthesized — not from a real measurement.
+ * Builds synthesized profile data spanning [0, totalDepth] for the given well,
+ * so the curves visually fill the entire depth axis regardless of well depth.
+ *
+ * Synthesized — not from a real measurement. For demo / visual verification only.
  */
-export const mockProfiles: Profile[] = [
-  {
-    id: 'pres-fondo',
-    name: 'Presión',
-    unit: 'psi',
-    data: Array.from({ length: 10 }, (_, i) => {
-      const depth = i * 500;          // 0, 500, ..., 4500
-      // Linear pressure gradient ~0.45 psi/ft + a small bump near 3000 ft
-      const value = 100 + depth * 0.45 + (depth > 2500 && depth < 3500 ? 200 : 0);
-      return { depth, value };
-    }),
-  },
-  {
-    id: 'temp',
-    name: 'Temperatura',
-    unit: '°F',
-    data: Array.from({ length: 10 }, (_, i) => {
-      const depth = i * 500;
-      // Geothermal gradient ~1.5 °F per 100 ft, surface 80 °F
-      const value = 80 + depth * 0.015;
-      return { depth, value };
-    }),
-  },
-];
+export function buildMockProfiles(totalDepth: number): Profile[] {
+  if (totalDepth <= 0) return [];
+
+  const step = totalDepth / (MOCK_POINT_COUNT - 1);
+  // Place the synthetic pressure "bump" around the middle third of the well.
+  const bumpStart = totalDepth * 0.4;
+  const bumpEnd = totalDepth * 0.55;
+
+  return [
+    {
+      id: 'pres-fondo',
+      name: 'Presión',
+      unit: 'psi',
+      data: Array.from({ length: MOCK_POINT_COUNT }, (_, i) => {
+        const depth = i * step;
+        // Linear pressure gradient ~0.45 psi/ft + a small bump near the middle.
+        const value =
+          100 + depth * 0.45 + (depth > bumpStart && depth < bumpEnd ? 200 : 0);
+        return { depth, value };
+      }),
+    },
+    {
+      id: 'temp',
+      name: 'Temperatura',
+      unit: '°F',
+      data: Array.from({ length: MOCK_POINT_COUNT }, (_, i) => {
+        const depth = i * step;
+        // Geothermal gradient ~1.5 °F per 100 ft, surface 80 °F
+        const value = 80 + depth * 0.015;
+        return { depth, value };
+      }),
+    },
+  ];
+}
