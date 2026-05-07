@@ -8,9 +8,16 @@ import BackendJsonModal from './BackendJsonModal';
 interface ToolbarProps {
   showSimplified: boolean;
   onToggleSimplified: () => void;
+  showProfiles: boolean;
+  onToggleProfiles: () => void;
 }
 
-export default function Toolbar({ showSimplified, onToggleSimplified }: ToolbarProps) {
+export default function Toolbar({
+  showSimplified,
+  onToggleSimplified,
+  showProfiles,
+  onToggleProfiles,
+}: ToolbarProps) {
   const { exportPng, exportSvg, copyToClipboard } = useExport();
   const { importWells, exportWells, wells } = useWellStore();
   const { visible, toggle, showAll, hideAll } = useLabelsStore();
@@ -64,6 +71,14 @@ export default function Toolbar({ showSimplified, onToggleSimplified }: ToolbarP
           className={showSimplified ? 'active' : ''}
         >
           Simplificado
+        </button>
+        <button
+          onClick={onToggleProfiles}
+          className={showProfiles ? 'active' : ''}
+          disabled={showSimplified}
+          title={showSimplified ? 'No disponible en modo Simplificado' : undefined}
+        >
+          Perfiles
         </button>
         <div className="toolbar__labels-wrapper">
           <button

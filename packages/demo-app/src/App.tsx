@@ -12,6 +12,7 @@ export default function App() {
   const well = useWellStore(s => s.wells.find(w => w.id === s.selectedWellId));
   const visible = useLabelsStore(s => s.visible);
   const [showSimplified, setShowSimplified] = useState(false);
+  const [showProfiles, setShowProfiles] = useState(true);
 
   // Synthesize mock profiles spanning the full depth of the selected well, so
   // the curves visually cover the entire depth axis regardless of well depth.
@@ -22,7 +23,12 @@ export default function App() {
 
   return (
     <div className="app">
-      <Toolbar showSimplified={showSimplified} onToggleSimplified={() => setShowSimplified(s => !s)} />
+      <Toolbar
+        showSimplified={showSimplified}
+        onToggleSimplified={() => setShowSimplified(s => !s)}
+        showProfiles={showProfiles}
+        onToggleProfiles={() => setShowProfiles(s => !s)}
+      />
       <div className="app__body">
         <aside className="app__sidebar">
           <WellSelector />
@@ -30,7 +36,9 @@ export default function App() {
         </aside>
         <main className="app__diagram">
           {well ? (
-            showSimplified ? <SimplifiedDiagram well={well} /> : <WellDiagram well={well} labels={visible} profiles={profiles} />
+            showSimplified
+              ? <SimplifiedDiagram well={well} />
+              : <WellDiagram well={well} labels={visible} profiles={showProfiles ? profiles : undefined} />
           ) : (
             <div className="app__placeholder">
               <p>Selecciona o crea un pozo para visualizar el diagrama</p>
