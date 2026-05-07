@@ -163,6 +163,14 @@ function Report({ well }) {
 }
 ```
 
+Tambien acepta `profiles` (mismo prop que `WellDiagram`) — el panel de perfiles funciona identico en ambos componentes:
+
+```tsx
+<SimplifiedDiagram well={well} profiles={profiles} />
+```
+
+Nota: `SimplifiedDiagram` no soporta visualmente `halfSection` (sus layers siempre dibujan el casing simetrico completo), por lo que el modo de panel-fill cuando hay half-section no aplica aqui.
+
 ### Controlando Visibilidad de Labels
 
 Por defecto todas las etiquetas estan visibles. Puedes ocultar las que no necesites:
@@ -312,7 +320,7 @@ Para mejor performance, se recomienda < 500 puntos por perfil (la lib no hace do
 | Componente | Props | Descripcion |
 |---|---|---|
 | `WellDiagram` | `well: Well`, `labels?: Partial<Record<LabelCategory, boolean>>`, `theme?: Partial<BrandTheme>`, `profiles?: Profile[]`, `profileLayout?: ProfileLayout`, `profileTrackWidth?: number` | Diagrama completo con labels, tablas de detalle, tooltips, y panel opcional de perfiles |
-| `SimplifiedDiagram` | `well: Well` | Diagrama esquematico en escala de grises |
+| `SimplifiedDiagram` | `well: Well`, `profiles?: Profile[]`, `profileLayout?: ProfileLayout`, `profileTrackWidth?: number` | Diagrama esquematico en escala de grises, tambien con panel opcional de perfiles |
 
 ### Tipos Principales
 

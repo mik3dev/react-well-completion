@@ -36,7 +36,7 @@ function App() {
 | Component | Description |
 |---|---|
 | `WellDiagram` | Full detailed diagram with labels, detail tables, tooltips, and an optional profile panel (pressure, temperature, etc.) |
-| `SimplifiedDiagram` | Grayscale schematic diagram, ideal for reports and printing |
+| `SimplifiedDiagram` | Grayscale schematic diagram, ideal for reports and printing — also supports the optional profile panel |
 
 ### WellDiagram Props
 
@@ -56,8 +56,15 @@ interface WellDiagramProps {
 ```tsx
 interface SimplifiedDiagramProps {
   well: Well;
+  profiles?: Profile[];               // optional profile tracks (default: undefined → no panel)
+  profileLayout?: ProfileLayout;      // 'tracks' (only mode in v1)
+  profileTrackWidth?: number;         // px per track in vertical, px per track height in horizontal (default: 140)
 }
 ```
+
+The profile panel works the same way in `SimplifiedDiagram` as in `WellDiagram` (see the **Profile Panel** section below). The schematic + profile combination is a common format for well reports and PDF exports.
+
+Note: `SimplifiedDiagram`'s layers do not visually support `halfSection` (they always draw the full symmetric casing), so the half-section panel-fill mode does not apply here.
 
 ## Building a Well
 
@@ -279,6 +286,8 @@ const well = {
 ### Profile Panel
 
 Render parallel profile tracks (pressure, temperature, acoustic logs, etc.) alongside the diagram, sharing the depth axis. The panel is opt-in via the `profiles` prop. When omitted, the diagram renders exactly as before.
+
+Supported on both `WellDiagram` and `SimplifiedDiagram` — the API is identical.
 
 ```tsx
 import { WellDiagram } from '@mik3dev/react-well-completion';

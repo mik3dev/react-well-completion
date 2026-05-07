@@ -75,8 +75,6 @@ export default function Toolbar({
         <button
           onClick={onToggleProfiles}
           className={showProfiles ? 'active' : ''}
-          disabled={showSimplified}
-          title={showSimplified ? 'No disponible en modo Simplificado' : undefined}
         >
           Perfiles
         </button>

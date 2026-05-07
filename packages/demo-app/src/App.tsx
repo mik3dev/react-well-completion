@@ -37,7 +37,7 @@ export default function App() {
         <main className="app__diagram">
           {well ? (
             showSimplified
-              ? <SimplifiedDiagram well={well} />
+              ? <SimplifiedDiagram well={well} profiles={showProfiles ? profiles : undefined} />
               : <WellDiagram well={well} labels={visible} profiles={showProfiles ? profiles : undefined} />
           ) : (
             <div className="app__placeholder">
