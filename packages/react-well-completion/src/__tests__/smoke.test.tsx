@@ -241,4 +241,71 @@ describe('WellDiagram render', () => {
     // And ≤ the half-available width per track (no overflow when min is small).
     expect(trackWidth).toBeLessThanOrEqual(375 / 2 + 0.01);
   });
+
+  it('expands the panel to fill the freed half in horizontal + half-section', () => {
+    // Container 1000x800 horizontal.
+    // Vertical chrome = 100; halfAvailableH = (800 - 100) / 2 = 350.
+    // 2 tracks, default profileTrackWidth=140 → tracks grow to 350/2 = 175 each.
+    const well = {
+      ...createWell('Test-Hor-HS', 'GL'),
+      totalDepth: 5000,
+      totalFreeDepth: 4800,
+      orientation: 'horizontal' as const,
+      halfSection: true,
+      halfSide: 'left' as const,
+      casings: [
+        createCasing({ diameter: 7, top: 0, base: 5000, isLiner: false }),
+      ],
+    };
+    const profiles = [
+      {
+        id: 'p1', name: 'Presión', unit: 'psi',
+        data: [
+          { depth: 100, value: 500 },
+          { depth: 4900, value: 2400 },
+        ],
+      },
+      {
+        id: 't1', name: 'Temperatura', unit: '°F',
+        data: [
+          { depth: 100, value: 80 },
+          { depth: 4900, value: 145 },
+        ],
+      },
+    ];
+    const { container } = withFakeContainerSize(1000, 800, () =>
+      render(<WellDiagram well={well} profiles={profiles} />),
+    );
+    const tracks = container.querySelectorAll('rect.profile-track-border');
+    expect(tracks.length).toBe(2);
+    // In horizontal, each track's "height" (rect.height attribute) is the per-track
+    // dimension that grew. Width is the full diagram width (size.width - 50 = 950).
+    const trackHeight = parseFloat(tracks[0].getAttribute('height') ?? '0');
+    expect(trackHeight).toBeGreaterThan(140);
+    expect(trackHeight).toBeLessThanOrEqual(350 / 2 + 0.01);
+  });
+
+  it('horizontal + half-section + halfSide=right does not crash', () => {
+    const well = {
+      ...createWell('Test-Hor-HS-R', 'GL'),
+      totalDepth: 5000,
+      totalFreeDepth: 4800,
+      orientation: 'horizontal' as const,
+      halfSection: true,
+      halfSide: 'right' as const,
+      casings: [
+        createCasing({ diameter: 7, top: 0, base: 5000, isLiner: false }),
+      ],
+    };
+    const profiles = [
+      {
+        id: 'p1', name: 'Presión', unit: 'psi',
+        data: [{ depth: 100, value: 500 }, { depth: 4900, value: 2400 }],
+      },
+    ];
+    const { container } = withFakeContainerSize(1000, 800, () =>
+      render(<WellDiagram well={well} profiles={profiles} />),
+    );
+    expect(container.querySelector('rect.profile-track-border')).not.toBeNull();
+  });
 });

@@ -67,39 +67,53 @@ export default function WellDiagram({
   const halfSection = well.halfSection ?? false;
   const halfSide = well.halfSide ?? 'right';
 
-  // When vertical half-section is combined with profiles, the panel takes over
-  // the otherwise-empty half of the diagram (one mode "fills" the other).
-  // Horizontal half-section keeps the standard panel-below layout (out of scope for v1).
-  const halfSecPanelFill = !isH && halfSection && hasProfiles;
+  // When half-section is combined with profiles, the panel takes over the
+  // otherwise-empty half of the diagram. Two flavors:
+  //   - Vertical:   panel fills the freed left/right half (depending on halfSide)
+  //   - Horizontal: panel fills the freed top/bottom half (depending on halfSide)
+  const halfSecPanelFillV = !isH && halfSection && hasProfiles;
+  const halfSecPanelFillH =  isH && halfSection && hasProfiles;
 
-  // Track sizing:
+  // Track sizing — vertical:
   // - Standard: each track = profileTrackWidth (fixed).
   // - Half-section fill: each track grows to occupy the freed half;
   //   profileTrackWidth becomes a minimum (the panel may overflow into the
   //   diagram side if the consumer set a min larger than the freed slot).
   const halfAvailableW = (size.width - 50) / 2;
-  const effectiveTrackWidth = halfSecPanelFill && safeProfiles.length > 0
+  const effectiveTrackWidth = halfSecPanelFillV && safeProfiles.length > 0
     ? Math.max(profileTrackWidth, halfAvailableW / safeProfiles.length)
     : profileTrackWidth;
   const panelWidth = hasProfiles ? safeProfiles.length * effectiveTrackWidth : 0;
+
+  // Track sizing — horizontal: same logic, but the "available space" is the
+  // vertical half of the diagram-allocated area.
+  const halfAvailableH = (size.height - 100) / 2;
+  const effectiveTrackHeightH = halfSecPanelFillH && safeProfiles.length > 0
+    ? Math.max(profileTrackWidth, halfAvailableH / safeProfiles.length)
+    : profileTrackWidth;
 
   // For horizontal: swap dimensions so config generates vertical coords
   // that get rotated by the SVG transform
   // Fixed margins: 45px left for vertical depth axis, 120px bottom for horizontal labels + depth axis
   //
   // panel space reservation:
-  //   vertical (standard):     panel goes to the right → subtract panelWidth from horizontal space
-  //   vertical (half-sec fill): diagram uses one half, panel uses the other → keep full width
-  //   horizontal:               panel goes below diagram → subtract panelHeight from vertical space
+  //   vertical (standard):       panel goes to the right → subtract panelWidth from horizontal space
+  //   vertical (half-sec fill):  diagram uses one half, panel uses the other → keep full width
+  //   horizontal (standard):     panel goes below diagram → subtract panelHeight from vertical space
+  //   horizontal (half-sec fill): diagram uses one half, panel uses the other → keep full vertical
   //
   // In horizontal mode the diagram is rotated, so config dimensions are swapped:
   //   configW = vertical-axis pixels (originally size.height minus chrome)
   //   configH = horizontal-axis pixels (originally size.width minus chrome)
-  const panelHeight = hasProfiles && isH ? safeProfiles.length * profileTrackWidth : 0;
+  const panelHeight = isH && hasProfiles
+    ? safeProfiles.length * effectiveTrackHeightH
+    : 0;
 
   const configW = isH
-    ? size.height - 100 - panelHeight
-    : halfSecPanelFill
+    ? halfSecPanelFillH
+      ? size.height - 100
+      : size.height - 100 - panelHeight
+    : halfSecPanelFillV
       ? size.width - 50
       : size.width - 50 - panelWidth;
   const configH = isH ? size.width - 50 : size.height;
@@ -221,7 +235,7 @@ export default function WellDiagram({
              *   x = 45 + (size.width - 50) / 2.
              */}
             {hasProfiles && !isH && config && (() => {
-              const panelOffsetX = halfSecPanelFill
+              const panelOffsetX = halfSecPanelFillV
                 ? (halfSide === 'right' ? 45 : 45 + halfAvailableW)
                 : size.width - panelWidth;
               return (
@@ -239,26 +253,43 @@ export default function WellDiagram({
               );
             })()}
 
-            {/* Profile panel — horizontal: positioned below the diagram (above the depth axis) */}
-            {hasProfiles && isH && config && (
-              <g transform={`translate(45, ${30 + config.width})`}>
-                <ProfilePanel
-                  profiles={safeProfiles}
-                  trackWidth={profileTrackWidth}
-                  panelHeight={panelHeight}
-                  panelWidth={size.width - 50}
-                  depthToPos={(d: number) => {
-                    // In horizontal mode the diagram itself is rotated via SVG transform.
-                    // For the panel (which is NOT rotated), we map depth directly to X
-                    // using the same gamma γ=1.5 as the diagram's depthToPos.
-                    if (well.totalDepth === 0) return 0;
-                    return Math.pow(d / well.totalDepth, 1.5) * (size.width - 50);
-                  }}
-                  totalDepth={well.totalDepth}
-                  orientation="horizontal"
-                />
-              </g>
-            )}
+            {/* Profile panel — horizontal mode.
+             *
+             * Positioning:
+             * - Standard (no half-section): panel sits below the diagram at
+             *   y = 30 + config.width.
+             * - Half-section fill: panel takes the half opposite the drawn
+             *   diagram half. After the diagram's -90° rotation, the local
+             *   centerLine maps to screen Y = 30 + config.width / 2.
+             *   - halfSide='right' → diagram drawn in upper half → panel
+             *     positioned in the lower half (offsetY = 30 + halfAvail).
+             *   - halfSide='left'  → diagram drawn in lower half → panel
+             *     positioned in the upper half (offsetY = 30).
+             */}
+            {hasProfiles && isH && config && (() => {
+              const panelOffsetY = halfSecPanelFillH
+                ? (halfSide === 'right' ? 30 + halfAvailableH : 30)
+                : 30 + config.width;
+              return (
+                <g transform={`translate(45, ${panelOffsetY})`}>
+                  <ProfilePanel
+                    profiles={safeProfiles}
+                    trackWidth={effectiveTrackHeightH}
+                    panelHeight={panelHeight}
+                    panelWidth={size.width - 50}
+                    depthToPos={(d: number) => {
+                      // In horizontal mode the diagram itself is rotated via SVG transform.
+                      // For the panel (which is NOT rotated), we map depth directly to X
+                      // using the same gamma γ=1.5 as the diagram's depthToPos.
+                      if (well.totalDepth === 0) return 0;
+                      return Math.pow(d / well.totalDepth, 1.5) * (size.width - 50);
+                    }}
+                    totalDepth={well.totalDepth}
+                    orientation="horizontal"
+                  />
+                </g>
+              );
+            })()}
           </svg>
         )}
       </div>
