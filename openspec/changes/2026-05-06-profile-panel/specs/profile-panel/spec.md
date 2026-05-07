@@ -80,4 +80,4 @@ Cada point del profile SHALL mostrar un tooltip al `mouseEnter` con formato `{na
 
 #### Scenario: Hover sobre point
 - **WHEN** el mouse entra a la zona de un point con `name='Presión'`, `value=2450`, `unit='psi'`, `depth=1240`
-- **THEN** el tooltip muestra `Presión: 2450 psi @ 1240 ft`
+- **THEN** el tooltip muestra dos líneas: `Presión: 2450 psi` en la primera y `@ 1240 ft` en la segunda

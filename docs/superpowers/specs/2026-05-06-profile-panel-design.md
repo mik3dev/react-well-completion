@@ -170,15 +170,18 @@ Si el consumidor pasa `color` explícito, ese color se usa siempre — la paleta
 
 ### 4.8 Tooltip
 
-Reusa el `TooltipProvider` y componente `Tooltip` existentes. Formato:
+Reusa el `TooltipProvider` y componente `Tooltip` existentes. Formato (dos líneas):
 
+Línea 1: `{name}: {formatted_value} {unit}`
+Línea 2: `@ {rounded_depth} ft`
+
+Ejemplo:
 ```
-{name}: {value} {unit} @ {depth} ft
+Presión: 2450 psi
+@ 1240 ft
 ```
 
-Ejemplo: `Presión: 2450 psi @ 1240 ft`.
-
-`value` se redondea a 2 decimales si tiene fracción. `depth` siempre entero.
+`value` se redondea a 2 decimales si tiene fracción. `depth` se redondea a entero.
 
 ## 5. Arquitectura de archivos
 

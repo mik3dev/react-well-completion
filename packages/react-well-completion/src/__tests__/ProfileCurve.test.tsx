@@ -79,4 +79,25 @@ describe('ProfileCurve', () => {
     // depth=200 → x=20; value=2000 → y = 0 → "20,0"
     expect(poly?.getAttribute('points')).toBe('10,50 20,0');
   });
+
+  it('shows tooltip on mouseEnter over a hover dot', async () => {
+    const { container } = renderInSvg(<ProfileCurve {...baseProps} />);
+
+    // Hover dots are the transparent circles (in the multi-point case).
+    const circles = container.querySelectorAll('circle');
+    expect(circles.length).toBe(2);
+
+    // Trigger mouseEnter on the first hover dot.
+    const { fireEvent } = await import('@testing-library/react');
+    fireEvent.mouseEnter(circles[0]);
+
+    // Tooltip is rendered into the document body (TooltipProvider portals it).
+    // Look for the formatted tooltip text in the rendered output.
+    const fullText = document.body.textContent ?? '';
+    expect(fullText).toContain('Pres:');
+    expect(fullText).toContain('1000');
+    expect(fullText).toContain('psi');
+    expect(fullText).toContain('100');
+    expect(fullText).toContain('ft');
+  });
 });
