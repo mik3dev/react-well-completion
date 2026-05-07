@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useWellStore } from './store/well-store';
 import { useLabelsStore } from './store/labels-store';
+import { mockProfiles } from './data/example-wells';
 import Toolbar from './components/Toolbar';
 import WellSelector from './components/editor/WellSelector';
 import WellEditor from './components/editor/WellEditor';
@@ -22,7 +23,7 @@ export default function App() {
         </aside>
         <main className="app__diagram">
           {well ? (
-            showSimplified ? <SimplifiedDiagram well={well} /> : <WellDiagram well={well} labels={visible} />
+            showSimplified ? <SimplifiedDiagram well={well} /> : <WellDiagram well={well} labels={visible} profiles={mockProfiles} />
           ) : (
             <div className="app__placeholder">
               <p>Selecciona o crea un pozo para visualizar el diagrama</p>

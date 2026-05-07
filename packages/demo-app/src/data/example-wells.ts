@@ -218,3 +218,34 @@ export const exampleWells: Well[] = [
   },
   vlg3922Well,
 ];
+
+import type { Profile } from '@mik3dev/react-well-completion';
+
+/**
+ * Mock profile data for demo / visual verification.
+ * Synthesized — not from a real measurement.
+ */
+export const mockProfiles: Profile[] = [
+  {
+    id: 'pres-fondo',
+    name: 'Presión',
+    unit: 'psi',
+    data: Array.from({ length: 10 }, (_, i) => {
+      const depth = i * 500;          // 0, 500, ..., 4500
+      // Linear pressure gradient ~0.45 psi/ft + a small bump near 3000 ft
+      const value = 100 + depth * 0.45 + (depth > 2500 && depth < 3500 ? 200 : 0);
+      return { depth, value };
+    }),
+  },
+  {
+    id: 'temp',
+    name: 'Temperatura',
+    unit: '°F',
+    data: Array.from({ length: 10 }, (_, i) => {
+      const depth = i * 500;
+      // Geothermal gradient ~1.5 °F per 100 ft, surface 80 °F
+      const value = 80 + depth * 0.015;
+      return { depth, value };
+    }),
+  },
+];
