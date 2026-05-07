@@ -37,7 +37,7 @@ export default function WellDiagram({
   labels,
   theme,
   profiles,
-  profileLayout: _profileLayout = 'tracks',
+  // profileLayout is reserved for v2 (overlay mode); v1 only supports 'tracks'.
   profileTrackWidth = DEFAULT_PROFILE_TRACK_WIDTH,
 }: WellDiagramProps) {
   const safeProfiles = profiles ?? [];
