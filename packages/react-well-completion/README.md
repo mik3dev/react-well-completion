@@ -35,7 +35,7 @@ function App() {
 
 | Component | Description |
 |---|---|
-| `WellDiagram` | Full detailed diagram with labels, detail tables, and tooltips |
+| `WellDiagram` | Full detailed diagram with labels, detail tables, tooltips, and an optional profile panel (pressure, temperature, etc.) |
 | `SimplifiedDiagram` | Grayscale schematic diagram, ideal for reports and printing |
 
 ### WellDiagram Props
@@ -45,6 +45,9 @@ interface WellDiagramProps {
   well: Well;
   labels?: Partial<Record<LabelCategory, boolean>>;
   theme?: Partial<BrandTheme>;
+  profiles?: Profile[];               // optional profile tracks (default: undefined → no panel)
+  profileLayout?: ProfileLayout;      // 'tracks' (only mode in v1)
+  profileTrackWidth?: number;         // px per track in vertical, px per track height in horizontal (default: 140)
 }
 ```
 
@@ -273,6 +276,80 @@ const well = {
 };
 ```
 
+### Profile Panel
+
+Render parallel profile tracks (pressure, temperature, acoustic logs, etc.) alongside the diagram, sharing the depth axis. The panel is opt-in via the `profiles` prop. When omitted, the diagram renders exactly as before.
+
+```tsx
+import { WellDiagram } from '@mik3dev/react-well-completion';
+import type { Profile } from '@mik3dev/react-well-completion';
+
+const profiles: Profile[] = [
+  {
+    id: 'pres',
+    name: 'Presión',
+    unit: 'psi',
+    data: [
+      { depth: 0,    value: 100 },
+      { depth: 1500, value: 800 },
+      { depth: 3000, value: 1450 },
+      { depth: 4500, value: 2050 },
+    ],
+  },
+  {
+    id: 'temp',
+    name: 'Temperatura',
+    unit: '°F',
+    color: '#ef4444',                  // optional — palette fallback if omitted
+    scale: { min: 50, max: 200 },      // optional — auto from data ± 5% padding if omitted
+    data: [
+      { depth: 0,    value: 80 },
+      { depth: 4500, value: 145 },
+    ],
+  },
+];
+
+<WellDiagram well={well} profiles={profiles} profileTrackWidth={140} />
+```
+
+#### Profile Shape
+
+```tsx
+interface Profile {
+  id: string;                          // React key
+  name: string;                        // header label, e.g. "Presión"
+  unit: string;                        // header suffix, e.g. "psi"
+  color?: string;                      // hex; defaults to a cycling palette
+  scale?: { min?: number; max?: number };  // forces value-axis range; auto if omitted
+  data: { depth: number; value: number }[];
+}
+```
+
+#### Behavior
+
+- **Layout**: parallel tracks, one per profile. Each track has its own value axis with `min`, `mid`, `max` ticks.
+- **Depth axis**: shared with the diagram (pixel-perfect alignment, including the gamma γ=1.5 mapping).
+- **Auto scale**: when `scale` is omitted, the value axis spans `[dataMin - 5% range, dataMax + 5% range]`. `scale.min` and `scale.max` override per-axis.
+- **Color palette**: when `color` is omitted, the track uses `DEFAULT_PROFILE_COLORS[index % length]` cycling through sky/red/emerald/amber/violet/pink.
+- **Tooltip**: hovering over a data point shows two lines: `{name}: {value} {unit}` and `@ {depth} ft`.
+- **Orientation**: the panel follows the diagram. Vertical → tracks on the right. Horizontal → tracks stacked below.
+- **Backward compatibility**: omitting the `profiles` prop produces identical rendering to before this feature existed.
+
+#### Edge Cases
+
+| Case | Behavior |
+|---|---|
+| `data: []` | Track renders with header and axis but no curve |
+| Single point | Renders as a visible `<circle>` (no polyline) |
+| All values equal | Curve is a straight line at the center of the value axis |
+| `depth` outside `[0, totalDepth]` | Point silently filtered |
+| Unsorted `data` | Sorted internally (does not mutate input) |
+| Inverted `scale` (`min > max`) | Sanitized — values reordered |
+
+#### Performance
+
+For best results, keep each profile under ~500 points. The library does no downsampling in v1; very large datasets render but may impact responsiveness.
+
 ## API Reference
 
 ### Exports
@@ -308,6 +385,7 @@ import type {
   SeatNipple, Plug, GasAnchor, Mandrel, Sleeve,
   Packing, Perforation, Sand, Wire,
   LabelCategory, BrandTheme, DiagramConfig,
+  Profile, ProfilePoint, ProfileLayout,
   WellDiagramProps, SimplifiedDiagramProps,
   ParseBackendWellOverrides,
 } from '@mik3dev/react-well-completion';

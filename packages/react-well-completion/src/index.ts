@@ -7,6 +7,7 @@ export type {
   LabelCategory,
 } from './types';
 export type { DiagramConfig } from './types';
+export type { Profile, ProfilePoint, ProfileLayout } from './types';
 export { ALL_LABEL_CATEGORIES, LABEL_CATEGORIES } from './types';
 export type { BrandTheme } from './theme';
 export { defaultTheme } from './theme';
