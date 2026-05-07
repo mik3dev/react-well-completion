@@ -18,6 +18,28 @@ globalThis.ResizeObserver = class {
   disconnect() {}
 };
 
+/**
+ * In jsdom, `getBoundingClientRect` returns zeros by default, so WellDiagram's
+ * `useDiagramConfig` returns null (precondition: width/height > 0) and no SVG
+ * renders. For tests that need to assert on panel layout, temporarily patch
+ * the prototype to return non-zero dimensions.
+ */
+function withFakeContainerSize<T>(width: number, height: number, fn: () => T): T {
+  const original = Element.prototype.getBoundingClientRect;
+  Element.prototype.getBoundingClientRect = function () {
+    return {
+      width, height, top: 0, left: 0,
+      bottom: height, right: width, x: 0, y: 0,
+      toJSON: () => ({}),
+    } as DOMRect;
+  };
+  try {
+    return fn();
+  } finally {
+    Element.prototype.getBoundingClientRect = original;
+  }
+}
+
 describe('Library exports', () => {
   it('exports WellDiagram component', () => {
     expect(WellDiagram).toBeDefined();
@@ -150,5 +172,73 @@ describe('WellDiagram render', () => {
     ];
     const { container } = render(<WellDiagram well={well} profiles={profiles} />);
     expect(container.querySelector('rect.profile-track-border')).not.toBeNull();
+  });
+
+  it('renders profiles in half-section vertical mode without crashing (halfSide=right)', () => {
+    const well = {
+      ...createWell('Test-HS-Right', 'GL'),
+      totalDepth: 5000,
+      totalFreeDepth: 4800,
+      halfSection: true,
+      halfSide: 'right' as const,
+      casings: [
+        createCasing({ diameter: 7, top: 0, base: 5000, isLiner: false }),
+      ],
+    };
+    const profiles = [
+      {
+        id: 'p1', name: 'Presión', unit: 'psi',
+        data: [
+          { depth: 100, value: 500 },
+          { depth: 4900, value: 2400 },
+        ],
+      },
+    ];
+    const { container } = withFakeContainerSize(800, 600, () =>
+      render(<WellDiagram well={well} profiles={profiles} />),
+    );
+    expect(container.querySelector('rect.profile-track-border')).not.toBeNull();
+  });
+
+  it('expands the panel to fill the freed half (halfSide=left)', () => {
+    // Container width = 800. Chrome = 50. Half-available = (800 - 50) / 2 = 375.
+    // 2 tracks, default profileTrackWidth=140 → tracks grow to 375/2 = 187.5 each
+    // (since 187.5 > 140, the minimum is satisfied).
+    const well = {
+      ...createWell('Test-HS-Left', 'GL'),
+      totalDepth: 5000,
+      totalFreeDepth: 4800,
+      halfSection: true,
+      halfSide: 'left' as const,
+      casings: [
+        createCasing({ diameter: 7, top: 0, base: 5000, isLiner: false }),
+      ],
+    };
+    const profiles = [
+      {
+        id: 'p1', name: 'Presión', unit: 'psi',
+        data: [
+          { depth: 100, value: 500 },
+          { depth: 4900, value: 2400 },
+        ],
+      },
+      {
+        id: 't1', name: 'Temperatura', unit: '°F',
+        data: [
+          { depth: 100, value: 80 },
+          { depth: 4900, value: 145 },
+        ],
+      },
+    ];
+    const { container } = withFakeContainerSize(800, 600, () =>
+      render(<WellDiagram well={well} profiles={profiles} />),
+    );
+    const tracks = container.querySelectorAll('rect.profile-track-border');
+    expect(tracks.length).toBe(2);
+    const trackWidth = parseFloat(tracks[0].getAttribute('width') ?? '0');
+    // Each track should be > the default 140 (it grew to fill the half).
+    expect(trackWidth).toBeGreaterThan(140);
+    // And ≤ the half-available width per track (no overflow when min is small).
+    expect(trackWidth).toBeLessThanOrEqual(375 / 2 + 0.01);
   });
 });
