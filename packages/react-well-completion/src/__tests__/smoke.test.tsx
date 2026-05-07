@@ -128,4 +128,27 @@ describe('WellDiagram render', () => {
     expect(a.querySelector('rect.profile-track-border')).toBeNull();
     expect(b.querySelector('rect.profile-track-border')).toBeNull();
   });
+
+  it('renders profiles in horizontal orientation without crashing', () => {
+    const well = {
+      ...createWell('Test-Horizontal', 'BM'),
+      totalDepth: 5000,
+      totalFreeDepth: 4800,
+      orientation: 'horizontal' as const,
+      casings: [
+        createCasing({ diameter: 7, top: 0, base: 5000, isLiner: false }),
+      ],
+    };
+    const profiles = [
+      {
+        id: 'p1', name: 'Presión', unit: 'psi',
+        data: [
+          { depth: 100, value: 500 },
+          { depth: 4900, value: 2400 },
+        ],
+      },
+    ];
+    const { container } = render(<WellDiagram well={well} profiles={profiles} />);
+    expect(container.querySelector('rect.profile-track-border')).not.toBeNull();
+  });
 });

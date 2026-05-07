@@ -68,9 +68,18 @@ export default function WellDiagram({
   // For horizontal: swap dimensions so config generates vertical coords
   // that get rotated by the SVG transform
   // Fixed margins: 45px left for vertical depth axis, 120px bottom for horizontal labels + depth axis
-  // When profiles are present, reserve panelWidth in vertical mode (panel is to the right).
+  //
+  // panel space reservation:
+  //   vertical:   panel goes to the right → subtract panelWidth from horizontal space
+  //   horizontal: panel goes below diagram → subtract panelHeight from vertical space
+  //
+  // In horizontal mode the diagram is rotated, so config dimensions are swapped:
+  //   configW = vertical-axis pixels (originally size.height minus chrome)
+  //   configH = horizontal-axis pixels (originally size.width minus chrome)
+  const panelHeight = hasProfiles && isH ? safeProfiles.length * profileTrackWidth : 0;
+
   const configW = isH
-    ? size.height - 100
+    ? size.height - 100 - panelHeight
     : size.width - 50 - panelWidth;
   const configH = isH ? size.width - 50 : size.height;
   const config = useDiagramConfig(configW, configH, well);
@@ -142,6 +151,9 @@ export default function WellDiagram({
             {/* Horizontal depth axis — rendered outside rotation group at bottom */}
             {isH && config && (() => {
               const axisY = size.height - 20;
+              // Note: when profiles are present in horizontal mode, the panel lives
+              // between the diagram and the axis. We keep axisY at the bottom so the
+              // depth axis remains the last horizontal element, immediately below the panel.
               const ticks: number[] = [];
               let interval = config.maxDepth / 10;
               const mag = Math.pow(10, Math.floor(Math.log10(interval)));
@@ -188,6 +200,27 @@ export default function WellDiagram({
                   depthToPos={config.depthToPos}
                   totalDepth={well.totalDepth}
                   orientation="vertical"
+                />
+              </g>
+            )}
+
+            {/* Profile panel — horizontal: positioned below the diagram (above the depth axis) */}
+            {hasProfiles && isH && config && (
+              <g transform={`translate(45, ${30 + config.width})`}>
+                <ProfilePanel
+                  profiles={safeProfiles}
+                  trackWidth={profileTrackWidth}
+                  panelHeight={panelHeight}
+                  panelWidth={size.width - 50}
+                  depthToPos={(d: number) => {
+                    // In horizontal mode the diagram itself is rotated via SVG transform.
+                    // For the panel (which is NOT rotated), we map depth directly to X
+                    // using the same gamma γ=1.5 as the diagram's depthToPos.
+                    if (well.totalDepth === 0) return 0;
+                    return Math.pow(d / well.totalDepth, 1.5) * (size.width - 50);
+                  }}
+                  totalDepth={well.totalDepth}
+                  orientation="horizontal"
                 />
               </g>
             )}
