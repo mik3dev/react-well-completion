@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import type { Well } from '../../types';
+import type { Well, Profile, ProfileLayout } from '../../types';
 import { useDiagramConfig } from '../../hooks/use-diagram-config';
 import SimplifiedCasingLayer from './SimplifiedCasingLayer';
 import SimplifiedTubingLayer from './SimplifiedTubingLayer';
@@ -9,12 +9,26 @@ import SimplifiedPackingLayer from './SimplifiedPackingLayer';
 import SimplifiedMandrelLayer from './SimplifiedMandrelLayer';
 import SimplifiedPumpLayer from './SimplifiedPumpLayer';
 import SimplifiedDepthAxis from './SimplifiedDepthAxis';
+import ProfilePanel from '../profiles/ProfilePanel';
+import { TooltipProvider } from '../Tooltip';
 
 export interface SimplifiedDiagramProps {
   well: Well;
+  profiles?: Profile[];
+  profileLayout?: ProfileLayout;
+  profileTrackWidth?: number;
 }
 
-export default function SimplifiedDiagram({ well }: SimplifiedDiagramProps) {
+const DEFAULT_PROFILE_TRACK_WIDTH = 140;
+
+export default function SimplifiedDiagram({
+  well,
+  profiles,
+  // profileLayout is reserved for v2 (overlay mode); v1 only supports 'tracks'.
+  profileTrackWidth = DEFAULT_PROFILE_TRACK_WIDTH,
+}: SimplifiedDiagramProps) {
+  const safeProfiles = profiles ?? [];
+  const hasProfiles = safeProfiles.length > 0;
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
@@ -32,77 +46,127 @@ export default function SimplifiedDiagram({ well }: SimplifiedDiagramProps) {
   }, [measure]);
 
   const isH = (well.orientation ?? 'vertical') === 'horizontal';
-  const configW = isH ? size.height - 60 : size.width - 40;
+
+  // Panel space reservation:
+  //   vertical:   panel goes to the right → subtract panelWidth from horizontal space.
+  //   horizontal: panel goes below diagram → subtract panelHeight from vertical space.
+  // Note: SimplifiedDiagram does not support half-section fill (its layers use
+  // legacy `computeCasingPositions`, which is symmetric and ignores halfSection).
+  // So we always use the standard fixed-track-width layout.
+  const panelWidth = hasProfiles && !isH ? safeProfiles.length * profileTrackWidth : 0;
+  const panelHeight = hasProfiles && isH ? safeProfiles.length * profileTrackWidth : 0;
+
+  const configW = isH
+    ? size.height - 60 - panelHeight
+    : size.width - 40 - panelWidth;
   const configH = isH ? size.width - 40 : size.height;
   const config = useDiagramConfig(configW, configH, well);
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        width: '100%',
-        height: '100%',
-        overflow: 'hidden',
-        background: 'white',
-      }}
-    >
-      {config && (
-        <svg
-          width={size.width}
-          height={size.height}
-          style={{ display: 'block' }}
-        >
-          {/* Vertical depth axis — only in vertical mode */}
-          {!isH && (
-            <g transform="translate(35, 0)">
-              <SimplifiedDepthAxis config={config} />
-            </g>
-          )}
-
-          {/* Main layers group — rotated for horizontal */}
-          <g transform={isH
-            ? `translate(35, ${20 + config.width}) rotate(-90)`
-            : 'translate(35, 0)'
-          }>
-            <SimplifiedCasingLayer casings={well.casings} config={config} />
-            <SimplifiedTubingLayer tubingString={well.tubingString} config={config} />
-            <SimplifiedPerforationLayer
-              perforations={well.perforations}
-              casings={well.casings}
-              config={config}
-            />
-            <SimplifiedPackerLayer packers={well.packers} tubingString={well.tubingString} config={config} />
-            <SimplifiedPackingLayer packings={well.packings} casings={well.casings} tubingString={well.tubingString} config={config} />
-            <SimplifiedMandrelLayer mandrels={well.mandrels} tubingString={well.tubingString} config={config} />
-            <SimplifiedPumpLayer pump={well.pump} config={config} />
-          </g>
-
-          {/* Horizontal depth axis — only in horizontal mode, outside rotation */}
-          {isH && (() => {
-            const axisY = size.height - 18;
-            const rawInterval = config.maxDepth / 8;
-            const mag = Math.pow(10, Math.floor(Math.log10(rawInterval)));
-            const norm = rawInterval / mag;
-            const interval = norm <= 1 ? mag : norm <= 2 ? 2 * mag : norm <= 5 ? 5 * mag : 10 * mag;
-            const ticks: number[] = [];
-            for (let d = 0; d <= config.maxDepth; d += interval) ticks.push(d);
-            return (
-              <g>
-                <line x1={35} y1={axisY} x2={size.width} y2={axisY} stroke="#bbb" strokeWidth={1} />
-                {ticks.map(d => {
-                  const x = 35 + (config.maxDepth > 0 ? Math.pow(d / config.maxDepth, 1.5) * (size.width - 40) : 0);
-                  return (
-                    <g key={`htick-${d}`}>
-                      <line x1={x} y1={axisY} x2={x} y2={axisY + 5} stroke="#999" strokeWidth={1} />
-                      <text x={x} y={axisY + 14} fontSize={8} fill="#666" textAnchor="middle" fontFamily="sans-serif">{d}'</text>
-                    </g>
-                  );
-                })}
+    <TooltipProvider>
+      <div
+        ref={containerRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
+          background: 'white',
+        }}
+      >
+        {config && (
+          <svg
+            width={size.width}
+            height={size.height}
+            style={{ display: 'block' }}
+          >
+            {/* Vertical depth axis — only in vertical mode */}
+            {!isH && (
+              <g transform="translate(35, 0)">
+                <SimplifiedDepthAxis config={config} />
               </g>
-            );
-          })()}
-        </svg>
-      )}
-    </div>
+            )}
+
+            {/* Main layers group — rotated for horizontal */}
+            <g transform={isH
+              ? `translate(35, ${20 + config.width}) rotate(-90)`
+              : 'translate(35, 0)'
+            }>
+              <SimplifiedCasingLayer casings={well.casings} config={config} />
+              <SimplifiedTubingLayer tubingString={well.tubingString} config={config} />
+              <SimplifiedPerforationLayer
+                perforations={well.perforations}
+                casings={well.casings}
+                config={config}
+              />
+              <SimplifiedPackerLayer packers={well.packers} tubingString={well.tubingString} config={config} />
+              <SimplifiedPackingLayer packings={well.packings} casings={well.casings} tubingString={well.tubingString} config={config} />
+              <SimplifiedMandrelLayer mandrels={well.mandrels} tubingString={well.tubingString} config={config} />
+              <SimplifiedPumpLayer pump={well.pump} config={config} />
+            </g>
+
+            {/* Horizontal depth axis — only in horizontal mode, outside rotation */}
+            {isH && (() => {
+              const axisY = size.height - 18;
+              const rawInterval = config.maxDepth / 8;
+              const mag = Math.pow(10, Math.floor(Math.log10(rawInterval)));
+              const norm = rawInterval / mag;
+              const interval = norm <= 1 ? mag : norm <= 2 ? 2 * mag : norm <= 5 ? 5 * mag : 10 * mag;
+              const ticks: number[] = [];
+              for (let d = 0; d <= config.maxDepth; d += interval) ticks.push(d);
+              return (
+                <g>
+                  <line x1={35} y1={axisY} x2={size.width} y2={axisY} stroke="#bbb" strokeWidth={1} />
+                  {ticks.map(d => {
+                    const x = 35 + (config.maxDepth > 0 ? Math.pow(d / config.maxDepth, 1.5) * (size.width - 40) : 0);
+                    return (
+                      <g key={`htick-${d}`}>
+                        <line x1={x} y1={axisY} x2={x} y2={axisY + 5} stroke="#999" strokeWidth={1} />
+                        <text x={x} y={axisY + 14} fontSize={8} fill="#666" textAnchor="middle" fontFamily="sans-serif">{d}'</text>
+                      </g>
+                    );
+                  })}
+                </g>
+              );
+            })()}
+
+            {/* Profile panel — vertical: positioned to the right of the diagram. */}
+            {hasProfiles && !isH && (
+              <g transform={`translate(${size.width - panelWidth}, 0)`}>
+                <ProfilePanel
+                  profiles={safeProfiles}
+                  trackWidth={profileTrackWidth}
+                  panelHeight={config.height}
+                  panelWidth={panelWidth}
+                  depthToPos={config.depthToPos}
+                  totalDepth={well.totalDepth}
+                  orientation="vertical"
+                />
+              </g>
+            )}
+
+            {/* Profile panel — horizontal: positioned below the diagram (above the depth axis). */}
+            {hasProfiles && isH && (
+              <g transform={`translate(35, ${20 + config.width})`}>
+                <ProfilePanel
+                  profiles={safeProfiles}
+                  trackWidth={profileTrackWidth}
+                  panelHeight={panelHeight}
+                  panelWidth={size.width - 40}
+                  depthToPos={(d: number) => {
+                    // In horizontal mode the diagram is rotated via SVG transform.
+                    // For the panel (which is NOT rotated), we map depth directly to X
+                    // using the same gamma γ=1.5 as the diagram's depthToPos.
+                    if (well.totalDepth === 0) return 0;
+                    return Math.pow(d / well.totalDepth, 1.5) * (size.width - 40);
+                  }}
+                  totalDepth={well.totalDepth}
+                  orientation="horizontal"
+                />
+              </g>
+            )}
+          </svg>
+        )}
+      </div>
+    </TooltipProvider>
   );
 }

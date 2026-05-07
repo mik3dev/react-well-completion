@@ -285,6 +285,71 @@ describe('WellDiagram render', () => {
     expect(trackHeight).toBeLessThanOrEqual(350 / 2 + 0.01);
   });
 
+  it('SimplifiedDiagram renders with profiles in vertical', () => {
+    const well = {
+      ...createWell('Test-Simp-V', 'BM'),
+      totalDepth: 5000,
+      totalFreeDepth: 4800,
+      casings: [
+        createCasing({ diameter: 7, top: 0, base: 5000, isLiner: false }),
+      ],
+    };
+    const profiles = [
+      {
+        id: 'p1', name: 'Presión', unit: 'psi',
+        data: [
+          { depth: 100, value: 500 },
+          { depth: 4900, value: 2400 },
+        ],
+      },
+    ];
+    const { container } = withFakeContainerSize(800, 600, () =>
+      render(<SimplifiedDiagram well={well} profiles={profiles} />),
+    );
+    expect(container.querySelector('rect.profile-track-border')).not.toBeNull();
+  });
+
+  it('SimplifiedDiagram renders with profiles in horizontal', () => {
+    const well = {
+      ...createWell('Test-Simp-H', 'BM'),
+      totalDepth: 5000,
+      totalFreeDepth: 4800,
+      orientation: 'horizontal' as const,
+      casings: [
+        createCasing({ diameter: 7, top: 0, base: 5000, isLiner: false }),
+      ],
+    };
+    const profiles = [
+      {
+        id: 'p1', name: 'Presión', unit: 'psi',
+        data: [
+          { depth: 100, value: 500 },
+          { depth: 4900, value: 2400 },
+        ],
+      },
+      {
+        id: 't1', name: 'Temperatura', unit: '°F',
+        data: [
+          { depth: 100, value: 80 },
+          { depth: 4900, value: 145 },
+        ],
+      },
+    ];
+    const { container } = withFakeContainerSize(1000, 800, () =>
+      render(<SimplifiedDiagram well={well} profiles={profiles} />),
+    );
+    const tracks = container.querySelectorAll('rect.profile-track-border');
+    expect(tracks.length).toBe(2);
+  });
+
+  it('SimplifiedDiagram renders identically when profiles prop is omitted (regression)', () => {
+    const well = createWell('Test-Simp-No-Profiles', 'BM');
+    const { container: a } = render(<SimplifiedDiagram well={well} />);
+    const { container: b } = render(<SimplifiedDiagram well={well} profiles={[]} />);
+    expect(a.querySelector('rect.profile-track-border')).toBeNull();
+    expect(b.querySelector('rect.profile-track-border')).toBeNull();
+  });
+
   it('horizontal + half-section + halfSide=right does not crash', () => {
     const well = {
       ...createWell('Test-Hor-HS-R', 'GL'),
