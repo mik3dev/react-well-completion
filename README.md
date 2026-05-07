@@ -241,6 +241,63 @@ const well = {
 };
 ```
 
+### Panel de Perfiles (Pressure / Temperature / etc.)
+
+`WellDiagram` acepta un prop opcional `profiles` para renderizar uno o mas tracks de perfiles (presion, temperatura, registros, etc.) junto al diagrama, compartiendo el eje de profundidad.
+
+```tsx
+import { WellDiagram } from 'react-well-completion';
+import type { Profile } from 'react-well-completion';
+
+const profiles: Profile[] = [
+  {
+    id: 'pres',
+    name: 'Presion',
+    unit: 'psi',
+    data: [
+      { depth: 0,    value: 100 },
+      { depth: 1500, value: 800 },
+      { depth: 3000, value: 1450 },
+      { depth: 4500, value: 2050 },
+    ],
+  },
+  {
+    id: 'temp',
+    name: 'Temperatura',
+    unit: '°F',
+    color: '#ef4444',                 // opcional, paleta automatica si falta
+    scale: { min: 50, max: 200 },     // opcional, auto-min/max +/- 5% si falta
+    data: [
+      { depth: 0,    value: 80 },
+      { depth: 4500, value: 145 },
+    ],
+  },
+];
+
+<WellDiagram well={well} profiles={profiles} profileTrackWidth={140} />
+```
+
+Comportamiento:
+
+- **Layout**: tracks paralelos, uno por perfil. Cada track con header (`name unit`), eje de valor (3 ticks: min, mid, max), grid lines, y la curva.
+- **Eje de profundidad sincronizado**: cada track usa el mismo `depthToPos` que el diagrama, alineacion pixel-perfect con la correccion gamma γ=1.5.
+- **Orientacion**: el panel "sigue" al diagrama. Vertical → tracks a la derecha. Horizontal → tracks apilados debajo.
+- **Tooltip al hover**: dos lineas — `{name}: {value} {unit}` y `@ {depth} ft`.
+- **Backward-compatible**: sin el prop `profiles`, el render es identico al de antes de este feature.
+
+Edge cases manejados:
+
+| Caso | Comportamiento |
+|---|---|
+| `data: []` | Track con header y eje, sin curva |
+| 1 punto | `<circle>` visible (no polyline) |
+| Todos los valores iguales | Linea recta al centro del eje de valor |
+| `depth` fuera de `[0, totalDepth]` | Filtrado silenciosamente |
+| `data` desordenado | Se ordena internamente (sin mutar input) |
+| `scale.min > scale.max` | Reordenado automaticamente |
+
+Para mejor performance, se recomienda < 500 puntos por perfil (la lib no hace downsampling en v1).
+
 ---
 
 ## API Reference
@@ -249,7 +306,7 @@ const well = {
 
 | Componente | Props | Descripcion |
 |---|---|---|
-| `WellDiagram` | `well: Well`, `labels?: Partial<Record<LabelCategory, boolean>>`, `theme?: Partial<BrandTheme>` | Diagrama completo con labels, tablas de detalle, tooltips |
+| `WellDiagram` | `well: Well`, `labels?: Partial<Record<LabelCategory, boolean>>`, `theme?: Partial<BrandTheme>`, `profiles?: Profile[]`, `profileLayout?: ProfileLayout`, `profileTrackWidth?: number` | Diagrama completo con labels, tablas de detalle, tooltips, y panel opcional de perfiles |
 | `SimplifiedDiagram` | `well: Well` | Diagrama esquematico en escala de grises |
 
 ### Tipos Principales
@@ -293,6 +350,22 @@ interface BrandTheme {
   accent: string;              // default '#377AF3'
   headerText: string;          // default '#FFFFFF'
 }
+
+interface ProfilePoint {
+  depth: number;               // pies
+  value: number;               // unidad arbitraria, definida por Profile.unit
+}
+
+interface Profile {
+  id: string;
+  name: string;                // header del track, e.g. "Presion"
+  unit: string;                // sufijo del header, e.g. "psi"
+  color?: string;              // opcional, paleta automatica si falta
+  scale?: { min?: number; max?: number };  // opcional, fuerza rango del eje
+  data: ProfilePoint[];        // pares depth/value, no requiere estar ordenado
+}
+
+type ProfileLayout = 'tracks';  // futuro: 'tracks' | 'overlay'
 ```
 
 ### Factory Functions
