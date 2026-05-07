@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.8](https://github.com/mik3dev/react-well-completion/compare/react-well-completion-v0.1.7...react-well-completion-v0.1.8) (2026-05-07)
+
+
+### Features
+
+* profile panel fills the freed half in horizontal half-section ([92fa36f](https://github.com/mik3dev/react-well-completion/commit/92fa36f13ddf64141d41bb7f5c6f1e022d740f42))
+
 ## [0.1.7](https://github.com/mik3dev/react-well-completion/compare/react-well-completion-v0.1.6...react-well-completion-v0.1.7) (2026-05-07)
 
 
