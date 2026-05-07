@@ -333,6 +333,10 @@ interface Profile {
 - **Color palette**: when `color` is omitted, the track uses `DEFAULT_PROFILE_COLORS[index % length]` cycling through sky/red/emerald/amber/violet/pink.
 - **Tooltip**: hovering over a data point shows two lines: `{name}: {value} {unit}` and `@ {depth} ft`.
 - **Orientation**: the panel follows the diagram. Vertical → tracks on the right. Horizontal → tracks stacked below.
+- **Half-section fill (vertical only)**: when both `halfSection: true` and `profiles` are set in vertical orientation, the panel automatically expands into the half freed by the half-section. Tracks grow to fill the freed space (`profileTrackWidth` becomes a *minimum* in this mode). Position depends on `halfSide`:
+  - `halfSide: 'right'` (diagram on right) → panel on the **left**.
+  - `halfSide: 'left'` (diagram on left) → panel on the **right** (default position, just wider).
+  - Horizontal + half-section keeps the standard panel-below layout.
 - **Backward compatibility**: omitting the `profiles` prop produces identical rendering to before this feature existed.
 
 #### Edge Cases

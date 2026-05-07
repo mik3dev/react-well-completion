@@ -283,6 +283,10 @@ Comportamiento:
 - **Eje de profundidad sincronizado**: cada track usa el mismo `depthToPos` que el diagrama, alineacion pixel-perfect con la correccion gamma γ=1.5.
 - **Orientacion**: el panel "sigue" al diagrama. Vertical → tracks a la derecha. Horizontal → tracks apilados debajo.
 - **Tooltip al hover**: dos lineas — `{name}: {value} {unit}` y `@ {depth} ft`.
+- **Half-section fill (solo vertical)**: cuando se activan al mismo tiempo `halfSection: true` y `profiles` en orientacion vertical, el panel se expande para ocupar la mitad liberada por la half-section. Los tracks crecen para llenar el hueco (`profileTrackWidth` actua como minimo). Posicion segun `halfSide`:
+  - `halfSide: 'right'` (diagrama a la derecha) → panel a la **izquierda**.
+  - `halfSide: 'left'` (diagrama a la izquierda) → panel a la **derecha** (posicion habitual, mas ancho).
+  - Horizontal + half-section mantiene el layout estandar (panel debajo).
 - **Backward-compatible**: sin el prop `profiles`, el render es identico al de antes de este feature.
 
 Edge cases manejados:
