@@ -190,4 +190,57 @@ describe('parseBackendWell', () => {
     const unique = new Set(allIds);
     expect(unique.size).toBe(allIds.length);
   });
+
+  describe('isLiner inference', () => {
+    // Industry convention: a liner is a casing that does not extend to the
+    // surface (top > 0). The parser infers this from the geometry even when
+    // the source data dumps everything into the "Casing" array.
+
+    it('marks casing items with top=0 as non-liner', () => {
+      const well = parseBackendWell({
+        ...sampleJson,
+        Casing: [
+          { OD: '13 3/8"', posicion: 1, 'Base (pies)': 4000, 'Tope (pies)': 0 },
+        ],
+      });
+      expect(well.casings[0].isLiner).toBe(false);
+    });
+
+    it('infers isLiner=true for a casing item with top>0 (data quality fix)', () => {
+      const well = parseBackendWell({
+        ...sampleJson,
+        Casing: [
+          { OD: '13 3/8"', posicion: 1, 'Base (pies)': 4000, 'Tope (pies)': 0 },
+          { OD: '7"', posicion: 2, 'Base (pies)': 16178, 'Tope (pies)': 13873 },
+        ],
+      });
+      expect(well.casings[0].isLiner).toBe(false); // 13-3/8" from surface
+      expect(well.casings[1].isLiner).toBe(true);  // 7" hanging — inferred
+    });
+
+    it('always marks items from the Liner array as isLiner=true', () => {
+      const well = parseBackendWell({
+        ...sampleJson,
+        Casing: [
+          { OD: '9 5/8"', posicion: 1, 'Base (pies)': 14000, 'Tope (pies)': 0 },
+        ],
+        Liner: [
+          { OD: '7"', posicion: 1, 'Base (pies)': 16000, 'Tope (pies)': 13500 },
+        ],
+      });
+      expect(well.casings[0].isLiner).toBe(false);
+      expect(well.casings[1].isLiner).toBe(true);
+    });
+
+    it('marks a Liner entry as isLiner=true even if its top=0 (explicit beats inference)', () => {
+      const well = parseBackendWell({
+        ...sampleJson,
+        Casing: [],
+        Liner: [
+          { OD: '7"', posicion: 1, 'Base (pies)': 16000, 'Tope (pies)': 0 },
+        ],
+      });
+      expect(well.casings[0].isLiner).toBe(true);
+    });
+  });
 });
