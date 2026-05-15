@@ -10,6 +10,8 @@ interface ToolbarProps {
   onToggleSimplified: () => void;
   showProfiles: boolean;
   onToggleProfiles: () => void;
+  showEarth: boolean;
+  onToggleEarth: () => void;
 }
 
 export default function Toolbar({
@@ -17,6 +19,8 @@ export default function Toolbar({
   onToggleSimplified,
   showProfiles,
   onToggleProfiles,
+  showEarth,
+  onToggleEarth,
 }: ToolbarProps) {
   const { exportPng, exportSvg, copyToClipboard } = useExport();
   const { importWells, exportWells, wells } = useWellStore();
@@ -77,6 +81,13 @@ export default function Toolbar({
           className={showProfiles ? 'active' : ''}
         >
           Perfiles
+        </button>
+        <button
+          onClick={onToggleEarth}
+          className={showEarth ? 'active' : ''}
+          title="Mostrar/ocultar la EarthLayer (formacion)"
+        >
+          Formacion
         </button>
         <div className="toolbar__labels-wrapper">
           <button

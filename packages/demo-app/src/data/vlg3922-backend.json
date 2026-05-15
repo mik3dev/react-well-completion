@@ -9,7 +9,16 @@
     "HUD": 8500,
     "TDS": "JOSE 1",
     "Pozo": "VLG3922",
-    "Liner": [],
+    "Liner": [
+      {
+        "OD": "7\"",
+        "Grado": "P-110",
+        "Weight": 35,
+        "posicion": 1,
+        "Base (pies)": 16178,
+        "Tope (pies)": 13873
+      }
+    ],
     "Casing": [
       {
         "OD": "13 3/8\"",
@@ -25,14 +34,6 @@
         "posicion": 2,
         "Base (pies)": 14507,
         "Tope (pies)": 0
-      },
-      {
-        "OD": "7\"",
-        "Grado": "P-110",
-        "Weight": 35,
-        "posicion": 3,
-        "Base (pies)": 16178,
-        "Tope (pies)": 13873
       }
     ],
     "Tubing": [
