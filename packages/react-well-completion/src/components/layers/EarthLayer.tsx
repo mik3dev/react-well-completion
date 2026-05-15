@@ -7,6 +7,12 @@ interface Props {
   totalDepth: number;
   casings: Casing[];
   config: DiagramConfig;
+  /**
+   * Fill used for the earth/formation rectangles.
+   * Defaults to the SVG pattern `url(#earthFill)`. Pass `'transparent'`,
+   * `'#ffffff'`, or any CSS color to override.
+   */
+  fill?: string;
 }
 
 const WALL = 5; // casing wall thickness (must match CasingLayer)
@@ -58,17 +64,25 @@ function computeEarthSegments(
   return segments;
 }
 
-export default function EarthLayer({ totalFreeDepth, totalDepth, casings, config }: Props) {
+export default function EarthLayer({ totalFreeDepth, totalDepth, casings, config, fill = 'url(#earthFill)' }: Props) {
   const { show, move, hide } = useTooltip();
 
-  if (!totalFreeDepth || totalFreeDepth >= totalDepth) return null;
+  // Top of the earth visualization = deepest shoe among non-liner casings.
+  // Rationale: below that depth the only protection between wellbore and
+  // formation is the liner (or open hole), which is the productive zone.
+  // HUD (totalFreeDepth) is intentionally not used here — it represents an
+  // operational restriction that doesn't change where the formation is.
+  const nonLinerCasings = casings.filter(c => !c.isLiner);
+  if (nonLinerCasings.length === 0) return null;
+  const earthTop = Math.max(...nonLinerCasings.map(c => c.base));
+  if (earthTop >= totalDepth) return null;
 
   const casingPos = computeCasingPositions(casings, config);
-  const segments = computeEarthSegments(totalFreeDepth, totalDepth, casings);
+  const segments = computeEarthSegments(earthTop, totalDepth, casings);
 
   const tooltipInfo = [
     `Profundidad Total: ${totalDepth} ft`,
-    `Profundidad Libre: ${totalFreeDepth} ft`,
+    ...(totalFreeDepth > 0 ? [`Profundidad Libre: ${totalFreeDepth} ft`] : []),
   ];
 
   const half = config.halfSection;
@@ -101,7 +115,7 @@ export default function EarthLayer({ totalFreeDepth, totalDepth, casings, config
             {showLeft && leftEdge > 0 && (
               <rect
                 x={0} y={y} width={leftEdge} height={h}
-                fill="url(#earthFill)"
+                fill={fill}
                 onMouseEnter={e => show(e, tooltipInfo)}
                 onMouseMove={move}
                 onMouseLeave={hide}
@@ -110,7 +124,7 @@ export default function EarthLayer({ totalFreeDepth, totalDepth, casings, config
             {showRight && rightEdge < config.width && (
               <rect
                 x={rightEdge} y={y} width={config.width - rightEdge} height={h}
-                fill="url(#earthFill)"
+                fill={fill}
                 onMouseEnter={e => show(e, tooltipInfo)}
                 onMouseMove={move}
                 onMouseLeave={hide}

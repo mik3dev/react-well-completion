@@ -52,12 +52,20 @@ function parseCasings(raw: Record<string, unknown>[], isLiner: boolean): Casing[
   return raw.map(c => {
     const odRaw = c['OD'];
     const diameter = typeof odRaw === 'string' ? parseFractionalDiameter(odRaw) : getNumber(c, 'OD');
+    const top = getNumber(c, 'Tope (pies)');
+    const base = getNumber(c, 'Base (pies)');
+    // Items coming from the backend's "Liner" array are always liners.
+    // Items from the "Casing" array are liners only if they don't start at
+    // surface (top > 0) — industry convention: a liner is a casing that
+    // hangs from another casing, not from the wellhead. This protects against
+    // sources that lump all tubular elements into a single "Casing" array.
+    const inferredIsLiner = isLiner || top > 0;
     return {
       id: uuid(),
       diameter,
-      top: getNumber(c, 'Tope (pies)'),
-      base: getNumber(c, 'Base (pies)'),
-      isLiner,
+      top,
+      base,
+      isLiner: inferredIsLiner,
       weight: typeof c['Weight'] === 'number' ? c['Weight'] : undefined,
       grade: typeof c['Grado'] === 'string' ? c['Grado'] : undefined,
     };

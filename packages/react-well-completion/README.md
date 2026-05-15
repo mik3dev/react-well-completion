@@ -59,6 +59,7 @@ interface SimplifiedDiagramProps {
   profiles?: Profile[];               // optional profile tracks (default: undefined → no panel)
   profileLayout?: ProfileLayout;      // 'tracks' (only mode in v1)
   profileTrackWidth?: number;         // px per track in vertical, px per track height in horizontal (default: 140)
+  earthFill?: string;                 // formation fill (default: 'transparent' to preserve the schematic look)
 }
 ```
 
@@ -182,7 +183,7 @@ The parser expects JSON like this:
 | `HUD` | `well.totalFreeDepth` | |
 | `Profundidad Total` | `well.totalDepth` | If `0`, calculated from max base of casings/perforations/tubing |
 | `Tipo de Trabajo` | `well.liftMethod` | Mapped: `CVGL→GL`, `BME→BM`, etc. |
-| `Casing[]` + `Liner[]` | `well.casings` | Liners merged with `isLiner: true` |
+| `Casing[]` + `Liner[]` | `well.casings` | All items go to a single array. `Liner[]` entries are always `isLiner: true`. For `Casing[]` entries, `isLiner` is inferred from `Tope (pies)` — items with `Tope > 0` (i.e. don't reach the surface) are inferred as liners. This handles backends that lump everything into `Casing[]`. |
 | OD strings like `"13 3/8\""` | `casing.diameter` | Parsed to `13.375` |
 | `Tubing[]` | `well.tubingString` | With explicit `top`/`base` |
 | `Perforaciones[]` | `well.perforations` | |
@@ -243,7 +244,7 @@ Available categories: `casings`, `tubing`, `rods`, `pump`, `perforations`, `sand
 
 ### Theme
 
-Customize the brand colors of the detail tables:
+Customize the brand colors of the detail tables and the formation fill:
 
 ```tsx
 <WellDiagram
@@ -252,11 +253,20 @@ Customize the brand colors of the detail tables:
     headerBg: '#1a1a2e',     // Table header background
     accent: '#e94560',        // Accent stripe under header
     headerText: '#ffffff',    // Header text color
+    earthFill: 'transparent', // EarthLayer fill (any CSS color, pattern url, or 'transparent')
   }}
 />
 ```
 
-Defaults: `headerBg: '#205394'`, `accent: '#377AF3'`, `headerText: '#FFFFFF'`.
+Defaults: `headerBg: '#205394'`, `accent: '#377AF3'`, `headerText: '#FFFFFF'`, `earthFill: 'url(#earthFill)'`.
+
+### EarthLayer (formation)
+
+The library renders the formation between **`max(non-liner casing shoes)`** and `totalDepth`. The rationale: below the deepest non-liner shoe, the only protection between wellbore and formation is the liner — that's the productive zone. `totalFreeDepth` (HUD) is an operational restriction and is intentionally NOT used for this visual.
+
+If a well has no non-liner casings (only liners or no casings at all), the EarthLayer renders nothing.
+
+Override the fill via `theme.earthFill` (for `WellDiagram`) or the `earthFill` prop (for `SimplifiedDiagram` — default `'transparent'` to preserve the schematic look).
 
 ### Orientation
 

@@ -374,3 +374,86 @@ describe('WellDiagram render', () => {
     expect(container.querySelector('rect.profile-track-border')).not.toBeNull();
   });
 });
+
+describe('EarthLayer non-liner shoe criterion', () => {
+  // Synthetic well that mirrors VLG3873: surface casing, intermediate casing,
+  // and a deeper production liner. EarthLayer should render from the deepest
+  // non-liner shoe (intermediate base = 14650) to totalDepth, NOT from HUD.
+  const buildWell = (overrides: { halfSection?: boolean; halfSide?: 'left' | 'right' } = {}) => ({
+    ...createWell('Test-Earth', 'GL'),
+    totalDepth: 16377,
+    totalFreeDepth: 16233,
+    casings: [
+      createCasing({ diameter: 13.375, top: 0, base: 4000, isLiner: false }),
+      createCasing({ diameter: 9.625,  top: 0, base: 14650, isLiner: false }),
+      createCasing({ diameter: 7,      top: 14132, base: 16372, isLiner: true }),
+    ],
+    perforations: [
+      createPerforation({ top: 15774, base: 15780, type: 'shoot' as const }),
+    ],
+    ...overrides,
+  });
+
+  it('renders earth rects from deepest non-liner shoe to totalDepth', () => {
+    const { container } = withFakeContainerSize(800, 1200, () =>
+      render(<WellDiagram well={buildWell()} />),
+    );
+    const earthLayer = container.querySelector('g.layer-earth');
+    expect(earthLayer).not.toBeNull();
+    const rects = earthLayer?.querySelectorAll('rect') ?? [];
+    expect(rects.length).toBeGreaterThan(0);
+  });
+
+  it('does not render earth when there are no non-liner casings', () => {
+    const wellOnlyLiner = {
+      ...createWell('Test-Only-Liner', 'GL'),
+      totalDepth: 16377,
+      totalFreeDepth: 16233,
+      casings: [
+        createCasing({ diameter: 7, top: 14132, base: 16372, isLiner: true }),
+      ],
+    };
+    const { container } = withFakeContainerSize(800, 1200, () =>
+      render(<WellDiagram well={wellOnlyLiner} />),
+    );
+    const earthLayer = container.querySelector('g.layer-earth');
+    // The <g class="layer-earth"> may or may not be rendered depending on the
+    // null short-circuit in React. What matters is there are no earth rects.
+    const rects = earthLayer?.querySelectorAll('rect') ?? [];
+    expect(rects.length).toBe(0);
+  });
+
+  it('uses the default earthFill pattern when theme.earthFill is not overridden', () => {
+    const { container } = withFakeContainerSize(800, 1200, () =>
+      render(<WellDiagram well={buildWell()} />),
+    );
+    const rect = container.querySelector('g.layer-earth rect');
+    expect(rect?.getAttribute('fill')).toBe('url(#earthFill)');
+  });
+
+  it('respects custom theme.earthFill on WellDiagram', () => {
+    const { container } = withFakeContainerSize(800, 1200, () =>
+      render(<WellDiagram well={buildWell()} theme={{ earthFill: '#abcdef' }} />),
+    );
+    const rect = container.querySelector('g.layer-earth rect');
+    expect(rect?.getAttribute('fill')).toBe('#abcdef');
+  });
+
+  it('SimplifiedDiagram defaults earthFill to transparent', () => {
+    const { container } = withFakeContainerSize(800, 1200, () =>
+      render(<SimplifiedDiagram well={buildWell()} />),
+    );
+    const rect = container.querySelector('g.layer-earth rect');
+    // SimplifiedDiagram still renders the rects (so consumer can override),
+    // but the default fill is transparent.
+    expect(rect?.getAttribute('fill')).toBe('transparent');
+  });
+
+  it('SimplifiedDiagram respects earthFill prop', () => {
+    const { container } = withFakeContainerSize(800, 1200, () =>
+      render(<SimplifiedDiagram well={buildWell()} earthFill="#f5f5f5" />),
+    );
+    const rect = container.querySelector('g.layer-earth rect');
+    expect(rect?.getAttribute('fill')).toBe('#f5f5f5');
+  });
+});

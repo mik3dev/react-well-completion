@@ -159,6 +159,7 @@ export default function WellDiagram({
                 totalDepth={well.totalDepth}
                 casings={well.casings}
                 config={config}
+                fill={mergedTheme.earthFill}
               />
               <CasingLayer casings={well.casings} config={config} />
               <PerforationLayer

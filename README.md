@@ -212,6 +212,7 @@ Los colores de las tablas de detalle son configurables:
     headerBg: '#1a1a2e',     // Fondo del header de las tablas
     accent: '#e94560',        // Linea de acento bajo el header
     headerText: '#ffffff',    // Color del texto del header
+    earthFill: 'transparent', // Fill de la EarthLayer (default: 'url(#earthFill)')
   }}
 />
 
@@ -247,6 +248,26 @@ const well = {
   halfSide: 'right',  // 'right' (default) | 'left'
   // ... resto de datos
 };
+```
+
+### EarthLayer (formacion)
+
+La libreria pinta la formacion entre **`max(non-liner casing shoes)`** y `totalDepth`. Es decir: debajo del shoe del casing no-liner mas profundo, la unica proteccion contra la formacion es el liner — esa es la zona productiva. `totalFreeDepth` (HUD) **no** se usa para este criterio visual; HUD es una restriccion operacional, no fisica.
+
+Si el pozo no tiene casings non-liner (solo liners o sin casings), el EarthLayer no renderiza nada.
+
+El fill es configurable:
+
+```tsx
+// Default en WellDiagram (textura marron)
+<WellDiagram well={well} />
+
+// Fill custom (color solido, transparente, o patron SVG)
+<WellDiagram well={well} theme={{ earthFill: '#fafafa' }} />
+<WellDiagram well={well} theme={{ earthFill: 'transparent' }} />
+
+// SimplifiedDiagram default es 'transparent' — opt-in para mostrarlo
+<SimplifiedDiagram well={well} earthFill="#f5f5f5" />
 ```
 
 ### Panel de Perfiles (Pressure / Temperature / etc.)
@@ -320,7 +341,7 @@ Para mejor performance, se recomienda < 500 puntos por perfil (la lib no hace do
 | Componente | Props | Descripcion |
 |---|---|---|
 | `WellDiagram` | `well: Well`, `labels?: Partial<Record<LabelCategory, boolean>>`, `theme?: Partial<BrandTheme>`, `profiles?: Profile[]`, `profileLayout?: ProfileLayout`, `profileTrackWidth?: number` | Diagrama completo con labels, tablas de detalle, tooltips, y panel opcional de perfiles |
-| `SimplifiedDiagram` | `well: Well`, `profiles?: Profile[]`, `profileLayout?: ProfileLayout`, `profileTrackWidth?: number` | Diagrama esquematico en escala de grises, tambien con panel opcional de perfiles |
+| `SimplifiedDiagram` | `well: Well`, `profiles?: Profile[]`, `profileLayout?: ProfileLayout`, `profileTrackWidth?: number`, `earthFill?: string` | Diagrama esquematico en escala de grises, con panel opcional de perfiles y EarthLayer opcional (`earthFill` default `'transparent'`) |
 
 ### Tipos Principales
 
@@ -362,6 +383,7 @@ interface BrandTheme {
   headerBg: string;            // default '#205394'
   accent: string;              // default '#377AF3'
   headerText: string;          // default '#FFFFFF'
+  earthFill: string;           // default 'url(#earthFill)' (textura de formacion)
 }
 
 interface ProfilePoint {
@@ -439,6 +461,7 @@ const well = parseBackendWell(json, {
 - **Mapea lift methods**: `CVGL → GL`, `BME → BM`, etc.
 - **Calcula `totalDepth`**: Si el backend envia 0, usa el max de bases de casings/perforations/tubing
 - **Distribuye `EquipoDeFondo` por tipo**: `Niple → seatNipples`, `Manga → sleeves`, `Empacadura → packers`
+- **Infiere `isLiner` de casings**: items del array `Liner[]` siempre quedan como `isLiner: true`. Para items del array `Casing[]`, si `Tope (pies) > 0` (no llega a superficie) se infiere `isLiner: true`. Esto cubre backends que mezclan todo en un solo array.
 - **Infiere `valveType` de mandriles**: `PTR PSI` presente → `'operating'`, `Tipo Válvula: 'Dummy'` → `'dummy'`, ninguno → `null`
 - **Preserva campos extras en metadata**: Comentarios, fechas, FieldId, y tipos no reconocidos de equipo de fondo van a `well.metadata`
 
