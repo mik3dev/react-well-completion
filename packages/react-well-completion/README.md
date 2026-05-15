@@ -59,6 +59,7 @@ interface SimplifiedDiagramProps {
   profiles?: Profile[];               // optional profile tracks (default: undefined → no panel)
   profileLayout?: ProfileLayout;      // 'tracks' (only mode in v1)
   profileTrackWidth?: number;         // px per track in vertical, px per track height in horizontal (default: 140)
+  earthFill?: string;                 // formation fill (default: 'transparent' to preserve the schematic look)
 }
 ```
 
@@ -243,7 +244,7 @@ Available categories: `casings`, `tubing`, `rods`, `pump`, `perforations`, `sand
 
 ### Theme
 
-Customize the brand colors of the detail tables:
+Customize the brand colors of the detail tables and the formation fill:
 
 ```tsx
 <WellDiagram
@@ -252,11 +253,20 @@ Customize the brand colors of the detail tables:
     headerBg: '#1a1a2e',     // Table header background
     accent: '#e94560',        // Accent stripe under header
     headerText: '#ffffff',    // Header text color
+    earthFill: 'transparent', // EarthLayer fill (any CSS color, pattern url, or 'transparent')
   }}
 />
 ```
 
-Defaults: `headerBg: '#205394'`, `accent: '#377AF3'`, `headerText: '#FFFFFF'`.
+Defaults: `headerBg: '#205394'`, `accent: '#377AF3'`, `headerText: '#FFFFFF'`, `earthFill: 'url(#earthFill)'`.
+
+### EarthLayer (formation)
+
+The library renders the formation between **`max(non-liner casing shoes)`** and `totalDepth`. The rationale: below the deepest non-liner shoe, the only protection between wellbore and formation is the liner — that's the productive zone. `totalFreeDepth` (HUD) is an operational restriction and is intentionally NOT used for this visual.
+
+If a well has no non-liner casings (only liners or no casings at all), the EarthLayer renders nothing.
+
+Override the fill via `theme.earthFill` (for `WellDiagram`) or the `earthFill` prop (for `SimplifiedDiagram` — default `'transparent'` to preserve the schematic look).
 
 ### Orientation
 
