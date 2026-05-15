@@ -183,7 +183,7 @@ The parser expects JSON like this:
 | `HUD` | `well.totalFreeDepth` | |
 | `Profundidad Total` | `well.totalDepth` | If `0`, calculated from max base of casings/perforations/tubing |
 | `Tipo de Trabajo` | `well.liftMethod` | Mapped: `CVGL→GL`, `BME→BM`, etc. |
-| `Casing[]` + `Liner[]` | `well.casings` | Liners merged with `isLiner: true` |
+| `Casing[]` + `Liner[]` | `well.casings` | All items go to a single array. `Liner[]` entries are always `isLiner: true`. For `Casing[]` entries, `isLiner` is inferred from `Tope (pies)` — items with `Tope > 0` (i.e. don't reach the surface) are inferred as liners. This handles backends that lump everything into `Casing[]`. |
 | OD strings like `"13 3/8\""` | `casing.diameter` | Parsed to `13.375` |
 | `Tubing[]` | `well.tubingString` | With explicit `top`/`base` |
 | `Perforaciones[]` | `well.perforations` | |

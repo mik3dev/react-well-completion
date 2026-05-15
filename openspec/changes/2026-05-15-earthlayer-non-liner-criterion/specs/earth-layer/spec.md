@@ -51,3 +51,20 @@ La `EarthLayer` SHALL aceptar una prop opcional `fill` que controla el atributo 
 #### Scenario: Earth visible en simplified
 - **WHEN** el consumidor pasa `earthFill="#f5f5f5"`
 - **THEN** la `EarthLayer` renderiza rects con `fill="#f5f5f5"`
+
+### Requirement: parseBackendWell infiere isLiner desde la geometría
+`parseBackendWell` SHALL marcar como `isLiner: true` cualquier item del array `Casing[]` cuyo `Tope (pies)` sea mayor que 0. Items con `Tope (pies) === 0` SHALL quedar como `isLiner: false`. Items del array `Liner[]` SHALL siempre quedar como `isLiner: true` independientemente de su `Tope (pies)`.
+
+Esto cubre backends que mezclan liners en el array `Casing[]` (data quality issue común). Es necesario para que la `EarthLayer` funcione correctamente cuando el criterio de profundidad usa `max(non-liner shoes)`.
+
+#### Scenario: Casing desde superficie
+- **WHEN** el JSON tiene `Casing: [{ "Tope (pies)": 0, "Base (pies)": 4000 }]`
+- **THEN** `well.casings[0].isLiner === false`
+
+#### Scenario: Casing con Tope>0 (inferencia)
+- **WHEN** el JSON tiene `Casing: [{ "Tope (pies)": 13873, "Base (pies)": 16178 }]`
+- **THEN** `well.casings[0].isLiner === true` (inferido)
+
+#### Scenario: Liner explícito
+- **WHEN** el JSON tiene `Liner: [{ "Tope (pies)": 0, "Base (pies)": 16000 }]` (raro, top=0 en Liner)
+- **THEN** `well.casings[0].isLiner === true` (explícito sobre inferencia)

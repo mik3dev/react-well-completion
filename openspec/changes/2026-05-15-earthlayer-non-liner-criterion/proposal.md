@@ -39,6 +39,16 @@ Aplicado a VLG3873:
 
 `SimplifiedDiagram` no renderizaba earth antes. Ahora reutiliza el mismo `EarthLayer` (el componente es agnóstico de la orientación / tema), con default `transparent` para preservar el look schematic. El consumidor opta in pasando un fill visible.
 
+### Inferencia de `isLiner` en `parseBackendWell`
+
+El nuevo criterio depende fuertemente de que `isLiner` esté correctamente seteado. Algunos backends meten TODO en el array `Casing[]` (incluyendo liners reales) y dejan `Liner[]` vacío. Para protegernos contra esa data mal clasificada, ahora `parseBackendWell`:
+
+- Items en `Liner[]` → siempre `isLiner: true` (sin cambios).
+- Items en `Casing[]` con `Tope (pies) > 0` → `isLiner: true` (inferido, nuevo).
+- Items en `Casing[]` con `Tope (pies) === 0` → `isLiner: false` (lo esperado: llega a superficie).
+
+Convención industrial: un liner es un casing que cuelga de otro casing, no del wellhead — equivalente a `top > 0`. Esto evita que la EarthLayer no renderice por datos mal clasificados.
+
 ## Alcance
 
 - Cambio visual: solo afecta cómo se determina y pinta la zona de earth.

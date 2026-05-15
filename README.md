@@ -461,6 +461,7 @@ const well = parseBackendWell(json, {
 - **Mapea lift methods**: `CVGL → GL`, `BME → BM`, etc.
 - **Calcula `totalDepth`**: Si el backend envia 0, usa el max de bases de casings/perforations/tubing
 - **Distribuye `EquipoDeFondo` por tipo**: `Niple → seatNipples`, `Manga → sleeves`, `Empacadura → packers`
+- **Infiere `isLiner` de casings**: items del array `Liner[]` siempre quedan como `isLiner: true`. Para items del array `Casing[]`, si `Tope (pies) > 0` (no llega a superficie) se infiere `isLiner: true`. Esto cubre backends que mezclan todo en un solo array.
 - **Infiere `valveType` de mandriles**: `PTR PSI` presente → `'operating'`, `Tipo Válvula: 'Dummy'` → `'dummy'`, ninguno → `null`
 - **Preserva campos extras en metadata**: Comentarios, fechas, FieldId, y tipos no reconocidos de equipo de fondo van a `well.metadata`
 
