@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.9](https://github.com/mik3dev/react-well-completion/compare/react-well-completion-v0.1.8...react-well-completion-v0.1.9) (2026-05-15)
+
+
+### Features
+
+* EarthLayer renders from deepest non-liner shoe; configurable fill ([439ce0b](https://github.com/mik3dev/react-well-completion/commit/439ce0b29696c8be3a3edbdea2147881ffcf0878))
+* parseBackendWell infers isLiner from Tope (pies) &gt; 0 ([ffd1bac](https://github.com/mik3dev/react-well-completion/commit/ffd1bacdb3ab76ac514c4493db31b172c257fac8))
+
 ## [0.1.8](https://github.com/mik3dev/react-well-completion/compare/react-well-completion-v0.1.7...react-well-completion-v0.1.8) (2026-05-07)
 
 
