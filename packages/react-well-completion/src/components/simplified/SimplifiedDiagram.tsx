@@ -9,6 +9,7 @@ import SimplifiedPackingLayer from './SimplifiedPackingLayer';
 import SimplifiedMandrelLayer from './SimplifiedMandrelLayer';
 import SimplifiedPumpLayer from './SimplifiedPumpLayer';
 import SimplifiedDepthAxis from './SimplifiedDepthAxis';
+import EarthLayer from '../layers/EarthLayer';
 import ProfilePanel from '../profiles/ProfilePanel';
 import { TooltipProvider } from '../Tooltip';
 
@@ -17,15 +18,23 @@ export interface SimplifiedDiagramProps {
   profiles?: Profile[];
   profileLayout?: ProfileLayout;
   profileTrackWidth?: number;
+  /**
+   * Fill used by the earth/formation area below `max(non-liner shoes)`.
+   * Defaults to `'transparent'` (no visible earth, keeping the schematic look).
+   * Set to `'#fafafa'`, `'url(#earthFill)'`, or any CSS color to show the formation.
+   */
+  earthFill?: string;
 }
 
 const DEFAULT_PROFILE_TRACK_WIDTH = 140;
+const DEFAULT_SIMPLIFIED_EARTH_FILL = 'transparent';
 
 export default function SimplifiedDiagram({
   well,
   profiles,
   // profileLayout is reserved for v2 (overlay mode); v1 only supports 'tracks'.
   profileTrackWidth = DEFAULT_PROFILE_TRACK_WIDTH,
+  earthFill = DEFAULT_SIMPLIFIED_EARTH_FILL,
 }: SimplifiedDiagramProps) {
   const safeProfiles = profiles ?? [];
   const hasProfiles = safeProfiles.length > 0;
@@ -91,6 +100,14 @@ export default function SimplifiedDiagram({
               ? `translate(35, ${20 + config.width}) rotate(-90)`
               : 'translate(35, 0)'
             }>
+              {/* Earth/formation behind everything else — only renders if earthFill is non-transparent and there is a non-liner casing shoe above totalDepth. */}
+              <EarthLayer
+                totalFreeDepth={well.totalFreeDepth}
+                totalDepth={well.totalDepth}
+                casings={well.casings}
+                config={config}
+                fill={earthFill}
+              />
               <SimplifiedCasingLayer casings={well.casings} config={config} />
               <SimplifiedTubingLayer tubingString={well.tubingString} config={config} />
               <SimplifiedPerforationLayer
